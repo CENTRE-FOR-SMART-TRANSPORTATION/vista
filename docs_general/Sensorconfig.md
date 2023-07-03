@@ -1,5 +1,7 @@
 # Sensor configuration documentation
 
+[Back to README.md](README.md)
+
 ## Parameters
 
 The results from our simulation heavily depend on the parameters of the sensor configuration for the simulated AV, as the ranges of the sensor directly influence how many points are segmented, and subsequently the data rate required.

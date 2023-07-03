@@ -1,5 +1,7 @@
 # Scenery removal documentation
 
+[Back to README.md](README.md)
+
 ## Overview
 
 This is if you want to preprocess the input .las section such that only (or most of) the pavement remains; removing vegetation, scenery, etc. The program cuts out a fixed width (for now) along the trajectory from the input .las road section. Automatically determining the road boundaries is a bit more of a complex task, so for now we are cutting a fixed width for every road point.

@@ -44,7 +44,7 @@ For example, think of a light post, and a world as a bunch of XYZ points. If you
 
 ### Analysis
 
-After obtaining all of our output scenes for each road point, we can finally perform our analyses on the vehicle 'driving' down the road.
+After obtaining all of our output scenes for each road point, we can finally perform our analyses on the vehicle 'driving' down the road. See [here](Replayscenes.md) for more information regarding visualizations.
 
 <details>
   <summary>For visualization purposes, here is a replay of our autonomous vehicle driving down the road section for 100m.</summary>
@@ -55,6 +55,6 @@ After obtaining all of our output scenes for each road point, we can finally per
 
 </details>
 
-<br>We want to analyze the data rate required to process the data seen by the sensor as the simulated AV moves through the road section; bascially obtain the data rate at each scene.
+<br>We want to analyze the data rate required to process the data seen by the sensor as the simulated AV moves through the road section; basically obtain the data rate at each scene.
 
 In order to do so, we need to voxelize each output scene, and perform our necessary calculations as needed. See [here](Analysis.md) for more information regarding the data rate calculations.
