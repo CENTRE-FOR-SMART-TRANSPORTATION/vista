@@ -1,8 +1,8 @@
 #!/bin/bash
 
 ### USER INPUT HERE ###
-processes=6
-LASFILE="novehc-00314W_C1L1_44000_40000-trimmed.las"
+PROCESSES=5
+LASFILE="(11)77502S_C1L1_02000_00000.las"
 JSONFILE=velodyne_alpha_128.json # Do not put quotes here
 observer_height=1.8
 PAD_OUTPUTS=true
@@ -14,7 +14,7 @@ PITCH_MIN=-25
 PITCH_MAX=15
 YAW_MIN=-180
 YAW_MAX=180
-RANGE=245
+RANGE=245 
 CULLING_R=2
 
 # Comment this out if you want to generate a trajectory or if you already have a pregenerated trajectory
@@ -24,7 +24,8 @@ python gen_traj.py --input examples/vista_traces/${LASFILE} --observer_height ${
 if $PAD_OUTPUTS
 then
     # Run the entire road section, padded with the sensor range
-    STARTFRAME=$RANGE
+    #STARTFRAME=$RANGE
+    STARTFRAME=1560
     ENDFRAME=$((`cat examples/Trajectory/${LASFILE%.*}/forwards.csv | wc -l`-$RANGE))
 else
     STARTFRAME=0
@@ -47,6 +48,7 @@ export YAW_MIN
 export YAW_MAX
 export RANGE
 export CULLING_R
+export PROCESSES
 
 export LASFILE
 export STARTFRAME
@@ -54,17 +56,17 @@ export ENDFRAME
 export PAD_OUTPUTS
 
 start=1
-end=$processes
+end=$PROCESSES
 
 echo "Computing output from road point ${STARTFRAME} to road point ${ENDFRAME}..."
 echo "Input road section: ${LASFILE}"
 echo "Input sensor configuration: ${JSONFILE}"
 echo
-echo "Starting ${processes} processes..."
+echo "Starting ${PROCESSES} processes..."
 start_time=`date +%s`
 
 
-for (( i=$start; i<=$processes; i++ ))
+for (( i=$start; i<=$PROCESSES; i++ ))
 do
     #xterm -T "Process ${i}" -hold -e bash examples/processes/single/process_${i}.sh &
     xterm -T "Process ${i}" -e bash examples/processes/single/process_${i}.sh &

@@ -1,9 +1,9 @@
 #!/bin/bash
 
 ### USER INPUT HERE ###
-processes=6
-LASFILE="VL-Veg-81604S_C1L1_08000_04000_y_trimmed.las"
-JSONFILE=velodyne_alpha_128_front.json # Do not put quotes here
+PROCESSES=6
+LASFILE="(11)77502S_C1L1_02000_00000.las"
+JSONFILE=velodyne_alpha_128.json # Do not put quotes here
 observer_height=1.8
 PAD_OUTPUTS=true
 RUN_OCCLUSION=true
@@ -13,8 +13,8 @@ RUN_OCCLUSION=true
 RESOLUTION=0.11
 PITCH_MIN=-25
 PITCH_MAX=15
-YAW_MIN=-90
-YAW_MAX=90
+YAW_MIN=-180
+YAW_MAX=180
 RANGE=245
 CULLING_R=2
 
@@ -26,7 +26,7 @@ if $PAD_OUTPUTS
 then
     # Run the entire road section, padded with the sensor range
     STARTFRAME=$RANGE
-    #STARTFRAME=1145
+    #STARTFRAME=1700
     ENDFRAME=$((`cat examples/Trajectory/${LASFILE%.*}/forwards.csv | wc -l`-$RANGE))
 else
     STARTFRAME=0
@@ -55,9 +55,10 @@ export STARTFRAME
 export ENDFRAME
 export PAD_OUTPUTS
 export RUN_OCCLUSION
+export PROCESSES
 
 start=1
-end=$processes
+end=$PROCESSES
 
 echo "Computing output from road point ${STARTFRAME} to road point ${ENDFRAME}..."
 echo "Input road section: ${LASFILE}"
@@ -69,11 +70,11 @@ else
     echo "Running with unoccluded outputs!"
 fi
 echo
-echo "Starting ${processes} processes..."
+echo "Starting ${PROCESSES} processes..."
 start_time=`date +%s`
 
 
-for (( i=$start; i<=$processes; i++ ))
+for (( i=$start; i<=$PROCESSES; i++ ))
 do
     #xterm -T "Process ${i}" -hold -e bash examples/processes/single/process_${i}.sh &
     xterm -T "Process ${i}" -e bash examples/processes/single/process_${i}.sh &

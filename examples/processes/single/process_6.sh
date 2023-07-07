@@ -10,11 +10,12 @@ yaw_max=$YAW_MAX
 range=$RANGE
 culling_r=$CULLING_R
 run_occlusion=$RUN_OCCLUSION
+num_processes=$PROCESSES
 
 startframe=$STARTFRAME
 endframe=$ENDFRAME
 
-for (( i=startframe+5; i<endframe; i+=6 ))
+for (( i=startframe+5; i<endframe; i+=num_processes ))
 do
     if $run_occlusion
     then
