@@ -43,7 +43,7 @@ class Car(Entity):
         >>> car.step_dataset() # simply get next frame in the dataset without synthesis
 
     """
-    DEFAULT_CONFIG = {
+    DEFAULT_CONFIG = { # Has no effect on the lidar output
         'length': 5.,
         'width': 2.,
         'wheel_base': 2.78,

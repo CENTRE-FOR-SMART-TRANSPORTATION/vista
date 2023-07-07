@@ -44,9 +44,9 @@ class LidarSynthesis:
         input_pitch_fov: Tuple[float, float],
         yaw_fov: Optional[Tuple[float, float]] = None,
         pitch_fov: Optional[Tuple[float, float]] = None,
-        yaw_res: float = 0.1,
-        pitch_res: float = 0.1,
-        culling_r: int = 1,
+        yaw_res: float = 0.11,
+        pitch_res: float = 0.11,
+        culling_r: int = 2,
         load_model: bool = True,
         downsample: bool = False,
         **kwargs,
@@ -111,7 +111,7 @@ class LidarSynthesis:
         self,
         trans: np.ndarray,
         rot: np.ndarray,
-        pcd: np.ndarray,
+        pcd: Pointcloud,
         densification=False,
     ) -> Tuple[Pointcloud, np.ndarray]:
         """Apply rigid transformation to a dense pointcloud and return new
@@ -120,7 +120,7 @@ class LidarSynthesis:
         Args:
             trans (np.ndarray): Translation vector.
             rot (np.ndarray): Rotation matrix.
-            pcd (np.ndarray): Point cloud.
+            pcd (Pointcloud): Point cloud.
 
         Returns:
             Returns a tuple (``pointcloud``, ``array``), where ``pointcloud``
@@ -131,15 +131,20 @@ class LidarSynthesis:
         """
         # Rigid transform of points
         R = transform.rot2mat(rot)
-        pcd = pcd.transform(R, trans) # TODO Write the intensity
-
-        # Convert from new pointcloud to dense image
+        pcd = pcd.transform(R, trans) # These are the points from the.las file cut by range only
+        
+        # Convert from new pointcloud to dense image with three channels
+        # This should be where the circle appears
         visible = self._pcd2sparse(
             pcd,
             channels=(Point.DEPTH, Point.INTENSITY, Point.MASK),
             return_as_tensor=True,
             near=True,
         )
+        
+        
+        # visible represents the points (with their repsective channels) before culling
+        # print(torch.nonzero(~torch.isnan(visible[:,:,0].flatten())).shape)
 
         # occluded = self._pcd2sparse(
         #     pcd,
@@ -148,8 +153,8 @@ class LidarSynthesis:
         #     near = False,
         # )
         # occluded[occluded - visible <= 0] = np.nan
-
-        # Find occlusions and cull them from the rendering
+        
+        # Find occlusions and cull them from the rendering 
         occlusions, _ = self._cull_occlusions(visible[:, :, 0])
         visible[occlusions[:, 0], occlusions[:, 1]] = np.nan
         # occluded[~occlusions[:, 0], ~occlusions[:, 1]] = np.nan
@@ -160,9 +165,16 @@ class LidarSynthesis:
                 # occluded,
             ]
         ):
+            # Take depth and intensity channels of the point cloud
+            intensity = pcd[:, :, 1]
             pcd = pcd[:, :, 0]
+            
             pcd_idx = torch.nonzero(~torch.isnan(pcd)) # Get indices of non-nan values; those are the indices of the non occluded points
+            
+            # Remove occluded points (nan values)
+            intensities = intensity.flatten()[~torch.isnan(intensity.flatten())]
             depths = pcd.flatten()[~torch.isnan(pcd.flatten())]
+            
             fov_range = self._fov_rad[:, [1]] - self._fov_rad[:, [0]]
             step = fov_range / (self._dims)
 
@@ -226,17 +238,15 @@ class LidarSynthesis:
             import math
 
             # Note that these are all of the points for each frame
-            # xyzypdv = torch.stack((x, y, z, yaw, pitch, depths, volume)).T
-            xyzypdv = torch.stack((x, y, z, yaw, pitch, depths)).T
-            # Simple: divide total number of rows for xyzypdv by the total number of voxels (should be calculatable)
-            # Volumetric: divide occupied voxel volume by total voxel volume (which should given by depth)
-            # xyz /= 245000
+            xyzypd = torch.stack((x, y, z, yaw, pitch, depths)).T
+            # xyzi = torch.stack((x, y, z, intensities)).T
+
 
             import pandas
 
-            df = pandas.DataFrame(xyzypdv.cpu().numpy())
-            # df.columns = ["x", "y", "z", "yaw", "pitch", "depth", "volume"] # get volume, and save to tmp/... .txt?
+            df = pandas.DataFrame(xyzypd.cpu().numpy())
             df.columns = ["x", "y", "z", "yaw", "pitch", "depth"]
+            # df.columns = ["x", "y", "z", "intensity"]
             if self._downsample:
                 df = df.drop(df[df.depth < 50000].index)
 
@@ -272,13 +282,13 @@ class LidarSynthesis:
         # Compute the values to fill and the indicies where to fill
         values = [pcd.get(channel) for channel in channels]
         values = np.stack(values, axis=1)
-        inds = self._compute_sparse_inds(pcd)
+        inds = self._compute_sparse_inds(pcd) # Calculates where to put the channel (still before culling)
 
         # Re-order to fill points with smallest depth last
         if near:
-            order = np.argsort(pcd.dist)[::-1]
+            order = np.argsort(pcd.dist)[::-1] # Shorter ring at center
         else:
-            order = np.argsort(pcd.dist)[::1]
+            order = np.argsort(pcd.dist)[::1]  # Larger ring at center
         values = values[order]
         inds = inds[:, order]
 
@@ -286,6 +296,7 @@ class LidarSynthesis:
         img = np.empty((self._dims[1, 0], self._dims[0, 0], len(channels)), np.float32)
         img.fill(np.nan)
         img[-inds[1], inds[0], :] = values
+        img[0, :] = np.nan #FIXME Top row of the sparse image is causing the ring issue; boundary problem?
         return torch.tensor(img).to(self.device) if return_as_tensor else img
 
     def _cull_occlusions(
@@ -298,7 +309,10 @@ class LidarSynthesis:
         coords = torch.stack(torch.where(sparse > 0)).T
 
         # At each location, also compute coordinate for all of its neighbors
-        samples = coords[:, None, :] + self.offsets  # (N, M, 2)
+        samples = coords[:, None, :] + self.offsets  # (N, M, 2);  
+        # print(samples)
+        # print(samples.shape)
+        # Does the ring artifact come from the bottom?
 
         # Collect the samples in each neighborhood
         samples[:, :, 0] = torch.clip(samples[:, :, 0], 0, sparse.shape[0] - 1)
@@ -456,11 +470,13 @@ class LidarSynthesis:
         pitch = np.arcsin(pcd.z / pcd.dist)
         angles = np.stack((yaw, pitch))
 
-        fov_range = self._fov_rad[:, [1]] - self._fov_rad[:, [0]]
+        fov_range = self._fov_rad[:, [1]] - self._fov_rad[:, [0]] # total coverage of yaw, pitch in radians
+        
         slope = self._dims / fov_range
         inds = slope * (angles - self._fov_rad[:, [0]])
 
         inds = np.floor(inds).astype(int)
+
         np.clip(inds, np.zeros((2, 1)), self._dims - 1, out=inds)
 
         return inds
