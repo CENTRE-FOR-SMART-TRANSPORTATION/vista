@@ -181,6 +181,9 @@ def main(args):
         ) 
        
     else:
+        if not os.path.exists(f"./examples/vista_traces/lidar_{args.process}"):
+          os.makedirs(f"./examples/vista_traces/lidar_{args.process}")
+        
         # Write intermediate file for Vista simulation
         with h5py.File(
             f"./examples/vista_traces/lidar_{args.process}/lidar_3d.h5", "w"
