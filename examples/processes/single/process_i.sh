@@ -19,7 +19,7 @@ endframe=$ENDFRAME
 # i=startframe+$((PROCESS_ID-1))
 for (( i=$((startframe+($process_num-1))); i<endframe; i+=num_processes ))
 do
-    echo "(Process ${process_num}): frame #${i}/${endframe}" # Do not print the other frames
+    echo "(process ${process_num}): Frame #${i}/${endframe}"
 
     if $run_occlusion
     then
@@ -31,6 +31,7 @@ do
     fi
     # Use a pipe to output the progress somewhere?
     # For each process created, create a progress bar on the terminal to show the progress of each process
+    # Find a way to have a progress bar for each process stay the same
     # Use 'echo -ne'
 done 
 

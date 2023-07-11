@@ -6,6 +6,8 @@ The Vista simulator takes an input point cloud, and simulates an autonomous vehi
 
 ### Process for generating Vista outputs
 
+(see [here](Runninginstructions.md) for running instructions on how to generate these outputs)
+
 1. [Obtain trajectory](#trajectory)
 2. [Segment the scene from the point cloud](#segmentation)
 3. [Occlude the scene itself](#occlusion)

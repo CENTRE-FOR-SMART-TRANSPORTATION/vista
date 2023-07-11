@@ -79,7 +79,11 @@ export NUM_PROCESSES
 
 
 echo
+<<<<<<< Updated upstream
 echo "Computing output from road point ${STARTFRAME} to road point ${ENDFRAME} with ${NUM_PROCESSES} processes!"
+=======
+echo "Computing output from road point ${STARTFRAME} to road point ${ENDFRAME} with ${NUM_PROCESSES} processes."
+>>>>>>> Stashed changes
 echo "Input road section: ${LASFILE}"
 echo "Input sensor configuration: ${JSONFILE}"
 if $GRAPHICAL_VIA_PYTHON
@@ -124,7 +128,8 @@ if [[ $total_outputs -ne $expected_outputs ]]
 then
     echo -e "\e[31mExpected ${expected_outputs} outputs! (got ${total_outputs})\e[39m"
     # Find a way to generate the missing outputs or something later on?
-    # For now I will print these
+    # I could create a pipe from check_missing and then start a process from that...
+    # For now I will just print the missing files.
     python check_missing.py --output ${VISTAOUTPATH} --startframe ${STARTFRAME} --endframe ${ENDFRAME}
 else
     echo "Generating graphs..."

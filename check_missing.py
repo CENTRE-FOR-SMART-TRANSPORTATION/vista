@@ -82,10 +82,14 @@ def identify_missing_filenames(args: argparse.Namespace) -> None:
   ## Then find the missing integers in our frame range
   missing_frames = sorted(set(range(frames[0], frames[-1])) - set(frames))
   
+  if len(missing_frames == 0):
+    print("There are no missing outputs.")
+    return
+  
   print(f"Outputs were missing from frame range {startframe} to {endframe}:")
   for missing_frame in missing_frames:
     print(f"output_{missing_frame}_{res}.txt")
-
+    
   return
 
 

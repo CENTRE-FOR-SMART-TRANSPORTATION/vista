@@ -546,6 +546,8 @@ def obtain_multiple_scene_path(args: argparse.Namespace) -> str:
         print(
             f"\nYou have chosen to use the predefined path to the scenes:\n{scenes_folderpath}"
         )
+    
+    print("")
     for i in range(arg_numScenes):
         num_scenes = len(
             [
@@ -554,7 +556,7 @@ def obtain_multiple_scene_path(args: argparse.Namespace) -> str:
                 if os.path.isfile(os.path.join(scenes_folderpath[i], name))
             ]
         )
-        print(f"{num_scenes} scenes were found for the corresponding road section folder.")
+        print(f"{num_scenes} scenes were found for folder {i}.")
 
     return scenes_folderpath
 
