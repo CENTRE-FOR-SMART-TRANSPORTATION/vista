@@ -2,8 +2,8 @@
 
 ### USER INPUT BEGINS HERE ###
 
-NUM_PROCESSES=5
-LASFILE="01617W_L1L2_L1L3_08000_04000.las"
+NUM_PROCESSES=6
+LASFILE="(13)-noveg-84508S_C1L1_28000_26000.las"
 JSONFILE=velodyne_alpha_128.json # Do not put quotes here
 observer_height=1.8
 PAD_OUTPUTS=true # Only generate outputs that have the entire road in range (This saves some time)
@@ -23,6 +23,18 @@ YAW_MIN=-180
 YAW_MAX=180
 RANGE=245 
 CULLING_R=2
+
+# Generate our trajectory, should it not exist and is not valid (there must be 5 csvs)
+num_csvs=`find "./examples/Trajectory/${LASFILE%.*}/" -type f -name "*.csv" | wc -l`
+
+if [[ -d "./examples/Trajectory/${LASFILE%.*}" ]] && [[ $num_csvs -eq 5 ]]; then
+  echo "Trajectory exists already, skipping generation."
+else
+  echo "Generating trajectory."
+  python gen_traj.py --input examples/vista_traces/${LASFILE} --observer_height ${observer_height}
+fi
+
+### USER INPUT BEGINS HERE ###
 
 # Define the starting and ending frames
 if $PAD_OUTPUTS
@@ -49,17 +61,6 @@ then
     exit 1
 fi
 
-# Generate our trajectory, should it not exist and is not valid (there must be 5 csvs)
-num_csvs=`find "./examples/Trajectory/${LASFILE%.*}/" -type f -name "*.csv" | wc -l`
-
-if [[ -d "./examples/Trajectory/${LASFILE%.*}" ]] && [[ $num_csvs -eq 5 ]]; then
-  echo "Trajectory exists already, skipping generation."
-else
-  echo "Generating trajectory."
-  python gen_traj.py --input examples/vista_traces/${LASFILE} --observer_height ${observer_height}
-fi
-
-
 # Export our variables for our subprocesses
 export RESOLUTION
 export PITCH_MIN
@@ -78,7 +79,7 @@ export NUM_PROCESSES
 
 
 echo
-echo "Computing output from road point ${STARTFRAME} to road point ${ENDFRAME} with ${NUM_PROCESSES} processes"
+echo "Computing output from road point ${STARTFRAME} to road point ${ENDFRAME} with ${NUM_PROCESSES} processes!"
 echo "Input road section: ${LASFILE}"
 echo "Input sensor configuration: ${JSONFILE}"
 if $GRAPHICAL_VIA_PYTHON
@@ -92,13 +93,13 @@ fi
 echo
 start_time=`date +%s` # Just for timing purposes
 
-echo -e "\e[3m\e[1mType \"make\" to exit the processes (or type \"kill -- -1\")\e[0m"
+echo -e "\e[3m\e[1mType \"sh kill_processes.sh\" to exit the processes\e[0m"
 
 # This method will have background processes running unless if you explicitly kill them
 for (( PROCESS_NUM=1; PROCESS_NUM<=NUM_PROCESSES; PROCESS_NUM++ ))
 do
     export PROCESS_NUM
-    bash ./examples/processes/single/process_test.sh &
+    bash ./examples/processes/single/process_i.sh &
 done
 wait # Wait for eveyrthing to finish.
 
