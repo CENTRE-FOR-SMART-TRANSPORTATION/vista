@@ -101,10 +101,7 @@ def main(args):
     indices = np.where((xyz_distance < args.range * 1000))
     xyz = torch.tensor(xyz[indices]).to(device)
 
-    # Debug: Write segmented point cloud in global coordinates
-    #pd.DataFrame((xyz.cpu().numpy() + np.array([pov_X, pov_Y, pov_Z])) / 1000).to_csv(
-    #    f"./examples/vista_traces/lidar_3d.csv", header=False, index=False
-    #)
+
 
     # Rotation 1
     cos_1 = forwards[i][0] / ((forwards[i][0] ** 2 + forwards[i][1] ** 2) ** (0.5))
@@ -147,6 +144,9 @@ def main(args):
     # Translate by observer height (in mm)
     xyz[:, 2] -= 1800
     
+    # Debug: Write segmented point cloud in global coordinates
+
+    
     # Cull points by angle of sensor if we are not running occlusion
     if not run_occlusions:
         yaw_min = args.yaw_min
@@ -165,6 +165,10 @@ def main(args):
         xyz /= 1000 # Convert back to mm for less file size
 
     xyz = xyz.cpu().numpy() 
+    
+    #pd.DataFrame(xyz).to_csv(
+    #    f"./examples/vista_traces/lidar_3d.csv", header=False, index=False
+    #)
     
     # Write unoccluded output
     if not run_occlusions:
