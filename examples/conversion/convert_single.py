@@ -69,7 +69,7 @@ def main(args):
     i = args.frame
     print(f"Frame #: {i}")
 
-    # Fix the z component of the forwards vector
+    # Fix the z component of the forwards vector given that the other two are orthogonal
     forwards[i][2] = (
         -(upwards[i][0] * forwards[i][0] + upwards[i][1] * forwards[i][1])
         / upwards[i][2]
@@ -84,7 +84,7 @@ def main(args):
     pov_Y = (trajectory[i][1]) * 1000
     pov_Z = (trajectory[i][2]) * 1000
 
-    # Global coordinates in m
+    # Global coordinates in mm
     x = (np.array(las.x)) * 1000
     y = (np.array(las.y)) * 1000
     z = np.array(las.z) * 1000
@@ -106,10 +106,10 @@ def main(args):
     #    f"./examples/vista_traces/lidar_3d.csv", header=False, index=False
     #)
 
-    # Rotation 1
+    # Rotation 1 (yaw; about the z-axis, negative RHR)
     cos_1 = forwards[i][0] / ((forwards[i][0] ** 2 + forwards[i][1] ** 2) ** (0.5))
     sin_1 = forwards[i][1] / ((forwards[i][0] ** 2 + forwards[i][1] ** 2) ** (0.5))
-    # Inverse: cos -sin sin cos (swap the sin signs)
+    
     xyz = torch.matmul(
         torch.tensor([[cos_1, sin_1, 0], [-sin_1, cos_1, 0], [0, 0, 1]])
         .double()
@@ -117,14 +117,14 @@ def main(args):
         xyz.double().T,
     ).T
 
-    # Rotation 2
+    # Rotation 2 (pitch; about the y-axis, negative RHR)
     cos_2 = ((forwards[i][0] ** 2 + forwards[i][1] ** 2) ** (0.5)) / (
         ((forwards[i][0] ** 2 + forwards[i][1] ** 2) + forwards[i][2] ** 2) ** (0.5)
     )
     sin_2 = forwards[i][2] / (
         ((forwards[i][0] ** 2 + forwards[i][1] ** 2) + forwards[i][2] ** 2) ** (0.5)
     )
-    # Inverse: cos sin -sin cos
+    
     xyz = torch.matmul(
         torch.tensor([[cos_2, 0, -sin_2], [0, 1, 0], [sin_2, 0, cos_2]])
         .double()
@@ -132,6 +132,7 @@ def main(args):
         xyz.double().T,
     ).T
 
+    # Rotation 3 (roll; about the x-axis; positive RHR)
     tangent = leftwards[i][2] / ((leftwards[i][0] ** 2 + leftwards[i][1] ** 2) ** (0.5))
     cross_angle = math.atan(tangent)
     cos_3 = math.cos(cross_angle)

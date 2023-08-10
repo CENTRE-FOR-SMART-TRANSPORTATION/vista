@@ -7,7 +7,8 @@ import glob
 '''
 Sometimes, with the current shell script automation, some processes
 do not output the full range of frames that they were assigned to,
-leading to some missing output scenes.
+leading to some missing output scenes. This program is here just in case
+if you want to identify the missing outputs that happened for some reason.
 '''
 
 # Global variables for file I/O
