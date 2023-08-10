@@ -53,6 +53,7 @@ class LidarSynthesis:
     ):
         # Filename passed from the shell script
         self.roadsection_filename = os.path.splitext(kwargs["roadsection_filename"])[0]
+        self._culling_r = culling_r
         self._frame = frame
         self._downsample = downsample
 
@@ -133,15 +134,23 @@ class LidarSynthesis:
         R = transform.rot2mat(rot)
         pcd = pcd.transform(R, trans) # These are the points from the.las file cut by range only
         
+        # Temporary: print the raw, dense point cloud translated in local coordinates
+        #import pandas as pd
+        #temp_df = pd.DataFrame(np.hstack((pcd.xyz, pcd.intensity[:,np.newaxis])))
+        #temp_df.columns = ['x', 'y', 'z', 'intensity']
+        #temp_df.to_csv(f"./examples/vista_traces/CR-test_resolution=0.11/{self._frame}_unoccluded.txt", index=False)
+     
         # Convert from new pointcloud to dense image with three channels
         # This should be where the circle appears
         visible = self._pcd2sparse(
             pcd,
             channels=(Point.DEPTH, Point.INTENSITY, Point.MASK),
             return_as_tensor=True,
-            near=True,
+            near=False,
         )
         
+        # Print image representation of unoccluded
+        self._print_img_rep_temp(visible, False)
         
         # visible represents the points (with their repsective channels) before culling
         # print(torch.nonzero(~torch.isnan(visible[:,:,0].flatten())).shape)
@@ -158,6 +167,9 @@ class LidarSynthesis:
         occlusions, _ = self._cull_occlusions(visible[:, :, 0])
         visible[occlusions[:, 0], occlusions[:, 1]] = np.nan
         # occluded[~occlusions[:, 0], ~occlusions[:, 1]] = np.nan
+        
+        # Print image representation of occluded
+        self._print_img_rep_temp(visible, True)
 
         for idx, pcd in enumerate(
             [
@@ -166,6 +178,7 @@ class LidarSynthesis:
             ]
         ):
             # Take depth and intensity channels of the point cloud
+            
             intensity = pcd[:, :, 1]
             pcd = pcd[:, :, 0]
             
@@ -199,54 +212,19 @@ class LidarSynthesis:
             pitch = -angles[:, 1] # elevation
                                   # depths is given already
 
-            '''This is where we will 'voxelize' our point cloud; commented out because this isn't being used
-            # Spherically voxelize our point cloud
-            # Divide spherical coordinates by the spherical voxel size define
-            # by the sensor precision (manually defined for range)
-            vx_yaw = torch.floor(yaw / self._res[0])
-            vx_pch = torch.floor(pitch / self._res[1])
-            vx_rng = torch.floor(depths / 0.1)
-
-            # Get range for integration 
-            yaw_low  = vx_yaw * self._res[0]
-            pch_low  = vx_pch * self._res[1]
-            rng_low  = vx_rng * 0.1
-            yaw_high = yaw_low + self._res[0]
-            pch_high = pch_low + self._res[1]
-            rng_high = rng_low + 0.1
-            
-            volume = (1/3)*(
-                torch.pow(rng_high, 3)-torch.pow(rng_low, 3)
-                )*(
-                torch.cos(pch_low)-torch.cos(pch_high)
-                )*(
-                yaw_high-yaw_low)
-
-            max_volume = (1/3)*(
-                torch.pow(SENSORCON_RANGE_HIGH, 3)-torch.pow(SENSORCON_RANGE_LOW, 3)
-                )*(
-                torch.cos(self._fov_rad[1, 0])-torch.cos(self._fov_rad[1, 1])
-                )*(
-                self._fov_rad[0, 1]-self._fov_rad[0, 0])
-
-            azimuth_capacity = torch.floor((self._fov[0,1]-self._fov[0,0])/self._res[0])
-            elevation_capacity = torch.floor((self._fov[1,1]-self._fov[1,0])/self._res[1])
-            radius_capacity = torch.floor((SENSORCON_RANGE_HIGH-SENSORCON_RANGE_LOW)/0.1)
-            total_voxels = azimuth_capacity * elevation_capacity * radius_capacity
-            '''
-
             import math
 
             # Note that these are all of the points for each frame
-            xyzypd = torch.stack((x, y, z, yaw, pitch, depths)).T
-            # xyzi = torch.stack((x, y, z, intensities)).T
+            # xyzypd = torch.stack((x, y, z, yaw, pitch, depths)).T
+            xyzi = torch.stack((x, y, z, intensities)).T
 
 
             import pandas
 
-            df = pandas.DataFrame(xyzypd.cpu().numpy())
-            df.columns = ["x", "y", "z", "yaw", "pitch", "depth"]
-            # df.columns = ["x", "y", "z", "intensity"]
+            # df = pandas.DataFrame(xyzypd.cpu().numpy())
+            df = pandas.DataFrame(xyzi.cpu().numpy())
+            # df.columns = ["x", "y", "z", "yaw", "pitch", "depth"]
+            df.columns = ["x", "y", "z", "intensity"]
             if self._downsample:
                 df = df.drop(df[df.depth < 50000].index)
 
@@ -279,26 +257,85 @@ class LidarSynthesis:
         if not isinstance(channels, list) and not isinstance(channels, tuple):
             channels = [channels]
 
-        # Compute the values to fill and the indicies where to fill
+        # Compute the values to fill and the indices where to fill
         values = [pcd.get(channel) for channel in channels]
         values = np.stack(values, axis=1)
         inds = self._compute_sparse_inds(pcd) # Calculates where to put the channel (still before culling)
 
-        # Re-order to fill points with smallest depth last
+        # Re-order points with smallest depth last BEFORE populating the image
+        # In the image representation, points that are furthest are filled first.
         if near:
-            order = np.argsort(pcd.dist)[::-1] # Shorter ring at center
+            order = np.argsort(pcd.dist)[::-1] 
         else:
-            order = np.argsort(pcd.dist)[::1]  # Larger ring at center
+            order = np.argsort(pcd.dist)[::1]  
         values = values[order]
         inds = inds[:, order]
+
 
         # Creat the image and fill it
         img = np.empty((self._dims[1, 0], self._dims[0, 0], len(channels)), np.float32)
         img.fill(np.nan)
         img[-inds[1], inds[0], :] = values
         img[0, :] = np.nan #FIXME Top row of the sparse image is causing the ring issue; boundary problem?
-        return torch.tensor(img).to(self.device) if return_as_tensor else img
 
+        return torch.tensor(img).to(self.device) if return_as_tensor else img
+    
+    # Temporary, for writing image
+    
+    def _print_img_rep_temp(
+        self,
+        img: tensor_or_ndarray,
+        occluded: bool
+    ) -> None:
+
+        import cv2
+        from PIL import Image
+        
+        img = img.cpu().numpy()
+        
+        # Obtain image representation of depth channel. Image can be occluded or not.
+        img_depth_buffer = img[:,:,0]
+        img_depth_buffer[np.isnan(img_depth_buffer)] = 0
+        img_uint8_depth = ((img_depth_buffer / np.max(img_depth_buffer)) * 255).astype(np.uint8)
+        heat_depth = cv2.applyColorMap(img_uint8_depth, cv2.COLORMAP_JET)
+        
+        # Obtain image representation of intensity channel in grayscale. Image can be occluded or not.
+        img_intensity_buffer = img[:,:,1]
+        img_intensity_buffer[np.isnan(img_intensity_buffer)] = 0
+        heat_intensity = ((img_intensity_buffer / np.max(img_intensity_buffer)) * 255).astype(np.uint8)
+        data = Image.fromarray(heat_intensity)
+        
+        # Finally write the image
+        if not occluded:
+            depth_outfolder = f"./IMG_REPRESENTATION_TEST/{self.roadsection_filename}_depth/"
+            if not os.path.exists(depth_outfolder):
+                os.makedirs(depth_outfolder)
+
+            intensity_outfolder = f"./IMG_REPRESENTATION_TEST/{self.roadsection_filename}_intensity/"
+            if not os.path.exists(intensity_outfolder):
+                os.makedirs(intensity_outfolder)
+                
+            filename = f"{self._frame}.png"
+            
+        else:
+            depth_outfolder = f"./IMG_REPRESENTATION_TEST/{self.roadsection_filename}_depth_occluded-cr={self._culling_r}/"
+            if not os.path.exists(depth_outfolder):
+                os.makedirs(depth_outfolder)
+
+            intensity_outfolder = f"./IMG_REPRESENTATION_TEST/{self.roadsection_filename}_intensity_occluded-cr={self._culling_r}/"
+            if not os.path.exists(intensity_outfolder):
+                os.makedirs(intensity_outfolder)
+                
+            filename = f"{self._frame}_occ-cr={self._culling_r}.png"
+                
+                
+        depth_outpath = os.path.join(depth_outfolder, filename) 
+        intensity_outpath = os.path.join(intensity_outfolder, filename)    
+        cv2.imwrite(depth_outpath, heat_depth)
+        data.save(intensity_outpath)
+
+        return
+    
     def _cull_occlusions(
         self,
         sparse: tensor_or_ndarray,
@@ -477,6 +514,9 @@ class LidarSynthesis:
 
         inds = np.floor(inds).astype(int)
 
-        np.clip(inds, np.zeros((2, 1)), self._dims - 1, out=inds)
+        # Handles boundary values
+        # Any indices that correspond to pixels outside of the image representation are padded out
+        # NOTE This might be where we encounter some occlusion?
+        np.clip(inds, np.zeros((2, 1)), self._dims - 1, out=inds) # _dims corresponds to the pixel index of the resolution
 
         return inds
