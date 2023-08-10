@@ -46,7 +46,7 @@ For example, think of a light post, and a world as a bunch of XYZ points. If you
 
 ### Analysis
 
-After obtaining all of our output scenes for each road point, we can finally perform our analyses on the vehicle 'driving' down the road. See [here](Replayscenes.md) for more information regarding visualizations.
+After obtaining all of our output scenes for each road point, we can finally perform our analyses on the vehicle 'driving' down the road. See [here](Tools/Replayscenes.md) for more information regarding visualizations.
 
 <details>
   <summary>For visualization purposes, here is a replay of our autonomous vehicle driving down the road section for 100m.</summary>
