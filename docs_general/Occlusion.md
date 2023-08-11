@@ -17,19 +17,22 @@ If we were to set the culling radius to 0, we would see outputs as if they were 
 Here is the process when it comes to generating VISTA outputs/scenes from the raw point cloud:
 
 1. Given the trajectory, translate and rotate the point cloud, and center it at a road point (see [here](README.md#segmentation)) to obtain the driver's perspective at that frame from ``examples/conversion/single/convert_single.py``.
-    - We also cull any points of Euclidean distance greater than the sensor configuration's range just to be lighter on computational resources.<details><summary>Here is an example of the transformed viewpoint at a certain frame, with the ``veldyne_alpha_128.json`` sensor configuration:</summary>
-          ![Example of a prepared point cloud for VISTA](images/unoccluded.png)
+    - We also cull any points of Euclidean distance greater than the sensor configuration's range just to be lighter on computational resources.<details><summary>Here is an example of the transformed viewpoint at a certain frame, with the ``velodyne_alpha_128.json`` sensor configuration:</summary>
+          ![Example of a prepared point cloud for VISTA](images/unoccluded.png "Example of a prepared point cloud for VISTA, right before occlusion")
           The origin is set to be 1.8m (our observer height) above the pavement in this case.
+        
         </details>
 2. Convert the 3D representation of our transformed viewpoint to a 2D image *(represent each pixel location with a yaw and pitch value divided by their respective precisions)*, and take the smallest depth value for each pixel in the ``pcd2sparse()`` method, given in ``vista/entities/sensors/lidar_utils/LidarSynthesis.py``.
     - The image representation depends on the sensor configuration's angular ranges and precisions. If our sensor's horizontal range is 360 degrees, and our vertical range is 40 degrees, with their respective precisions being 0.11 degrees each, our image would be $\lceil\frac{360}{0.11}\rceil$ x $\lceil\frac{40}{0.11}\rceil$, or in other words $3272$ x $364$.
         - There can be multiple depths aggregrated to one pixel in this process, which is why we will take the smallest depth possible for that pixel.<details><summary>Here is an example image representation, where all of the pixels shown have the smallest depth possible. The colormap shown represents the depth.</summary>
-          ![Example of an image representation](images/img_representation_unoccluded.png)
+          ![Example of an image representation](images/img_representation_unoccluded.png "Example of an image representation before occlusion")
+        
         </details>
     - Note that when we convert our point cloud, there are two other parameters, or channels that are passed (intensity, and mask). These aren't really that important for occlusion handling, only for outputs.
 3. Cull occlusions from this image representation given the culling radius $\lambda$, in the ``cull_occlusions()`` method, given in ``LidarSynthesis.py``.
     - For each pixel location (or query pixel), compute the average depth for all of its neighbours. If the depth of the query pixel, with a slack of 1mm is greater than that of the average depth of its neighbours, then that point is considered as occluded and is culled from the image representation. <details><summary>Here is the previous image representation, after culling the occluded points. In this case, we take the culling radius to be 2 pixels.</summary>
-          ![Example of an image representation after occlusion](images/img_representation_occluded.png)
+          ![Example of an image representation after occlusion](images/img_representation_occluded.png "Example of an image representation after occlusion")
+        
         </details>
     - If we take $\lambda$ as 0, then this would be equivalent to raycasting, which was implemented with the older MATLAB code.
 4. Reproject our culled image in 2D space back to 3D coordinates, in the ``synthesize()`` method given in ``LidarSynthesis.py``.
