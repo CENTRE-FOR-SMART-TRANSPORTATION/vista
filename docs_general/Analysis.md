@@ -60,17 +60,6 @@ The process to voxelize our point cloud is as follows:
 2. Divide each point by their respective precisions to obtain the voxel index (i.e. nth voxel in the range, azimuth, and elevation directions).
     - Non-integer indices indicate that the point is within some voxel index; the point $P(R,\theta,\phi)$ belongs to the $(\lfloor\frac{R}{\delta_{R}}\rfloor$, $\lfloor\frac{\theta}{\delta_{\theta}}\rfloor$, $\lfloor\frac{\phi}{\delta_{\phi}}\rfloor)$ th voxel.
 
-    <details>
-      <summary>Here is the visualization mentioned before, for reference.</summary>
-
-      ![Visualization of the voxelization process](images/voxelization_visual.png "Polar grid.")
-
-      *Points (in this case, a random distribution) on the grid are aggregrated to their respective voxel. Although this visual is given in polar, this process applies in a spherical coordinate system.*
-
-      It should also be noted that the grid is determined by the sensor's parameters; min and max angles, range, and their respective precisions.
-
-    </details>
-
       - When we divide the coordinates by their respective coordinate precisions, we are essentially identifying the voxel index, (the red sections of the grid) that our point is on.
       - As our voxel indices will never be perfect integers (and indices are given in integers anyway), we then take the floor of them to **aggregrate points to their respective voxel.** This performs what the orange arrows do in the visualization.
         - When we aggregrate our points to their respective voxel, we sort of transform the points of the occupied voxel to the 'base point' of the voxel. To get the 'base point' in real coordinates (the green points in the visualization), we simply remultiply the voxel index by their respective precisions.
