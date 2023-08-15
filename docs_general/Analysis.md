@@ -41,6 +41,15 @@ We will voxelize a scene, and then find which voxels within a particular scene a
 *Pretend that instead of a sphere, this solid is represented as a sensor FOV with a similar grid shown above.*
 
 </details>
+
+<details>
+  <summary>A visual representation of the voxelization process, in polar coordinates. We will explain this further below.</summary>
+
+![Visualization of the voxelization process](images/voxelization_visual.png "Polar grid.")
+
+*Points (in this case, a random distribution) on the grid are aggregrated to their respective voxel. Although this visual is given in polar, this process applies in a spherical coordinate system.*
+
+</details>
 <br>
 
 #### Methodology for voxelization
@@ -48,9 +57,25 @@ We will voxelize a scene, and then find which voxels within a particular scene a
 The process to voxelize our point cloud is as follows:
 
 1. Convert our point cloud to spherical coordinates $P(x,y,z)\rightarrow P(R,\theta,\phi)$.
-2. Divide each point by their respective precisions to obtain the voxel index (i.e. nth voxel in the range, azimuth, and elevation directions)
+2. Divide each point by their respective precisions to obtain the voxel index (i.e. nth voxel in the range, azimuth, and elevation directions).
     - Non-integer indices indicate that the point is within some voxel index; the point $P(R,\theta,\phi)$ belongs to the $(\lfloor\frac{R}{\delta_{R}}\rfloor$, $\lfloor\frac{\theta}{\delta_{\theta}}\rfloor$, $\lfloor\frac{\phi}{\delta_{\phi}}\rfloor)$ th voxel.
-    - We then take the points with **unique voxel indices** to implement the 'all-or-nothing' criteria, where a voxel is considered as occupied iff. there are one or more points inside it.
+
+    <details>
+      <summary>Here is the visualization mentioned before, for reference.</summary>
+
+      ![Visualization of the voxelization process](images/voxelization_visual.png "Polar grid.")
+
+      *Points (in this case, a random distribution) on the grid are aggregrated to their respective voxel. Although this visual is given in polar, this process applies in a spherical coordinate system.*
+
+      It should also be noted that the grid is determined by the sensor's parameters; min and max angles, range, and their respective precisions.
+
+    </details>
+
+      - When we divide the coordinates by their respective coordinate precisions, we are essentially identifying the voxel index, (the red sections of the grid) that our point is on.
+      - As our voxel indices will never be perfect integers (and indices are given in integers anyway), we then take the floor of them to **aggregrate points to their respective voxel.** This performs what the orange arrows do in the visualization.
+        - When we aggregrate our points to their respective voxel, we sort of transform the points of the occupied voxel to the 'base point' of the voxel. To get the 'base point' in real coordinates (the green points in the visualization), we simply remultiply the voxel index by their respective precisions.
+
+      - Now that we identified voxels with more than one point inside them (i.e. duplicate voxel indices shown as above) We then take the points with **unique voxel indices** to implement the 'all-or-nothing' criteria, where a voxel is considered as occupied iff. there are one or more points inside it.
 3. Handle occlusions by sorting our voxel index data by ascending range; get rid of all of the voxels that are behind a certain angle coordinate.
 
 Now we have obtained the indices (or locations) of all of the occupied voxels. We can then apply our criteria onto this set of occupied voxels.
