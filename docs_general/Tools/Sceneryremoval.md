@@ -12,7 +12,7 @@ From our trajectory with $N$ road points, we define $N$ 2D bounding boxes of a c
 
 After translating these bounding boxes, we will end up with something along the lines of this:
 
-![Example of the bounding boxes translated/centered at the road points](images/example_bounding_region.png)
+![Example of the bounding boxes translated/centered at the road points](./../images/example_bounding_region.png)
 
 *The colored path of points represent the road points. In this picture, the bounding boxes were set to 1.9m left of the road point, and 5.7m right of the road point.*
 
@@ -22,12 +22,12 @@ where we end up with a path of bounding points made from the bounding boxes cent
 
 Here's an example of a single bounding box, along the path of road points in blue. The point that our box is centered about is larger.
 
-![Example of a single bounding region](images/example_single_bounding_region.png)
+![Example of a single bounding region](./../images/example_single_bounding_region.png)
 *The larger point represents the origin from the local coordinate system that we defined the bounding box.*
 
 This process is done for the rest of the bounding boxes, leaving us with overlap in the indices calculated. We then take unique indices, and then we have our .las file cut to our width as seen in blue:
 
-![Example of all of the points, trimmed](images/example_bounding_region_with_trimmed.png)
+![Example of all of the points, trimmed](./../images/example_bounding_region_with_trimmed.png)
 
 *Note: When working with large .las inputs (>35 million points), this process will require a lot of memory (64GB is recommended).*
 
@@ -67,16 +67,16 @@ The ``scenery3d`` branch aims to solve this issue by using 3D bounding boxes ins
 
 Example of the points that make up the 3D bounding region:
 
-![Example of 3D bounding points](images/example_3d_bounding_region.png)
+![Example of 3D bounding points](./../images/example_3d_bounding_region.png)
 
 *The bottom bounds of the far side of the road points are faint, but visible. In this case for the z-coordinate, we take 0.25m above the road point and 2m below the road point to remove noise points such as vehicles.*
 
 Here is the cut road section, with the 3D method in red.
 
-![Example of the cut road, using the 3D method](images/example_3d_bounding_region_with_trimmed.png)
+![Example of the cut road, using the 3D method](./../images/example_3d_bounding_region_with_trimmed.png)
 
 Note that the 3D method (in red) appears a lot more jagged as it is right now. As I mentioned earlier, you are probably better off cutting the road using the 2D method and manually removing vehicles using CloudCompare.
 
-![Example of the cut road, with the jagged edges for some reason](images/example_3d_trimmed_jagged.png)
+![Example of the cut road, with the jagged edges for some reason](./../images/example_3d_trimmed_jagged.png)
 
 The bounding points and road points are shown again for reference.
