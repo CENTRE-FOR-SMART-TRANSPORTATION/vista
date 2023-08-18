@@ -4,6 +4,11 @@
 
 This document contains an overview of which programs/functions within these programs are called, in order for certain tasks. I wrote these notes as reference down in case if you want to make changes to the current code.
 
+## Contents
+
+1. [Creating Vista outputs](#creating-vista-outputs-running-the-process-controller)
+2. [Files/tools within the repository](#files-and-tools)
+
 ## Creating Vista outputs (running the process controller)
 
 ### ``convert_single.py``
@@ -117,11 +122,11 @@ def main(args):
 </details>
 <br>
 
-#### Entities: agents and sensors
+### Entities: agents and sensors
 
 An agent (``Car.py`` in this case) of ``World`` contains one (or more) sensors. In this case, we use ``Lidar.py``. This agent is attached to ``World``, which controls everything. Most of the computation takes place after we call ``World.reset()``.
 
-#### Lidar
+### Lidar capture process in VISTA
 
 For our use case, we spawn a ``Lidar`` object on our Car, from ``Car.spawn_lidar()`` from ``sim_lidar.py``. When creating the ``Lidar`` sensor, we attach a ``LidarSynthesis`` object to the sensor itself.
 
@@ -243,11 +248,9 @@ It should be noted that the process of synthesizing our viewpoint here is dorman
 </details>
 <br>
 
-``LidarSynthesis.synthesize()``, attached to ``Lidar``, which is attached to ``Car``, which is finally attached to ``World`` is where we generate our outputs. I will explain the full path leading up to this in the next section.
+When we call ``Lidar.capture()``, it eventually calls ``Lidar.LidarSynthesis.synthesize()``, which is attached to ``Car``, which is finally attached to ``World`` is where we generate our outputs.
 
-#### Capture process/flow
-
-When ``World.reset()`` is called, each agent that is defined in ``sim_lidar.py`` is reset.
+Back to ``World``. When ``World.reset()`` is called, each agent that is defined in ``sim_lidar.py`` is reset.
 
 <details>
   <summary>Here is a code snippet of the World.reset() method. I am pretty sure that for our use case, the loop where we reset each agent is only really useful.</summary>
@@ -280,3 +283,149 @@ def reset(
 <br>
 
 When we call ``reset()`` to an agent, i.e., a ``Car``, we also call ``capture()`` for each sensor that is attached to the agent, after calling ``step_sensors()`` (``Car.reset()`` -> ``Car.step_sensors()`` -> call ``capture`` for each sensor attached to ``Car``). The details can be found in the source code if you want to find out things in detail.
+
+We know that when we call ``capture()`` for each sensor that is attached on each agent, it synthesizes the final output for the sensor(s) attached.
+
+## Files and tools
+
+This contains information about the files/tools that are within the repository.
+
+### Necessary files
+
+TODO FILL LATER ON
+
+### Tools
+
+Contents:
+
+1. [visualize_scene.py](#visualize_scenepy)
+2. [sensorpoints.py](#sensorpointspy)
+3. [trim_scenes.py (to be replaced) and remove_scenery.py](#replay_scenespy-old-to-be-replaced-and-replay_sensorpy)
+
+#### ``visualize_scene.py``
+
+This allows you to relate the LiDAR data from the road section into Google Maps, at a particular road point in the driver's POV.
+See the code for more information of its inner workings.
+
+**Usage**
+
+```bash
+python visualize_scene.py   # Manually prompts you to enter the trajectory
+```
+
+OR
+
+```bash
+python visualize_scene.py --trajectory {PATH_TO_TRAJECTORY}
+```
+
+You will be prompted to enter a UTM zone, and a road point into the terminal. If the output on Google Maps doesn't seem to show anything or does not represent the LiDAR data at all, you should change the UTM zone as directed.
+
+[Back to tools](#tools)
+
+#### ``sensorpoints,py``
+
+This generates [points that represent the sensor FOV](README.md/#segmentation), at a particular road point, aligned with the driver's POV. It should also be noted that this code was converted from MATLAB. Note that the angular and range precisions (the spacings between each point) were forced to be 2 degrees or meters, for visibility purposes.
+
+Note that for now, this script only supports single-sensor configurations, given in .json. Either way, both the .json and .yaml files do the same thing.
+
+**Usage**
+
+```bash
+python sensorpoints.py  # Manually prompts you to enter the trajectory, config, and road/observer point.
+```
+
+```bash
+python sensorpoints.py --trajectory {PATH_TO_TRAJECTORY} --config {PATH_TO_JSON_CONFIG} --observer_point {YOUR_OBSERVER_POINT}
+```
+
+There is also an option to regenerate your trajectory for some reason if you want to, just provide ``--regenerate True``, ``--input {PATH_TO_LAS_FILE}``, and ``--observer_height {OBSERVER_HEIGHT}`` flags in the command line.
+
+[Back to tools](#tools)
+
+#### ``trim_scenes.py`` (deprecated) and ``remove_scenery.py``
+
+Performs horizontal (though fixed, along the x-axis) trimming on individual Vista scenes (trim_scenes) and horizontal trimming (follows the trajectory) on individual roads. ``trim_scenes`` should not be used since it is not flexible and only works if the vehicle is not going around a curve.
+
+More details can be found in the code, and [here](Tools/Sceneryremoval.md).
+
+**Usage**
+
+To change the trimming widths (and also at specific road points), change the values in the ``generate_bounds()`` method.
+
+```bash
+python remove_scenery.py  # Manually prompts you to enter the trajectory, and road section.
+```
+
+```bash
+python remove_scenery --trajectory {PATH_TO_TRAJECTORY} --input {PATH_TO_LAS_FILE}
+```
+
+[Back to tools](#tools)
+
+#### ``replay_scenes.py`` (old, to be replaced) and ``replay_sensor.py``
+
+Creates a slideshow, or replay of each of the Vista scenes. The point of view of the replay can be configured within the code (CTRL+F POV and the visualizer controls of Open3D can be found). **Note, Open3D must be version 0.16, and this is not currently reflected in requirements.txt (Or it might be reflected in vista_venv) for the visualizer view control to work.**
+
+``replay_scenes.py`` only replays Vista, and currently has working video output. ``replay_sensor.py`` replays both Vista, the sensor FOV moving down the road section, and lastly (not implemented yet!) the drawing of the data rate graphs. The process to stitch all of these replays to a video has not been finished yet, and also the rendering is Open3D is really finnicky and it does need some work.
+
+For example, the ``replay_vista()`` method does not work so far on ``replay_sensor``, only ``replay_scenes``. The ``replay_lidar`` method does work so far on ``replay_sensor`` though. Whenever you are rendering scenes using Open3D, it should follow this particular order (given that you want to render multiple scenes, ``segments`` in this case contains several ``o3d.t.geometry.PointCloud``s and make a replay):
+
+```python
+import open3d as o3d
+# other imports...
+
+# Setup our visualizer
+vis = o3d.visualization.Visualizer()
+
+vis.create_window(window_name=f"Window",
+                  width=screen_width,
+                  height=screen_height
+                  )
+
+vis.set_full_screen(True) # Full screen to capture full view
+
+ctr = vis.get_view_control()
+
+# Configure our render options here
+render_opt = vis.get_render_option()
+render_opt.point_size = 1.5
+render_opt.background_color = np.array([16/255, 16/255, 16/255]) # 8-bit RGB, (16, 16, 16)
+
+# Dummy geometry/pointcloud which points or colors that will be updated for each frame
+current_pcd = o3d.geometry.PointCloud()
+
+for frame, segment in enumerate(segments):
+    # Update current point cloud's points and colors (for example)
+    current_pcd.points = segment.to_legacy().points
+    current_pcd.colors = segment.to_legacy().colors
+
+    if frame == 0:
+      vis.add_geometry(current_pcd)
+      vis.reset_view_point(True)
+      # Change the visualizer's field of view here using ctr.change_filed_of_view()
+    else:
+      vis.update_geometry(current_pcd)
+
+    # Update the POV of the visualizer
+    ctr.set_front(-traj.getForwards()[frame, :])  
+    ctr.set_up(traj.getUpwards()[frame,:])
+    ctr.set_lookat(traj.getRoadPoints()[frame, :] + 3.5*traj.getUpwards()[frame, :]) # Center the view around the sensor FOV
+    ctr.set_zoom(0.02) # Smaller values -> more zoomed in
+
+    # Finally update the renderer
+    vis.poll_events()
+    vis.update_renderer()
+
+    # Grab your image here
+    img = np.asarray(vis.capture_screen_float_buffer(do_render=True))
+    img = (img[:,:]*255).astype(np.uint8) # Normalize RGB to 8-bit
+
+# All done
+vis.clear_geometries()
+vis.clear_window()
+```
+
+**Usage**
+
+Stuff goes here
