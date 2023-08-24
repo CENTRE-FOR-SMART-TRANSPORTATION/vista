@@ -10,4 +10,3 @@ torchvision
 h5py
 laspy
 pandas
-open3d`
