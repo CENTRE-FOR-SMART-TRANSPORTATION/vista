@@ -1,3 +1,5 @@
+import numpy as np
+
 class LasPointCloud:
     """
     Container class for the .las file. Cuts down on unused fields from the
