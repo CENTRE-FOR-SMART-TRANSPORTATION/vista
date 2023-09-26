@@ -532,6 +532,12 @@ def combine_images(car_path: str, sensor_path: str):
     sensor_images = sorted(
         sensor_images, key=lambda f: int(os.path.splitext(f)[0]))
 
-    print(car_images[0], sensor_images[0])
+    car_image = os.path.join(car_path, car_images[0])
+    sensor_image = os.path.join(sensor_image, sensor_images[0])
+    img1 = cv2.imread(car_image)
+    img2 = cv2.imread(sensor_image)
+    vis = np.concatenate((img1, img2), axis=0)
+    cv2.imshow()
+    cv2.waitKey(0)
 
 combine_images(car_path, sensor_images_path)
