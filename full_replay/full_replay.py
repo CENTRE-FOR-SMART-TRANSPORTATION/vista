@@ -308,6 +308,28 @@ def create_video(images_dir: str, w: int, h: int, path_to_scenes: str, vehicle_s
   writer.release()
   print(f"Video replay has been written to {output_path}")
   return
+
+
+# Obtains screen size (width, height) in pixels
+def obtain_screen_size() -> tuple:
+  # Obtain screen parameters for our video
+  from tkinter import Tk
+  root = Tk()
+  root.withdraw()
+  
+  SCREEN_WIDTH, SCREEN_HEIGHT = root.winfo_screenwidth(), root.winfo_screenheight()
+  
+  return (SCREEN_WIDTH, SCREEN_HEIGHT)
+
+def check_for_padded(path_to_scenes: str) -> int:
+  path_to_scenes_ext = os.path.join(path_to_scenes, '*.txt')
+  filenames = [os.path.basename(abs_path) for abs_path in glob.glob(path_to_scenes_ext)]
+  offset = int(min(filenames, key=lambda x: int((x.split('_'))[1])).split('_')[1])
+  
+  return offset
+
+# main code that runs everything
+
 path_to_scenes = os.path.abspath(os.environ["PATH_TO_SCENES"])
 
 print(f"You have chosen the directory {path_to_scenes} as the path to the .txt files")
@@ -326,6 +348,17 @@ else:
         # print("in else", type(scenes))
 
 # print(type(scenes[0]))
-frames, sw, sh = visualize_replay(path_to_scenes, scenes)
-print(frames, sw, sh)
-create_video(frames, sw, sh, path_to_scenes)
+
+# creating the video from the pov of the driver
+
+# frames, sw, sh = visualize_replay(path_to_scenes, scenes)
+# print(frames, sw, sh)
+# create_video(frames, sw, sh, path_to_scenes)
+
+traj = os.path.abspath(os.environ["TRAJ_PATH"])
+cfg = os.path.abspath(os.environ["SENSOR_PATH"])
+las_path = os.path.abspath(os.environ["LAS_FILE_PATH"])
+vista_output_path = os.path.abspath(os.environ["VISTA_OUTPUT_PATH"])
+
+screen_wh = obtain_screen_size()
+frame_offset = check_for_padded(path_to_scenes)
