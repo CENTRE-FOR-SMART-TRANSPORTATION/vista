@@ -1,6 +1,8 @@
 import open3d as o3d
 import numpy as np
 from classes import LasPointCloud, Trajectory, SensorConfig
+import os
+import laspy
 
 # Open our .las point cloud into memory
 

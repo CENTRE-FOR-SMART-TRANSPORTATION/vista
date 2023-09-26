@@ -498,13 +498,13 @@ sensor_images_path = os.path.join(os.getcwd(), "fov")
 screen_wh = obtain_screen_size()
 frame_offset = check_for_padded(path_to_scenes)
 
-road_o3d, src_name = las2o3d_pcd(road)
+road_o3d, src_name = utils.las2o3d_pcd(road)
 render_sensor_fov(cfg=cfg,
                   traj=traj,
                   road=road_o3d,
                   src_name=src_name,
-                  sensor_images_path=temp_dir,
+                  sensor_images_path=sensor_images_path,
                   screen_width=screen_wh[0],
                   screen_height=screen_wh[1],
-                  offset=offset
+                  offset=frame_offset
                   )
