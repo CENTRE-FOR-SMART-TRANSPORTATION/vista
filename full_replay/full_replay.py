@@ -227,7 +227,7 @@ def visualize_replay(
     return
 
 
-def create_video(images_dir: str, w: int, h: int, path_to_scenes: str, vehicle_speed: np.float32 = 100, point_density: np.float32 = 1.0) -> None:
+def create_video(images_dir: str, w: int, h: int, path_to_scenes: str, vehicle_speed: np.float32 = 100, point_density: np.float32 = 1.0, filename : str = "") -> None:
     """Creates a video from the recorded frames.
 
     Args:
@@ -258,7 +258,8 @@ def create_video(images_dir: str, w: int, h: int, path_to_scenes: str, vehicle_s
         return annotated_image
 
     # Get filename of the recorded visualization
-    filename = f"{os.path.basename(os.path.normpath(path_to_scenes))[:-1]}.mp4"
+    if filename == "":
+        filename = f"{os.path.basename(os.path.normpath(path_to_scenes))[:-1]}.mp4"
 
     output_folder = os.path.join(os.getcwd(), "videos")
     if not os.path.exists(output_folder):
@@ -532,28 +533,33 @@ def combine_images(car_path: str, sensor_path: str):
     sensor_images = sorted(
         sensor_images, key=lambda f: int(os.path.splitext(f)[0]))
 
-    car_image = os.path.join(car_path, car_images[0])
-    sensor_image = os.path.join(sensor_path, sensor_images[0])
+    for i in range(len(car_images)):
+        car_image = os.path.join(car_path, car_images[i])
+        sensor_image = os.path.join(sensor_path, sensor_images[i])
 
-    img1 = cv2.imread(sensor_image)
-    img2 = cv2.imread(car_image)
+        img1 = cv2.imread(sensor_image)
+        img2 = cv2.imread(car_image)
 
-    (h1, w1) = img1.shape[:2]
-    (h2, w2) = img2.shape[:2]
+        (h1, w1) = img1.shape[:2]
+        (h2, w2) = img2.shape[:2]
 
-    img1 = img1[h1//5:h1-(h1//3 + h1//10), :]
-    img2 = img2[h2//7:, :]
+        img1 = img1[h1//5:h1-(h1//3 + h1//10), :]
+        img2 = img2[h2//7:, :]
 
-    (h1, w1) = img1.shape[:2]
-    (h2, w2) = img2.shape[:2]
+        (h1, w1) = img1.shape[:2]
+        (h2, w2) = img2.shape[:2]
 
-    out = np.zeros((h1 + h2, w1, 3), dtype="uint8")
+        out = np.zeros((h1 + h2, w1, 3), dtype="uint8")
 
-    out[0:h1, 0:w1] = img1
-    out[h1:h1+h2, 0:w1] = img2
+        out[0:h1, 0:w1] = img1
+        out[h1:h1+h2, 0:w1] = img2
 
-    cv2.imshow('image window', out)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+        cv2.imwrite(os.path.join(os.getcwd(), "combined_images", f"{i}.png"), out)
+    
 
-combine_images(car_path, sensor_images_path)
+    # return the height and width to pass on to the create_video function
+    return h1+h2, w1
+
+h, w = combine_images(car_path, sensor_images_path)
+images_dir = os.path.join(os.getcwd(), "combined_images")
+create_video(images_dir, w, h, path_to_scenes, filename="combined.mp4")
