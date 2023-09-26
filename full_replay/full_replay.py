@@ -388,13 +388,13 @@ def render_sensor_fov(
 
     # Begin our replay of the sensor FOV
     num_points = traj.getNumPoints()
-    fov_points = sensorpoints.generate_sensor_points(cfg)
+    fov_points = utils.generate_sensor_points(cfg)
     if not os.path.exists(sensor_images_path):
         os.makedirs(sensor_images_path)
 
     for frame in range(0+offset, num_points-offset):
         # Get sensor FOV
-        aligned_fov_points, _ = sensorpoints.align_sensor_points(
+        aligned_fov_points, _ = utils.align_sensor_points(
             fov_points, traj, frame)
 
         # TODO Accomodate multi-sensor configurations
