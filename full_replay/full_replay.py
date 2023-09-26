@@ -339,7 +339,7 @@ def render_sensor_fov(
             centerpt = traj.getRoadPoints()[np.floor(
                 num_points/2).astype(int), :].T.reshape((3, 1))
             # Set the view at the center, top down
-            ctr.set_front([0, 1, 1])
+            ctr.set_front([-1, 0, 1])
             ctr.set_up([0, 0, 1])
             ctr.set_lookat(centerpt)
             ctr.set_zoom(0.3125)
