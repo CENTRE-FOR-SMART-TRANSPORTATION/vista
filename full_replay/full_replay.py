@@ -481,30 +481,57 @@ else:
 # print(frames, sw, sh)
 # create_video(frames, sw, sh, path_to_scenes)
 
+
+# creating the video from sensor fov
+
 traj_path = os.path.abspath(os.environ["TRAJ_PATH"])
-traj = utils.obtain_trajectory_details(traj_path)
+# traj = utils.obtain_trajectory_details(traj_path)
 
 cfg_path = os.path.abspath(os.environ["SENSOR_PATH"])
-cfg = utils.open_sensor_config_file(cfg_path)
+# cfg = utils.open_sensor_config_file(cfg_path)
 
 las_path = os.path.abspath(os.environ["LAS_FILE_PATH"])
-road = utils.open_las(las_path)
+# road = utils.open_las(las_path)
 
 
 vista_output_path = os.path.abspath(os.environ["VISTA_OUTPUT_PATH"])
 
+car_path = os.path.join(os.getcwd(), "frame_images/")
 sensor_images_path = os.path.join(os.getcwd(), "fov")
 
 screen_wh = obtain_screen_size()
 frame_offset = check_for_padded(path_to_scenes)
 
-road_o3d, src_name = utils.las2o3d_pcd(road)
-render_sensor_fov(cfg=cfg,
-                  traj=traj,
-                  road=road_o3d,
-                  src_name=src_name,
-                  sensor_images_path=sensor_images_path,
-                  screen_width=screen_wh[0],
-                  screen_height=screen_wh[1],
-                  offset=frame_offset
-                  )
+# road_o3d, src_name = utils.las2o3d_pcd(road)
+# render_sensor_fov(cfg=cfg,
+#                   traj=traj,
+#                   road=road_o3d,
+#                   src_name=src_name,
+#                   sensor_images_path=sensor_images_path,
+#                   screen_width=screen_wh[0],
+#                   screen_height=screen_wh[1],
+#                   offset=frame_offset
+#                   )
+
+
+# combine images
+
+def combine_images(car_path: str, sensor_path: str):
+    # Read our frames from our temporary directory
+    car_path_ext = os.path.join(car_path, '*.png')
+    sensor_path_ext = os.path.join(sensor_path, '*.png')
+
+    # Get list of filenames within our temporary directory
+    car_images = [os.path.basename(abs_path)
+                  for abs_path in glob.glob(car_path_ext)]
+    car_images = sorted(filenames, key=lambda f: int(os.path.splitext(f)[0]))
+
+    # Get list of filenames within our temporary directory
+    sensor_images = [os.path.basename(abs_path)
+                     for abs_path in glob.glob(sensor_path_ext)]
+    sensor_images = sorted(
+        filenames, key=lambda f: int(os.path.splitext(f)[0]))
+
+    print(car_images[0], sensor_images[0])
+
+combine_images()
