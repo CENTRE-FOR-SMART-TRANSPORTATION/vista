@@ -461,17 +461,17 @@ print(
     f"You have chosen the directory {path_to_scenes} as the path to the .txt files")
 
 scenes_list_path = os.path.join(os.getcwd(), 'scenes_list.pkl')
-scenes = None
-if not os.path.exists(scenes_list_path):
-    scenes = obtain_scenes(path_to_scenes)
-    # print("in if", type(scenes))
-    with open(scenes_list_path, "wb") as f:
-        pickle.dump(scenes, f)
-else:
-    print("Loading saved list...")
-    with open(scenes_list_path, "rb") as f:
-        scenes = pickle.load(f)
-        # print("in else", type(scenes))
+# scenes = None
+# if not os.path.exists(scenes_list_path):
+#     scenes = obtain_scenes(path_to_scenes)
+#     # print("in if", type(scenes))
+#     with open(scenes_list_path, "wb") as f:
+#         pickle.dump(scenes, f)
+# else:
+#     print("Loading saved list...")
+#     with open(scenes_list_path, "rb") as f:
+#         scenes = pickle.load(f)
+#         # print("in else", type(scenes))
 
 # print(type(scenes[0]))
 
@@ -534,4 +534,4 @@ def combine_images(car_path: str, sensor_path: str):
 
     print(car_images[0], sensor_images[0])
 
-combine_images()
+combine_images(car_path, sensor_images_path)
