@@ -524,13 +524,13 @@ def combine_images(car_path: str, sensor_path: str):
     # Get list of filenames within our temporary directory
     car_images = [os.path.basename(abs_path)
                   for abs_path in glob.glob(car_path_ext)]
-    car_images = sorted(filenames, key=lambda f: int(os.path.splitext(f)[0]))
+    car_images = sorted(car_images, key=lambda f: int(os.path.splitext(f)[0]))
 
     # Get list of filenames within our temporary directory
     sensor_images = [os.path.basename(abs_path)
                      for abs_path in glob.glob(sensor_path_ext)]
     sensor_images = sorted(
-        filenames, key=lambda f: int(os.path.splitext(f)[0]))
+        sensor_images, key=lambda f: int(os.path.splitext(f)[0]))
 
     print(car_images[0], sensor_images[0])
 
