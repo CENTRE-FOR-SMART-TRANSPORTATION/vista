@@ -8,6 +8,9 @@ sandbox/
 test*.png
 *.avi
 *.mp4
+frame_images/
+fov/
+scenes_list.pkl
 
 # Docs
 # docs/source/_static/
