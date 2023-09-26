@@ -537,7 +537,8 @@ def combine_images(car_path: str, sensor_path: str):
     img1 = cv2.imread(car_image)
     img2 = cv2.imread(sensor_image)
     vis = np.concatenate((img1, img2), axis=0)
-    cv2.imshow()
+    cv2.imshow('image window', vis)
     cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
 combine_images(car_path, sensor_images_path)
