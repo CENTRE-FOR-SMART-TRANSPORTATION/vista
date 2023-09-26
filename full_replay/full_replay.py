@@ -541,8 +541,8 @@ def combine_images(car_path: str, sensor_path: str):
     (h1, w1) = img1.shape[:2]
     (h2, w2) = img2.shape[:2]
 
-    img1 = img1[h1//7:, :]
-    img2 = img2[h2//5:h2-h2//5, :]
+    img1 = img1[h1//5:h1-(h1//3 + h1//10), :]
+    img2 = img2[h2//7:, :]
 
     (h1, w1) = img1.shape[:2]
     (h2, w2) = img2.shape[:2]
