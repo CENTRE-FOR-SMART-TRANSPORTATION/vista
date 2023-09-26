@@ -534,8 +534,9 @@ def combine_images(car_path: str, sensor_path: str):
 
     car_image = os.path.join(car_path, car_images[0])
     sensor_image = os.path.join(sensor_path, sensor_images[0])
-    img1 = cv2.imread(car_image)
-    img2 = cv2.imread(sensor_image)
+
+    img1 = cv2.imread(sensor_image)
+    img2 = cv2.imread(car_image)
 
     (h1, w1) = img1.shape[:2]
     (h2, w2) = img2.shape[:2]
