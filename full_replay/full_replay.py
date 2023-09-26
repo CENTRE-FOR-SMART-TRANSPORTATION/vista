@@ -540,6 +540,12 @@ def combine_images(car_path: str, sensor_path: str):
     (h1, w1) = img1.shape[:2]
     (h2, w2) = img2.shape[:2]
 
+    img1 = img1[h1//7:, :]
+    img2 = img2[h2//5:h2-h2//5, :]
+
+    (h1, w1) = img1.shape[:2]
+    (h2, w2) = img2.shape[:2]
+
     out = np.zeros((h1 + h2, w1, 3), dtype="uint8")
 
     out[0:h1, 0:w1] = img1
