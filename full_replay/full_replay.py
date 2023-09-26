@@ -540,10 +540,10 @@ def combine_images(car_path: str, sensor_path: str):
     (h1, w1) = img1.shape[:2]
     (h2, w2) = img2.shape[:2]
 
-    out = zeros((h1, w1 + w2 + w3 + w4), dtype="uint8")
+    out = np.zeros((h1 + h2, w1, 3), dtype="uint8")
 
     out[0:h1, 0:w1] = img1
-    out[0:h1, w1:w1 + w2] = img2
+    out[h1:h1+h2, 0:w1] = img2
 
     cv2.imshow('image window', out)
     cv2.waitKey(0)
