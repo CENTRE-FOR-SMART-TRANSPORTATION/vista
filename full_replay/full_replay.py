@@ -498,7 +498,9 @@ las_path = os.path.abspath(os.environ["LAS_FILE_PATH"])
 vista_output_path = os.path.abspath(os.environ["VISTA_OUTPUT_PATH"])
 
 car_path = os.path.join(os.getcwd(), "frame_images/")
-sensor_images_path = os.path.join(os.getcwd(), "fov")
+sensor_images_path = os.path.join(os.getcwd(), "fov/")
+graph_path = os.path.join(os.getcwd(), "plt_images/")
+
 
 screen_wh = obtain_screen_size()
 frame_offset = check_for_padded(path_to_scenes)
@@ -517,10 +519,11 @@ frame_offset = check_for_padded(path_to_scenes)
 
 # combine images
 
-def combine_images(car_path: str, sensor_path: str):
+def combine_images(car_path: str, sensor_path: str, graph_path: str):
     # Read our frames from our temporary directory
     car_path_ext = os.path.join(car_path, '*.png')
     sensor_path_ext = os.path.join(sensor_path, '*.png')
+    graph_path_ext = os.path.join(graph_path, "*.png")
 
     # Get list of filenames within our temporary directory
     car_images = [os.path.basename(abs_path)
@@ -532,16 +535,26 @@ def combine_images(car_path: str, sensor_path: str):
                      for abs_path in glob.glob(sensor_path_ext)]
     sensor_images = sorted(
         sensor_images, key=lambda f: int(os.path.splitext(f)[0]))
+    
+    graph_images = [os.path.basename(abs_path)
+                     for abs_path in glob.glob(graph_path_ext)]
+    graph_images = sorted(
+        graph_images, key=lambda f: int(os.path.splitext(f)[0]))
 
     for i in range(len(car_images)):
         car_image = os.path.join(car_path, car_images[i])
         sensor_image = os.path.join(sensor_path, sensor_images[i])
+        graph_image = os.path.join(graph_path, graph_images[i])
 
         img1 = cv2.imread(sensor_image)
         img2 = cv2.imread(car_image)
+        img3 = cv2.imread(graph_image)
 
         (h1, w1) = img1.shape[:2]
         (h2, w2) = img2.shape[:2]
+        (h3, w3) = img3.shape[:2]
+
+        print(h3, w3)
 
         img1 = img1[h1//5:h1-(h1//3 + h1//10), :]
         img2 = img2[h2//7:, :]
@@ -560,7 +573,7 @@ def combine_images(car_path: str, sensor_path: str):
     # return the height and width to pass on to the create_video function
     return h1+h2, w1
 
-# h, w = combine_images(car_path, sensor_images_path)
+h, w = combine_images(car_path, sensor_images_path)
 # images_dir = os.path.join(os.getcwd(), "combined_images")
 # create_video(images_dir, w, h, path_to_scenes, filename="combined.mp4")
 
