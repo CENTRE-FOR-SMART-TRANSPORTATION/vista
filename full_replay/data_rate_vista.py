@@ -812,32 +812,32 @@ def data_rate_vista_automated(
                 offset = (i - 1) * 0.7
                 ax4_new.spines['right'].set_position(('outward', offset * 100))
 
-        fig, ax = plt.subplots()
-        t = np.linspace(0, 3, 40)
-        g = -9.81
-        v0 = 12
-        z = g * t**2 / 2 + v0 * t
+    fig, ax = plt.subplots()
+    t = np.linspace(0, 3, 40)
+    g = -9.81
+    v0 = 12
+    z = g * t**2 / 2 + v0 * t
 
-        v02 = 5
-        z2 = g * t**2 / 2 + v02 * t
+    v02 = 5
+    z2 = g * t**2 / 2 + v02 * t
 
-        scat = ax.scatter(t[0], z[0], c="b", s=5, label=f'v0 = {v0} m/s')
-        line2 = ax.plot(t[0], z2[0], label=f'v0 = {v02} m/s')[0]
-        ax.set(xlim=[0, 3], ylim=[-4, 10], xlabel='Time [s]', ylabel='Z [m]')
-        ax.legend()
+    scat = ax.scatter(t[0], z[0], c="b", s=5, label=f'v0 = {v0} m/s')
+    line2 = ax.plot(t[0], z2[0], label=f'v0 = {v02} m/s')[0]
+    ax.set(xlim=[0, 3], ylim=[-4, 10], xlabel='Time [s]', ylabel='Z [m]')
+    ax.legend()
 
 
-        def update(frame):
-            # for each frame, update the data stored on each artist.
-            x = t[:frame]
-            y = z[:frame]
-            # update the scatter plot:
-            data = np.stack([x, y]).T
-            scat.set_offsets(data)
-            # update the line plot:
-            line2.set_xdata(t[:frame])
-            line2.set_ydata(z2[:frame])
-            return (scat, line2)
+    def update(frame):
+        # for each frame, update the data stored on each artist.
+        x = t[:frame]
+        y = z[:frame]
+        # update the scatter plot:
+        data = np.stack([x, y]).T
+        scat.set_offsets(data)
+        # update the line plot:
+        line2.set_xdata(t[:frame])
+        line2.set_ydata(z2[:frame])
+        return (scat, line2)
 
     ani = animation.FuncAnimation(fig=fig, func=update, frames=40, interval=30)
     plt.show()
@@ -857,15 +857,16 @@ def data_rate_vista_automated(
             #        'Atomic norm Data rate',True)
 
             # Get data rate plots for simple method
-            saveGraphImages(outmatrix_count, an_data_rate2,
-                                          an_data_rate2_ave, 'Simple method datarate', 'Data rate for occupancy count', 'distance (m)',
-                                          'Atomic norm Data rate', True)
+            # saveGraphImages(outmatrix_count, an_data_rate2,
+            #                               an_data_rate2_ave, 'Simple method datarate', 'Data rate for occupancy count', 'distance (m)',
+            #                               'Atomic norm Data rate', True)
 
             # Get data rate plots for volume method
-            if not USE_VOLUMETRIC:
-                fig43, ax43 = saveGraphImages(outmatrix_count, an_data_rate,
-                                              an_data_rate_ave, 'Volume method datarate', 'Data rate for volumetric method', 'distance (m)',
-                                              'Atomic norm Data rate', True)
+            if USE_VOLUMETRIC:
+                pass
+            #     fig43, ax43 = saveGraphImages(outmatrix_count, an_data_rate,
+            #                                   an_data_rate_ave, 'Volume method datarate', 'Data rate for volumetric method', 'distance (m)',
+            #                                   'Atomic norm Data rate', True)
             else:
                 pass
 
@@ -932,7 +933,7 @@ def data_rate_vista_automated(
 def main():
     args = file_tools.parse_cmdline_args()
     sensorcon_path = file_tools.obtain_sensor_path(args)
-    path2scenes = file_tools.obtain_multiple_scene_path(args)
+    path2scenes = os.environ(["VISTA_OUTPUT_PATH"])
 
     data_rate_vista_automated(
         sensorcon_path=sensorcon_path,
