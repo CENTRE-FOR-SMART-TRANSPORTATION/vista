@@ -556,6 +556,14 @@ def combine_images(car_path: str, sensor_path: str, graph_path: str):
 
         print(h3, w3)
 
+        scale_percent = 60 # percent of original size
+        w3 = int(img3.shape[1] * scale_percent / 100)
+        h3 = int(img3.shape[0] * scale_percent / 100)
+        dim = (width, height)
+        
+        # resize image
+        resized = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)
+
         img1 = img1[h1//5:h1-(h1//3 + h1//10), :]
         img2 = img2[h2//7:, :]
 
@@ -563,9 +571,12 @@ def combine_images(car_path: str, sensor_path: str, graph_path: str):
         (h2, w2) = img2.shape[:2]
 
         out = np.zeros((h1 + h2, w1, 3), dtype="uint8")
-
+        
+        graph_h_start = h1-(h3//2)
+        graph_w_start = w1 - (w3) - 100
         out[0:h1, 0:w1] = img1
         out[h1:h1+h2, 0:w1] = img2
+        out[graph_h_start:graph_h_start+h3, graph_w_start:graph_w_start+w3]
 
         cv2.imwrite(os.path.join(os.getcwd(), "combined_images", f"{i}.png"), out)
     
