@@ -765,13 +765,13 @@ def data_rate_vista_automated(
         print(min(yBarData[0]), max(yBarData[0]))
         fig, ax = plt.subplots()
 
-        line2 = ax.plot(xBarData[0][0, 0], yBarData[0][0], label=graphTitle)[0]
-        ax.set(xlim=[min(xBarData[0][:, 0]), max(xBarData[0][:, 0])], ylim=[min(yBarData[0]), max(yBarData[0])], xlabel=xlabel, ylabel=ylabel)
+        line2 = ax.plot(xBarData[0][0, 0], yBarData[0][0], label=graphTitle, color=f'{colourScheme[np.mod(i,2)][1]}')[0]
+        ax.set(xlim=[min(xBarData[0][:, 0])-50, max(xBarData[0][:, 0])+50], ylim=[min(yBarData[0])-10, max(yBarData[0])]+10, xlabel=xlabel, ylabel=ylabel)
         ax.legend()
 
-        # plt_images_dir = os.path.join(os.getcwd(), "plt_images")
-        # if not os.path.exists(plt_images_dir):
-        #     os.makedirs(plt_images_dir)
+        plt_images_dir = os.path.join(os.getcwd(), "plt_images")
+        if not os.path.exists(plt_images_dir):
+            os.makedirs(plt_images_dir)
 
         def update(frame):
             # for each frame, update the data stored on each artist.
@@ -781,7 +781,7 @@ def data_rate_vista_automated(
             # update the line plot:
             line2.set_xdata(x)
             line2.set_ydata(y)
-            # plt.savefig(os.path.join(plt_images_dir, f'frame_{len(x)}.png'))
+            plt.savefig(os.path.join(plt_images_dir, f'frame_{len(x)}.png'))
             return (line2)
 
         ani = animation.FuncAnimation(
