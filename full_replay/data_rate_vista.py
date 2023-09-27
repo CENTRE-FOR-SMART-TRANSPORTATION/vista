@@ -798,6 +798,8 @@ def data_rate_vista_automated(
     if not enable_graphical:
         if enable_regression:
             # Get data rate plots for simple method
+            print("showing data rate graph")
+            print(outmatrix_count, an_data_rate2, an_data_rate2_ave)
             fig53, ax53 = showDataRateGraph(outmatrix_count, an_data_rate2,
                                             an_data_rate2_ave, 'Simple method datarate', 'Data rate for occupancy count', 'distance (m)',
                                             'Atomic norm Data rate', True)
