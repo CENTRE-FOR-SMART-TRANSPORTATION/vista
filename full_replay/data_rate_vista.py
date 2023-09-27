@@ -795,7 +795,7 @@ def data_rate_vista_automated(
         plt.show()
 
     # Datarate graphs
-    if not enable_graphical:
+    if enable_graphical:
         if enable_regression:
             # Get data rate plots for simple method
             print("showing data rate graph")
