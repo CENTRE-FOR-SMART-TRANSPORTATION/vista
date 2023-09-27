@@ -761,7 +761,7 @@ def data_rate_vista_automated(
     def saveGraphImages(xBarData, yBarData, yBarAverageData, windowTitle, graphTitle, xlabel, ylabel, isSimple):
         print(len(xBarData[0]))
         print(len(yBarAverageData[0]))
-        print(min(xBarData[0]), max(xBarData[0]))
+        print(min(xBarData[0][:, 0]), max(xBarData[0][:, 0]))
         print(min(yBarData[0]), max(yBarData[0]))
         # fig, ax = plt.subplots()
 
