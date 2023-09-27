@@ -795,6 +795,60 @@ def data_rate_vista_automated(
             
             return fig, ax
 
+    def saveGraphImages(xBarData,yBarData,yBarAverageData,windowTitle,graphTitle,xlabel,ylabel,isSimple):
+        def plot_and_save(data_point, save_path):
+            # Create a new figure and axis for each data point
+            fig, ax = plt.subplots()
+            
+            fig.canvas.manager.set_window_title(f'{windowTitle}') 
+            fig.suptitle(f"{graphTitle}", fontsize=12)
+            ax.set_ylabel(f"{ylabel}",color='black')
+            ax.tick_params(axis='y', colors='black')
+
+            # Add your data point to the plot, e.g., using plt.scatter() or plt.plot()
+            # Replace this with your actual data plotting code
+            plt.scatter(data_point[0], data_point[1])
+
+            # Save the current plot as an image
+            plt.savefig(save_path)
+
+            # Close the figure to release resources (optional)
+            plt.close(fig)
+        if isSimple:
+            colourScheme = [['g','m'],['b','y']]
+        else:
+            colourScheme = [['r','c'],['b','y']]
+        
+
+        print(len(xBarData[0]))
+        print(type(xBarData[0]))
+        print(len(yBarData[0]))
+        print(type(yBarData[0]))
+        # for i in range(numScenes):
+        #     if i == 0:
+        #         #ORIGINAL PLOT
+        #         for j in range(len(xBarData[i])):
+        #             ax4.plot(xBarData[i][:, 0], yBarAverageData[i],
+        #             f'{colourScheme[np.mod(i,2)][1]}')        
+        #             ax4.plot(xBarData[i][:j+1, 0], yBarAverageData[i])           
+        #     else:
+        #         print('else called')
+        #         ax4_new = ax4.twinx()
+        #         ax4_new.plot(xBarData[i][:, 0], yBarAverageData[i],
+        #             f'{colourScheme[np.mod(i,2)][1]}')  
+                 
+        #         ax4_new.tick_params(axis='y', colors=f'{colourScheme[np.mod(i,2)][0]}')   
+                
+        #         offset = (i - 1) * 0.7
+        #         ax4_new.spines['right'].set_position(('outward', offset * 100))
+                    
+        # ax4.set_xlabel(f"{xlabel}")
+        # fig4.legend()
+        # fig4.tight_layout()        
+        # cursor(hover=True)        
+        
+        print(xBarData, yBarAverageData)
+        return fig4, ax4 
     ## Datarate graphs
     if enable_graphical:
         if enable_regression:
@@ -811,13 +865,13 @@ def data_rate_vista_automated(
             #        'Atomic norm Data rate',True)
             
             # Get data rate plots for simple method
-            fig53, ax53 = showDataRateGraph(outmatrix_count,an_data_rate2,\
+            fig53, ax53 = saveGraphImages(outmatrix_count,an_data_rate2,\
                 an_data_rate2_ave,'Simple method datarate','Data rate for occupancy count','distance (m)',\
                    'Atomic norm Data rate',True)   
 
             # Get data rate plots for volume method
-            if USE_VOLUMETRIC:
-                fig43, ax43 = showDataRateGraph(outmatrix_count,an_data_rate,\
+            if not USE_VOLUMETRIC:
+                fig43, ax43 = saveGraphImages(outmatrix_count,an_data_rate,\
                     an_data_rate_ave,'Volume method datarate','Data rate for volumetric method','distance (m)',\
                     'Atomic norm Data rate',True)      
             else:
