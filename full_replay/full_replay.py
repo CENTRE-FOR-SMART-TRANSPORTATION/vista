@@ -520,6 +520,10 @@ frame_offset = check_for_padded(path_to_scenes)
 # combine images
 
 def combine_images(car_path: str, sensor_path: str, graph_path: str):
+    out_path = os.path.join(os.getcwd(), "combined_images")
+    if not os.path.exists(out_path):
+        os.makedirs(out_path)
+        
     # Read our frames from our temporary directory
     car_path_ext = os.path.join(car_path, '*.png')
     sensor_path_ext = os.path.join(sensor_path, '*.png')
