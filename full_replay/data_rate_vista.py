@@ -991,7 +991,8 @@ def data_rate_vista_automated(
             #plt.show(block=False)   
             #plt.show()    
             '''
-    plt.show()
+    # plt.show()
+    print("done saving")
 
 
 def main():
