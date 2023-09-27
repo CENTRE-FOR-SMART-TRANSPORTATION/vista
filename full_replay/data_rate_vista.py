@@ -485,7 +485,7 @@ def data_rate_vista_automated(
         if USE_VOLUMETRIC:
             results_list_path = os.path.join(os.getcwd(), 'results.pkl')
             results = None
-            if not os.path.exists(scenes_list_path):
+            if not os.path.exists(results_list_path):
                 with mp.Pool(numCores) as p:
                     inputData = [(voxel_rsize, voxel_asize, voxel_esize, data, i, vistaoutput_path[itr],
                                 point_density, max_volume, global_offset) for i in range(smallest, upperbound, resolution)]
@@ -499,7 +499,7 @@ def data_rate_vista_automated(
                             results.append(result)
                             pbar.update()
 
-                with open(scenes_list_path, "wb") as f:
+                with open(results_list_path, "wb") as f:
                     pickle.dump(results, f)
             else:
                 print("Loading saved list...")
@@ -528,7 +528,7 @@ def data_rate_vista_automated(
 
         results_list_path = os.path.join(os.getcwd(), 'results.pkl')
         results = None
-        if not os.path.exists(scenes_list_path):
+        if not os.path.exists(results_list_path):
             with mp.Pool(numCores) as p:
                 inputData = [(voxel_rsize, voxel_asize, voxel_esize, data, i, vistaoutput_path[itr],
                             point_density, total_voxels, global_offset) for i in range(smallest, upperbound, resolution)]
@@ -541,7 +541,7 @@ def data_rate_vista_automated(
                             result[0] - smallest)//resolution] = result[1]
                         results.append(result)
                         pbar.update()
-            with open(scenes_list_path, "wb") as f:
+            with open(results_list_path, "wb") as f:
                 pickle.dump(results, f)
         else:
             print("Loading saved list...")
