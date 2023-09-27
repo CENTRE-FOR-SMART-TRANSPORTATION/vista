@@ -759,10 +759,11 @@ def data_rate_vista_automated(
         return fig, ax
 
     def saveGraphImages(xBarData, yBarData, yBarAverageData, windowTitle, graphTitle, xlabel, ylabel, isSimple):
-        print(len(xBarData[0]))
-        print(len(yBarAverageData[0]))
-        print(min(xBarData[0][:, 0]), max(xBarData[0][:, 0]))
-        print(min(yBarData[0]), max(yBarData[0]))
+        if isSimple:
+            colourScheme = [['g', 'm'], ['b', 'y']]
+        else:
+            colourScheme = [['r', 'c'], ['b', 'y']]
+            
         fig, ax = plt.subplots()
 
         line2 = ax.plot(xBarData[0][0, 0], yBarData[0][0], label=graphTitle, color=f'{colourScheme[np.mod(i,2)][1]}')[0]
