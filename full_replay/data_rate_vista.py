@@ -759,40 +759,37 @@ def data_rate_vista_automated(
         return fig, ax
 
     def saveGraphImages(xBarData, yBarData, yBarAverageData, windowTitle, graphTitle, xlabel, ylabel, isSimple):
-        fig, ax = plt.subplots()
-        t = np.linspace(0, 3, 40)
-        g = -9.81
-        v0 = 12
-        z = g * t**2 / 2 + v0 * t
+        print(len(xBarData[0]))
+        print(len(yBarAverageData[0]))
+        print(min(xBarData[0]), max(xBarData[0]))
+        print(min(yBarData[0]), max(yBarData[0]))
+        # fig, ax = plt.subplots()
 
-        v02 = 5
-        z2 = g * t**2 / 2 + v02 * t
+        # # scat = ax.scatter(xBarData[0][0], yBarData[0], c="b", s=5, label=f'v0 = {v0} m/s')
+        # line2 = ax.plot(t[0], z2[0], label=f'v0 = {v02} m/s')[0]
+        # ax.set(xlim=[0, 3], ylim=[-4, 10], xlabel=xlabel, ylabel=ylabel)
+        # ax.legend()
 
-        scat = ax.scatter(t[0], z[0], c="b", s=5, label=f'v0 = {v0} m/s')
-        line2 = ax.plot(t[0], z2[0], label=f'v0 = {v02} m/s')[0]
-        ax.set(xlim=[0, 3], ylim=[-4, 10], xlabel='Time [s]', ylabel='Z [m]')
-        ax.legend()
+        # plt_images_dir = os.path.join(os.getcwd(), "plt_images")
+        # if not os.path.exists(plt_images_dir):
+        #     os.makedirs(plt_images_dir)
 
-        plt_images_dir = os.path.join(os.getcwd(), "plt_images")
-        if not os.path.exists(plt_images_dir):
-            os.makedirs(plt_images_dir)
+        # def update(frame):
+        #     # for each frame, update the data stored on each artist.
+        #     x = t[:frame]
+        #     y = z[:frame]
+        #     # update the scatter plot:
+        #     data = np.stack([x, y]).T
+        #     scat.set_offsets(data)
+        #     # update the line plot:
+        #     line2.set_xdata(t[:frame])
+        #     line2.set_ydata(z2[:frame])
+        #     plt.savefig(os.path.join(plt_images_dir, f'frame_{len(x)}.png'))
+        #     return (scat, line2)
 
-        def update(frame):
-            # for each frame, update the data stored on each artist.
-            x = t[:frame]
-            y = z[:frame]
-            # update the scatter plot:
-            data = np.stack([x, y]).T
-            scat.set_offsets(data)
-            # update the line plot:
-            line2.set_xdata(t[:frame])
-            line2.set_ydata(z2[:frame])
-            plt.savefig(os.path.join(plt_images_dir, f'frame_{len(x)}.png'))
-            return (scat, line2)
-
-        ani = animation.FuncAnimation(
-            fig=fig, func=update, frames=40, interval=30, repeat=False)
-        plt.show()
+        # ani = animation.FuncAnimation(
+        #     fig=fig, func=update, frames=40, interval=30, repeat=False)
+        # plt.show()
 
     # Datarate graphs
     if enable_graphical:
@@ -800,12 +797,16 @@ def data_rate_vista_automated(
             # Get data rate plots for simple method
             print("showing data rate graph")
             print(outmatrix_count, an_data_rate2, an_data_rate2_ave)
-            fig53, ax53 = showDataRateGraph(outmatrix_count, an_data_rate2,
+            saveGraphImages(outmatrix_count, an_data_rate2,
+                                            an_data_rate2_ave, 'Simple method datarate', 'Data rate for occupancy count', 'distance (m)',
+                                            'Atomic norm Data rate', True)
+            showDataRateGraph(outmatrix_count, an_data_rate2,
                                             an_data_rate2_ave, 'Simple method datarate', 'Data rate for occupancy count', 'distance (m)',
                                             'Atomic norm Data rate', True)
 
             # Get data rate plots for volume method
-            if USE_VOLUMETRIC:
+            # if USE_VOLUMETRIC:
+            if False:
                 fig43, ax43 = showDataRateGraph(outmatrix_count, an_data_rate,
                                                 an_data_rate_ave, 'Volume method datarate', 'Data rate for volumetric method', 'distance (m)',
                                                 'Atomic norm Data rate', True)
