@@ -767,7 +767,7 @@ def data_rate_vista_automated(
         fig, ax = plt.subplots()
 
         line2 = ax.plot(xBarData[0][0, 0], yBarData[0][0], label=graphTitle, color=f'{colourScheme[np.mod(i,2)][1]}')[0]
-        ax.set(xlim=[min(xBarData[0][:, 0])-50, max(xBarData[0][:, 0])+50], ylim=[min(yBarData[0])-10, max(yBarData[0])+10], xlabel=xlabel, ylabel=ylabel)
+        ax.set(xlim=[min(xBarData[0][:, 0])-50, max(xBarData[0][:, 0])+50], ylim=[min(yBarData[0])-100000, max(yBarData[0])+1000000], xlabel=xlabel, ylabel=ylabel)
         ax.legend()
 
         plt_images_dir = os.path.join(os.getcwd(), "plt_images")
