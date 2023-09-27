@@ -826,7 +826,10 @@ def data_rate_vista_automated(
     ax.set(xlim=[0, 3], ylim=[-4, 10], xlabel='Time [s]', ylabel='Z [m]')
     ax.legend()
 
-
+    plt_images_dir = os.path.join(os.getcwd(), "plt_images")
+    if not os.path.exists(plt_images_dir):
+        os.makedirs(plt_images_dir)
+    
     def update(frame):
         # for each frame, update the data stored on each artist.
         x = t[:frame]
@@ -837,9 +840,10 @@ def data_rate_vista_automated(
         # update the line plot:
         line2.set_xdata(t[:frame])
         line2.set_ydata(z2[:frame])
+        plt.savefig(os.path.join(plt_images_dir, f'frame_{len(x)}.png'))
         return (scat, line2)
 
-    ani = animation.FuncAnimation(fig=fig, func=update, frames=40, interval=30)
+    ani = animation.FuncAnimation(fig=fig, func=update, frames=40, interval=30, repeat=False)
     plt.show()
     # Datarate graphs
     if not enable_graphical:
