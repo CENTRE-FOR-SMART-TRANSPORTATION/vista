@@ -483,7 +483,7 @@ def data_rate_vista_automated(
 
         # Calculate deltas using the volume method if selected.
         if USE_VOLUMETRIC:
-            results_list_path = os.path.join(os.getcwd(), 'results.pkl')
+            results_list_path = os.path.join(os.getcwd(), 'results_vol.pkl')
             results = None
             if not os.path.exists(results_list_path):
                 with mp.Pool(numCores) as p:
@@ -506,8 +506,6 @@ def data_rate_vista_automated(
                 with open(results_list_path, "rb") as f:
                     results = pickle.load(f)
                     # print("in else", type(scenes))
-        else:
-            pass
 
         # Calculate deltas using the simple method.
         # Calculate the total possible number of Cartesian voxels within our FOV given in spherical coordinates.
@@ -526,7 +524,7 @@ def data_rate_vista_automated(
                 (data["r_high"]-data["r_low"])/data["r_size"])
             total_voxels = azimuth_capacity * elevation_capacity * radius_capacity
 
-        results_list_path = os.path.join(os.getcwd(), 'results.pkl')
+        results_list_path = os.path.join(os.getcwd(), 'results_cart.pkl')
         results = None
         if not os.path.exists(results_list_path):
             with mp.Pool(numCores) as p:
@@ -562,8 +560,6 @@ def data_rate_vista_automated(
                                                               1] / np.max(outmatrix_volume2[i][:, 1])  # BANDAID FIX
             outmatrix_count2[i][:, 1] = outmatrix_count2[i][:,
                                                             1] / np.max(outmatrix_count2[i][:, 1])
-    else:
-        pass
 
     # calculating rolling average
     def rolling_average(input, col):
@@ -584,8 +580,7 @@ def data_rate_vista_automated(
         outmatrix_volume_ave = []
         outmatrix_volume2_ave = []
         outmatrix_count2_ave = []
-    else:
-        pass
+
     outmatrix_count_ave = []
 
     # Get rolling averages for all deltas
@@ -615,8 +610,6 @@ def data_rate_vista_automated(
                                                           1] * log_inverse_delta
             an_data_rate.append(np.transpose(
                 np.array([delta_log_inverse_delta * datarate_buffer])))
-        else:
-            pass
 
         # Calculate data rate from simple method.
         log_inverse_delta2 = np.log((1/(2*outmatrix_count[i][:, 1])))
