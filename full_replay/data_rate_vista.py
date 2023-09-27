@@ -484,11 +484,11 @@ def data_rate_vista_automated(
         # Calculate deltas using the volume method if selected.
         if USE_VOLUMETRIC:
             results_list_path = os.path.join(os.getcwd(), 'results_vol.pkl')
-            results = None
+            results_vol = None
             if not os.path.exists(results_list_path):
                 with mp.Pool(numCores) as p:
                     inputData = [(voxel_rsize, voxel_asize, voxel_esize, data, i, vistaoutput_path[itr],
-                                point_density, max_volume, global_offset) for i in range(smallest, upperbound, resolution)]
+                                  point_density, max_volume, global_offset) for i in range(smallest, upperbound, resolution)]
                     results = []
                     with tqdm(total=len(inputData), desc="Processing Volume") as pbar:
                         for result in p.imap(multiprocessed_vol_funct, inputData):
@@ -501,10 +501,15 @@ def data_rate_vista_automated(
 
                 with open(results_list_path, "wb") as f:
                     pickle.dump(results, f)
+                    results_vol = results
             else:
                 print("Loading saved list...")
                 with open(results_list_path, "rb") as f:
                     results = pickle.load(f)
+                    for result in results:
+                        outmatrix_volume[itr][(
+                            result[0] - smallest)//resolution] = result[1]
+
                     # print("in else", type(scenes))
 
         # Calculate deltas using the simple method.
@@ -525,11 +530,11 @@ def data_rate_vista_automated(
             total_voxels = azimuth_capacity * elevation_capacity * radius_capacity
 
         results_list_path = os.path.join(os.getcwd(), 'results_cart.pkl')
-        results = None
+        results_cart = None
         if not os.path.exists(results_list_path):
             with mp.Pool(numCores) as p:
                 inputData = [(voxel_rsize, voxel_asize, voxel_esize, data, i, vistaoutput_path[itr],
-                            point_density, total_voxels, global_offset) for i in range(smallest, upperbound, resolution)]
+                              point_density, total_voxels, global_offset) for i in range(smallest, upperbound, resolution)]
                 results = []
                 with tqdm(total=len(inputData), desc="Processing Count") as pbar:
                     for result in p.imap(multiprocessed_count_funct, inputData):
@@ -541,12 +546,14 @@ def data_rate_vista_automated(
                         pbar.update()
             with open(results_list_path, "wb") as f:
                 pickle.dump(results, f)
+                results_cart = results
         else:
             print("Loading saved list...")
             with open(results_list_path, "rb") as f:
                 results = pickle.load(f)
-                # print("in else", type(scenes))
-
+                for result in results:
+                    outmatrix_count[itr][(
+                        result[0] - smallest)//resolution] = result[1]
 
     print('\nDone!')
 
@@ -769,7 +776,7 @@ def data_rate_vista_automated(
         plt_images_dir = os.path.join(os.getcwd(), "plt_images")
         if not os.path.exists(plt_images_dir):
             os.makedirs(plt_images_dir)
-        
+
         def update(frame):
             # for each frame, update the data stored on each artist.
             x = t[:frame]
@@ -783,22 +790,23 @@ def data_rate_vista_automated(
             plt.savefig(os.path.join(plt_images_dir, f'frame_{len(x)}.png'))
             return (scat, line2)
 
-        ani = animation.FuncAnimation(fig=fig, func=update, frames=40, interval=30, repeat=False)
+        ani = animation.FuncAnimation(
+            fig=fig, func=update, frames=40, interval=30, repeat=False)
         plt.show()
 
     # Datarate graphs
     if not enable_graphical:
         if enable_regression:
             # Get data rate plots for simple method
-            fig53, ax53 = showDataRateGraph(outmatrix_count,an_data_rate2,\
-                an_data_rate2_ave,'Simple method datarate','Data rate for occupancy count','distance (m)',\
-                   'Atomic norm Data rate',True)   
+            fig53, ax53 = showDataRateGraph(outmatrix_count, an_data_rate2,
+                                            an_data_rate2_ave, 'Simple method datarate', 'Data rate for occupancy count', 'distance (m)',
+                                            'Atomic norm Data rate', True)
 
             # Get data rate plots for volume method
             if USE_VOLUMETRIC:
-                fig43, ax43 = showDataRateGraph(outmatrix_count,an_data_rate,\
-                    an_data_rate_ave,'Volume method datarate','Data rate for volumetric method','distance (m)',\
-                    'Atomic norm Data rate',True)    
+                fig43, ax43 = showDataRateGraph(outmatrix_count, an_data_rate,
+                                                an_data_rate_ave, 'Volume method datarate', 'Data rate for volumetric method', 'distance (m)',
+                                                'Atomic norm Data rate', True)
         else:
             # TO UPDATE
             '''
@@ -823,14 +831,14 @@ def data_rate_vista_automated(
             #plt.show(block=False)   
             #plt.show()    
             '''
-    # plt.show()
+    plt.show()
     print("done saving")
 
 
 def main():
     args = file_tools.parse_cmdline_args()
     sensorcon_path = file_tools.obtain_sensor_path(args)
-    path2scenes =  [os.path.abspath(os.environ["VISTA_OUTPUT_PATH"])]
+    path2scenes = [os.path.abspath(os.environ["VISTA_OUTPUT_PATH"])]
 
     data_rate_vista_automated(
         sensorcon_path=sensorcon_path,
