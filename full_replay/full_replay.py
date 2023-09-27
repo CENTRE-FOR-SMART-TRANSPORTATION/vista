@@ -576,7 +576,7 @@ def combine_images(car_path: str, sensor_path: str, graph_path: str):
         graph_w_start = w1 - (w3) - 100
         out[0:h1, 0:w1] = img1
         out[h1:h1+h2, 0:w1] = img2
-        out[graph_h_start:graph_h_start+h3, graph_w_start:graph_w_start+w3]
+        out[graph_h_start:graph_h_start+h3, graph_w_start:graph_w_start+w3] = resized
 
         cv2.imwrite(os.path.join(os.getcwd(), "combined_images", f"{i}.png"), out)
     
