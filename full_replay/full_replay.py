@@ -523,7 +523,7 @@ def combine_images(car_path: str, sensor_path: str, graph_path: str):
     out_path = os.path.join(os.getcwd(), "combined_images")
     if not os.path.exists(out_path):
         os.makedirs(out_path)
-        
+
     # Read our frames from our temporary directory
     car_path_ext = os.path.join(car_path, '*.png')
     sensor_path_ext = os.path.join(sensor_path, '*.png')
@@ -560,7 +560,7 @@ def combine_images(car_path: str, sensor_path: str, graph_path: str):
 
         # print(h3, w3)
 
-        scale_percent = 60 # percent of original size
+        scale_percent = 90 # percent of original size
         w3 = int(img3.shape[1] * scale_percent / 100)
         h3 = int(img3.shape[0] * scale_percent / 100)
         dim = (w3, h3)
