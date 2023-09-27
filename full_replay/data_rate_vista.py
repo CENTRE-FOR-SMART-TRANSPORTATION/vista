@@ -763,33 +763,30 @@ def data_rate_vista_automated(
         print(len(yBarAverageData[0]))
         print(min(xBarData[0][:, 0]), max(xBarData[0][:, 0]))
         print(min(yBarData[0]), max(yBarData[0]))
-        # fig, ax = plt.subplots()
+        fig, ax = plt.subplots()
 
-        # # scat = ax.scatter(xBarData[0][0], yBarData[0], c="b", s=5, label=f'v0 = {v0} m/s')
-        # line2 = ax.plot(t[0], z2[0], label=f'v0 = {v02} m/s')[0]
-        # ax.set(xlim=[0, 3], ylim=[-4, 10], xlabel=xlabel, ylabel=ylabel)
-        # ax.legend()
+        line2 = ax.plot(xBarData[0][0, 0], yBarData[0][0], label=graphTitle)[0]
+        ax.set(xlim=[min(xBarData[0][:, 0]), max(xBarData[0][:, 0])], ylim=[min(yBarData[0]), max(yBarData[0])], xlabel=xlabel, ylabel=ylabel)
+        ax.legend()
 
         # plt_images_dir = os.path.join(os.getcwd(), "plt_images")
         # if not os.path.exists(plt_images_dir):
         #     os.makedirs(plt_images_dir)
 
-        # def update(frame):
-        #     # for each frame, update the data stored on each artist.
-        #     x = t[:frame]
-        #     y = z[:frame]
-        #     # update the scatter plot:
-        #     data = np.stack([x, y]).T
-        #     scat.set_offsets(data)
-        #     # update the line plot:
-        #     line2.set_xdata(t[:frame])
-        #     line2.set_ydata(z2[:frame])
-        #     plt.savefig(os.path.join(plt_images_dir, f'frame_{len(x)}.png'))
-        #     return (scat, line2)
+        def update(frame):
+            # for each frame, update the data stored on each artist.
+            x = xBarData[0][:frame, 0]
+            y = yBarData[0][:frame]
 
-        # ani = animation.FuncAnimation(
-        #     fig=fig, func=update, frames=40, interval=30, repeat=False)
-        # plt.show()
+            # update the line plot:
+            line2.set_xdata(x)
+            line2.set_ydata(y)
+            # plt.savefig(os.path.join(plt_images_dir, f'frame_{len(x)}.png'))
+            return (line2)
+
+        ani = animation.FuncAnimation(
+            fig=fig, func=update, frames=len(xBarData[0]), interval=30, repeat=False)
+        plt.show()
 
     # Datarate graphs
     if enable_graphical:
