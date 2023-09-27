@@ -9,10 +9,11 @@ from tqdm import tqdm
 import matplotlib.pyplot as plt
 import copy
 from mplcursors import cursor
+import matplotlib.animation as animation
 
 import file_tools
 
-USE_VOLUMETRIC = True
+USE_VOLUMETRIC = False
 USE_CARTESIAN = True
 x_res = 0.11
 y_res = 0.11
@@ -482,18 +483,29 @@ def data_rate_vista_automated(
 
         # Calculate deltas using the volume method if selected.
         if USE_VOLUMETRIC:
-            with mp.Pool(numCores) as p:
-                inputData = [(voxel_rsize, voxel_asize, voxel_esize, data, i, vistaoutput_path[itr],
-                              point_density, max_volume, global_offset) for i in range(smallest, upperbound, resolution)]
-                results = []
-                with tqdm(total=len(inputData), desc="Processing Volume") as pbar:
-                    for result in p.imap(multiprocessed_vol_funct, inputData):
-                        # result[0] is i in line 119. This subtraction is done so that result[1] can be inserted into
-                        # outmatrix_volume at the proper index, which starts from 0, rather than at the variable "smallest"
-                        outmatrix_volume[itr][(
-                            result[0] - smallest)//resolution] = result[1]
-                        results.append(result)
-                        pbar.update()
+            results_list_path = os.path.join(os.getcwd(), 'results.pkl')
+            results = None
+            if not os.path.exists(scenes_list_path):
+                with mp.Pool(numCores) as p:
+                    inputData = [(voxel_rsize, voxel_asize, voxel_esize, data, i, vistaoutput_path[itr],
+                                point_density, max_volume, global_offset) for i in range(smallest, upperbound, resolution)]
+                    results = []
+                    with tqdm(total=len(inputData), desc="Processing Volume") as pbar:
+                        for result in p.imap(multiprocessed_vol_funct, inputData):
+                            # result[0] is i in line 119. This subtraction is done so that result[1] can be inserted into
+                            # outmatrix_volume at the proper index, which starts from 0, rather than at the variable "smallest"
+                            outmatrix_volume[itr][(
+                                result[0] - smallest)//resolution] = result[1]
+                            results.append(result)
+                            pbar.update()
+
+                with open(scenes_list_path, "wb") as f:
+                    pickle.dump(results, f)
+            else:
+                print("Loading saved list...")
+                with open(results_list_path, "rb") as f:
+                    results = pickle.load(f)
+                    # print("in else", type(scenes))
         else:
             pass
 
@@ -514,18 +526,29 @@ def data_rate_vista_automated(
                 (data["r_high"]-data["r_low"])/data["r_size"])
             total_voxels = azimuth_capacity * elevation_capacity * radius_capacity
 
-        with mp.Pool(numCores) as p:
-            inputData = [(voxel_rsize, voxel_asize, voxel_esize, data, i, vistaoutput_path[itr],
-                          point_density, total_voxels, global_offset) for i in range(smallest, upperbound, resolution)]
-            results = []
-            with tqdm(total=len(inputData), desc="Processing Count") as pbar:
-                for result in p.imap(multiprocessed_count_funct, inputData):
-                    # result[0] is i in line 133. This subtraction is done so that result[1] can be inserted into
-                    # outmatrix_count at the proper index, which starts from 0, rather than at the variable "smallest"
-                    outmatrix_count[itr][(
-                        result[0] - smallest)//resolution] = result[1]
-                    results.append(result)
-                    pbar.update()
+        results_list_path = os.path.join(os.getcwd(), 'results.pkl')
+        results = None
+        if not os.path.exists(scenes_list_path):
+            with mp.Pool(numCores) as p:
+                inputData = [(voxel_rsize, voxel_asize, voxel_esize, data, i, vistaoutput_path[itr],
+                            point_density, total_voxels, global_offset) for i in range(smallest, upperbound, resolution)]
+                results = []
+                with tqdm(total=len(inputData), desc="Processing Count") as pbar:
+                    for result in p.imap(multiprocessed_count_funct, inputData):
+                        # result[0] is i in line 133. This subtraction is done so that result[1] can be inserted into
+                        # outmatrix_count at the proper index, which starts from 0, rather than at the variable "smallest"
+                        outmatrix_count[itr][(
+                            result[0] - smallest)//resolution] = result[1]
+                        results.append(result)
+                        pbar.update()
+            with open(scenes_list_path, "wb") as f:
+                pickle.dump(results, f)
+        else:
+            print("Loading saved list...")
+            with open(results_list_path, "rb") as f:
+                results = pickle.load(f)
+                # print("in else", type(scenes))
+
 
     print('\nDone!')
 
@@ -578,124 +601,6 @@ def data_rate_vista_automated(
             pass
         outmatrix_count_ave.append(rolling_average(outmatrix_count[itr], 1))
 
-    # complementary_colours = [['-r','-c'],['-g','-m'],['-b','-y']]
-    complementary_colours = [['r', 'c'], ['g', 'm'], ['b', 'y']]
-
-    def displayGraph(xBarData, yBarData, yBarAverageData, windowTitle, graphTitle, xlabel, ylabel, isShowOriginal, isShowAverage, isShowRegression):
-        # Need to add main title and axis titles
-        fig, ax = plt.subplots()
-        fig.canvas.manager.set_window_title(f'{windowTitle}')
-        fig.suptitle(f"{graphTitle}", fontsize=12)
-        ax.set_ylabel(f"{ylabel} {get_folder(vistaoutput_path[0])}", color='r')
-        ax.tick_params(axis='y', colors='r')
-        for i in range(numScenes):
-            if i == 0:
-                # ORIGINAL PLOT
-                if isShowOriginal:
-                    ax.plot(xBarData[i][:, 0], yBarData[i]
-                            [:, 1], f'r', label=f'Original)')
-                # ROLLING AVERAHE
-                if isShowAverage:
-                    ax.plot(xBarData[i][:, 0], yBarAverageData[i],
-                            f'g', label=f'Rolling Average')
-                # BEST FIT LINE
-                if isShowRegression:
-                    poly, residual, _, _, _ = np.polyfit(
-                        xBarData[i][:, 0], yBarData[i][:, 1], deg=regression_power, full=True)
-                    ax.plot(xBarData[i][:, 0], np.polyval(poly, xBarData[i][:, 0]), f'b',
-                            label=f'Fitted: {get_folder(vistaoutput_path[i])}')
-            else:
-                ax_new = ax.twinx()
-                # ORIGINAL PLOT
-                if isShowOriginal:
-                    ax_new.plot(xBarData[i][:, 0], yBarData[i]
-                                [:, 1], f'r', label=f'Original)')
-                # ROLLING AVERAGE
-                if isShowAverage:
-                    ax_new.plot(
-                        xBarData[i][:, 0], yBarAverageData[i], f'g', label=f'Rolling Average')
-                # BEST FIT LINE
-                if isShowRegression:
-                    poly, residual, _, _, _ = np.polyfit(
-                        xBarData[i][:, 0], yBarData[i][:, 1], deg=regression_power, full=True)
-                    ax_new.plot(xBarData[i][:, 0], np.polyval(poly, xBarData[i][:, 0]), f'b',
-                                label=f'Fitted: {get_folder(vistaoutput_path[i])}')
-                # Setting new Y-axis
-                ax_new.set_ylabel(
-                    f"{ylabel} {get_folder(vistaoutput_path[i])}", color=complementary_colours[np.mod(i, 3)][0])
-                ax_new.tick_params(
-                    axis='y', colors=complementary_colours[np.mod(i, 3)][0])
-
-                offset = (i - 1) * 0.7
-                ax_new.spines['right'].set_position(('outward', offset * 100))
-
-        ax.set_xlabel(f"{xlabel}")
-        fig.legend()
-        # plt.ylabel("volume ratio (volume of occupied voxel/total volume in sensor)")
-        fig.tight_layout()
-
-        return fig, ax
-
-    # Making graph
-    '''
-    if enable_graphical:
-        if enable_regression:
-            fig1, ax1 = displayGraph(outmatrix_volume,outmatrix_volume,outmatrix_volume_ave,'Volume Method',\
-                'Data ratio of volumetric voxelization method','distance (m)',\
-                    'volume ratio (volume of occupied voxel/total volume in sensor)',True,True,True)
-    
-            fig2, ax2 = displayGraph(outmatrix_count,outmatrix_count,outmatrix_count_ave,'Simple Method',\
-                'Data ratio of simple voxelization method','distance (m)',\
-                    'voxel count ratio (number of occupied voxel/total count in sensor)',True,True,True)
-
-            fig3, ax3 = displayGraph(outmatrix_volume2,outmatrix_volume2,outmatrix_volume2_ave,'Volume Method',\
-                'Delta ratio of volumetric voxelization method','distance (m)',\
-                    'delta ratio (delta/max delta)',True,True,True)       
-
-            fig6, ax6 = displayGraph(outmatrix_count2,outmatrix_count2,outmatrix_count2_ave,'Simple method',\
-                'Delta ratio of simple voxelization method','distance (m)',\
-                    'delta ratio (delta/max delta)',True,True,True)
-        else:
-        '''
-    # TO UPDATE
-    '''
-            fig1 = plt.figure("Volume method (data ratio)")
-            fig1.suptitle("Data ratio of volumetric voxelization method", fontsize=12)
-            for i in range(numScenes):
-                plt.plot(outmatrix_volume[i][:, 0], outmatrix_volume[i][:, 1], f'{complementary_colours[np.mod(i,3)][0]}')
-            plt.xlabel("distance (m)")
-            plt.ylabel("volume ratio (volume of occupied voxel/total volume in sensor)")
-
-            #plt.show(block=False)
-            plt.show() 
-            
-            fig2 = plt.figure("Simple method")
-            fig2.suptitle("Data ratio of simple voxelization method", fontsize=12)
-            for i in range(numScenes):
-                plt.plot(outmatrix_count[i][:, 0], outmatrix_count[i][:, 1], f'{complementary_colours[np.mod(i,3)][0]}')
-            plt.xlabel("distance (m)")
-            plt.ylabel("voxel count ratio (number of occupied voxel/total count in sensor)")
-            
-            #plt.show(block=False)
-            #plt.show() 
-            
-            fig3 = plt.figure("Volume method (delta ratio)")
-            fig3.suptitle("Delta ratio of volumetric voxelization method", fontsize=12)
-            for i in range(numScenes):
-                plt.plot(outmatrix_volume2[i][:, 0], outmatrix_volume2[i][:, 1], f'{complementary_colours[np.mod(i,3)][0]}')
-            plt.xlabel("distance (m)")
-            plt.ylabel("delta ratio (delta/max delta)")
-        
-            #plt.show(block=False) 
-            #plt.show()            
-        '''
-
-    # Data rate calculations
-    # The calculation is the same one present on the paper we are basing this
-    # program off of. Look there to find out how it works.
-
-    # Done in steps to avoid matlab errors.
-    # For outmatrix 1
     datarate_buffer = (32*sensor_range*azimuth_fov*elevation_fov*refresh_rate*bitspermeasurements)\
         / (3*voxel_asize*voxel_esize*voxel_rsize*snrMax)
 
@@ -703,7 +608,6 @@ def data_rate_vista_automated(
     an_data_rate2 = []
 
     for i in range(numScenes):
-
         # Calculate data rate from volumetric method, if selected.
         if USE_VOLUMETRIC:
             log_inverse_delta = np.log((1/(2*outmatrix_volume[i][:, 1])))
