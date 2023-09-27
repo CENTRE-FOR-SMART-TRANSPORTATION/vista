@@ -560,6 +560,9 @@ def combine_images(car_path: str, sensor_path: str):
     # return the height and width to pass on to the create_video function
     return h1+h2, w1
 
-h, w = combine_images(car_path, sensor_images_path)
-images_dir = os.path.join(os.getcwd(), "combined_images")
-create_video(images_dir, w, h, path_to_scenes, filename="combined.mp4")
+# h, w = combine_images(car_path, sensor_images_path)
+# images_dir = os.path.join(os.getcwd(), "combined_images")
+# create_video(images_dir, w, h, path_to_scenes, filename="combined.mp4")
+
+
+# data rate stuff
