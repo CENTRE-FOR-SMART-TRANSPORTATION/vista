@@ -789,7 +789,7 @@ def data_rate_vista_automated(
             # update the line plot:
             line2.set_xdata(x)
             line2.set_ydata(y)
-            plt.savefig(os.path.join(plt_images_dir, f'frame_{len(x)}.png'))
+            plt.savefig(os.path.join(plt_images_dir, f'{len(x)}.png'))
             return (line2)
 
         ani = animation.FuncAnimation(
