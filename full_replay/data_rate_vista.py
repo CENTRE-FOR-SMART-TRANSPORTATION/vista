@@ -13,7 +13,7 @@ import matplotlib.animation as animation
 import pickle
 import file_tools
 
-USE_VOLUMETRIC = False
+USE_VOLUMETRIC = True
 USE_CARTESIAN = True
 x_res = 0.11
 y_res = 0.11
@@ -759,153 +759,53 @@ def data_rate_vista_automated(
         return fig, ax
 
     def saveGraphImages(xBarData, yBarData, yBarAverageData, windowTitle, graphTitle, xlabel, ylabel, isSimple):
-        def plot_and_save(plt_arg1, plt_arg2, plt_arg3, save_path):
-            # Create a new figure and axis for each data point
-            fig, ax = plt.subplots()
+        fig, ax = plt.subplots()
+        t = np.linspace(0, 3, 40)
+        g = -9.81
+        v0 = 12
+        z = g * t**2 / 2 + v0 * t
 
-            fig.canvas.manager.set_window_title(f'{windowTitle}')
-            fig.suptitle(f"{graphTitle}", fontsize=12)
-            ax.set_ylabel(f"{ylabel}", color='black')
-            ax.tick_params(axis='y', colors='black')
+        v02 = 5
+        z2 = g * t**2 / 2 + v02 * t
 
-            # Add your data point to the plot, e.g., using plt.scatter() or plt.plot()
-            # Replace this with your actual data plotting code
-            plt.plot(plt_arg1, plt_arg2,
-                     plt_arg3)
+        scat = ax.scatter(t[0], z[0], c="b", s=5, label=f'v0 = {v0} m/s')
+        line2 = ax.plot(t[0], z2[0], label=f'v0 = {v02} m/s')[0]
+        ax.set(xlim=[0, 3], ylim=[-4, 10], xlabel='Time [s]', ylabel='Z [m]')
+        ax.legend()
 
-            ax.set_xlabel(f"{xlabel}, huh")
-            fig.legend()
-            fig.tight_layout()
-            # Save the current plot as an image
-            plt.savefig(save_path)
-            # Close the figure to release resources (optional)
-            plt.close(fig)
-        if isSimple:
-            colourScheme = [['g', 'm'], ['b', 'y']]
-        else:
-            colourScheme = [['r', 'c'], ['b', 'y']]
-
-        print(len(xBarData[0]))
-        print(type(xBarData[0]))
-        print(len(yBarData[0]))
-        print(type(yBarData[0]))
         plt_images_dir = os.path.join(os.getcwd(), "plt_images")
         if not os.path.exists(plt_images_dir):
             os.makedirs(plt_images_dir)
         
-        for i in range(numScenes):
-            if i == 0:
-                #ORIGINAL PLOT
-                for j in range(len(xBarData[i])):
-                    filename = f"plot_{j + 1}.png"
-                    save_path = os.path.join(plt_images_dir, filename)
-                    plot_and_save(xBarData[i][j, 0], yBarAverageData[i][j],
-                    f'{colourScheme[np.mod(i,2)][1]}', save_path)
-            else:
-                print('else called')
-                ax4_new = ax4.twinx()
-                ax4_new.plot(xBarData[i][:, 0], yBarAverageData[i],
-                    f'{colourScheme[np.mod(i,2)][1]}')
+        def update(frame):
+            # for each frame, update the data stored on each artist.
+            x = t[:frame]
+            y = z[:frame]
+            # update the scatter plot:
+            data = np.stack([x, y]).T
+            scat.set_offsets(data)
+            # update the line plot:
+            line2.set_xdata(t[:frame])
+            line2.set_ydata(z2[:frame])
+            plt.savefig(os.path.join(plt_images_dir, f'frame_{len(x)}.png'))
+            return (scat, line2)
 
-                ax4_new.tick_params(axis='y', colors=f'{colourScheme[np.mod(i,2)][0]}')
+        ani = animation.FuncAnimation(fig=fig, func=update, frames=40, interval=30, repeat=False)
+        plt.show()
 
-                offset = (i - 1) * 0.7
-                ax4_new.spines['right'].set_position(('outward', offset * 100))
-
-    fig, ax = plt.subplots()
-    t = np.linspace(0, 3, 40)
-    g = -9.81
-    v0 = 12
-    z = g * t**2 / 2 + v0 * t
-
-    v02 = 5
-    z2 = g * t**2 / 2 + v02 * t
-
-    scat = ax.scatter(t[0], z[0], c="b", s=5, label=f'v0 = {v0} m/s')
-    line2 = ax.plot(t[0], z2[0], label=f'v0 = {v02} m/s')[0]
-    ax.set(xlim=[0, 3], ylim=[-4, 10], xlabel='Time [s]', ylabel='Z [m]')
-    ax.legend()
-
-    plt_images_dir = os.path.join(os.getcwd(), "plt_images")
-    if not os.path.exists(plt_images_dir):
-        os.makedirs(plt_images_dir)
-    
-    def update(frame):
-        # for each frame, update the data stored on each artist.
-        x = t[:frame]
-        y = z[:frame]
-        # update the scatter plot:
-        data = np.stack([x, y]).T
-        scat.set_offsets(data)
-        # update the line plot:
-        line2.set_xdata(t[:frame])
-        line2.set_ydata(z2[:frame])
-        plt.savefig(os.path.join(plt_images_dir, f'frame_{len(x)}.png'))
-        return (scat, line2)
-
-    ani = animation.FuncAnimation(fig=fig, func=update, frames=40, interval=30, repeat=False)
-    plt.show()
     # Datarate graphs
     if not enable_graphical:
         if enable_regression:
-            # Need to add main title and axis titles
-            ''' # BANDAID FIX  
-            fig4, ax4, fig41, ax41, fig42, ax42, fig43, ax43 = showDataRateGraph(outmatrix_volume,an_data_rate,\
-                an_data_rate_ave,'Volume method datarate','Data rate of volumetric voxelization method','distance (m)',\
-                    'Atomic norm Data rate',False)
-            '''
-
-            # BANDAID FIX
-            # fig5, ax5, fig51, ax51, fig52, ax52, fig53, ax53 = showDataRateGraph(outmatrix_count,an_data_rate2,\
-            #    an_data_rate2_ave,'Simple method datarate','Data rate of simple voxelization method','distance (m)',\
-            #        'Atomic norm Data rate',True)
-
             # Get data rate plots for simple method
-            # saveGraphImages(outmatrix_count, an_data_rate2,
-            #                               an_data_rate2_ave, 'Simple method datarate', 'Data rate for occupancy count', 'distance (m)',
-            #                               'Atomic norm Data rate', True)
+            fig53, ax53 = showDataRateGraph(outmatrix_count,an_data_rate2,\
+                an_data_rate2_ave,'Simple method datarate','Data rate for occupancy count','distance (m)',\
+                   'Atomic norm Data rate',True)   
 
             # Get data rate plots for volume method
             if USE_VOLUMETRIC:
-                pass
-            #     fig43, ax43 = saveGraphImages(outmatrix_count, an_data_rate,
-            #                                   an_data_rate_ave, 'Volume method datarate', 'Data rate for volumetric method', 'distance (m)',
-            #                                   'Atomic norm Data rate', True)
-            else:
-                pass
-
-            '''
-            for i in range(numScenes):
-                plt.figure(f"Method datarate comparison: {get_folder(vistaoutput_path[i])}")
-                plt.suptitle("Data rate of volumetric voxelization method vs simple voxelization method", fontsize=12)
-                plt.plot(outmatrix_volume[i][:, 0], an_data_rate_ave[i],\
-                f'r', label=f'Rolling Average of volumetric method: {get_folder(vistaoutput_path[0])}')
-                plt.plot(outmatrix_count[i][:, 0], an_data_rate2_ave[i],\
-                f'g', label=f'Rolling Average of simple method: {get_folder(vistaoutput_path[0])}')  
-                plt.xlabel("distance (m)")
-                plt.ylabel(f"Data Rate of volumetric voxelization method: {get_folder(vistaoutput_path[i])}")
-                cursor(hover=True)
-            '''
-
-            '''
-            fig7, ax7 = plt.subplots()
-            fig7.canvas.manager.set_window_title(f'Simple vs Volumetric') 
-            fig7.suptitle(f"Simple vs volumetric data rate", fontsize=12)
-            ax7.set_ylabel(f"Data Rate of volumetric voxelization method: {get_folder(vistaoutput_path[0])}",color='r')
-            ax7.tick_params(axis='y', colors='r')
-            
-            #ROLLING AVERAGE
-            ax7.plot(outmatrix_volume[i][:, 0], an_data_rate_ave[i],\
-                f'g', label=f'Rolling Average of volumetric method: {get_folder(vistaoutput_path[0])}')
-            #ROLLING AVERAGE
-            ax7.plot(outmatrix_count[i][:, 0], an_data_rate2_ave[i],\
-                f'g', label=f'Rolling Average of simple method: {get_folder(vistaoutput_path[0])}')  
-            
-            ax7.set_xlabel(f"distance (m)")
-            fig7.legend()
-            fig7.tight_layout()
-            cursor(hover=True)
-            '''
+                fig43, ax43 = showDataRateGraph(outmatrix_count,an_data_rate,\
+                    an_data_rate_ave,'Volume method datarate','Data rate for volumetric method','distance (m)',\
+                    'Atomic norm Data rate',True)    
         else:
             # TO UPDATE
             '''
