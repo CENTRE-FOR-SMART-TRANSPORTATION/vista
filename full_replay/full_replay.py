@@ -143,7 +143,8 @@ def visualize_replay(
             tqdm.tqdm(scenes_list, desc="Replaying and capturing scenes")
         ):
             
-            xyz = scene.point.positions  # IF THE SCENE IS IN TENSOR
+            xyz = scene.point.positions.numpy()  # IF THE SCENE IS IN TENSOR
+            geometry.points = o3d.utility.Vector3dVector(xyz)
             print("hello")
             continue
 
