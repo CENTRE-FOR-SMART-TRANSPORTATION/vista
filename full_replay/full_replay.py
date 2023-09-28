@@ -144,8 +144,9 @@ def visualize_replay(
         ):
             
             xyz = scene.point.positions  # IF THE SCENE IS IN TENSOR
-            print(xyz)
-            return
+            print("hello")
+            continue
+
             if frame == 0:
                 vis.add_geometry(geometry, reset_bounding_box=True)
             else:
