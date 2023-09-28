@@ -143,7 +143,7 @@ def visualize_replay(
             tqdm.tqdm(scenes_list, desc="Replaying and capturing scenes")
         ):
             
-            geometry.points = scene.to_legacy().points  # IF THE SCENE IS IN TENSOR
+            geometry.points = scene.to_legacy().points[:, :3]  # IF THE SCENE IS IN TENSOR
             if frame == 0:
                 vis.add_geometry(geometry, reset_bounding_box=True)
             else:
