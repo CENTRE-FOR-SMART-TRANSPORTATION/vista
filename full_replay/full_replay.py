@@ -43,8 +43,10 @@ class PointCloudOpener:
         # print(f"Opening {scene_name} as pcd...")
 
         # Skip our header, and read only XYZ coordinates
-        df = pd.read_csv(path_to_scene, skiprows=0, usecols=[0, 1, 2])
-        xyz = df.to_numpy() / 1000
+        df = pd.read_csv(path_to_scene, skiprows=0, usecols=[0, 1, 2, 3])
+        xyz = df.iloc[:, :3].to_numpy() / 1000  # Extract XYZ coordinates
+        intensity = df.iloc[:, 3].to_numpy()      # Extract intensity values
+
 
         # Create Open3D point cloud object with tensor values.
         # For parallelization, outputs must be able to be serialized
@@ -52,6 +54,14 @@ class PointCloudOpener:
         pcd.point.positions = o3d.core.Tensor(
             xyz, o3d.core.float32, o3d.core.Device("CPU:0")
         )
+
+        # Create an intensity color map using a colormap (e.g., grayscale)
+        intensity_color = (intensity[:, np.newaxis] / np.max(intensity))  # Normalize intensity values
+        color_map = plt.get_cmap('gray')(intensity_color)  # Use a grayscale colormap
+
+        # Set the colors of the point cloud using the intensity-based color map
+        pcd.point.colors = o3d.core.Tensor(color_map[:, :3], o3d.core.float32, o3d.core.Device("CPU:0"))
+
 
         return pcd
 
@@ -462,48 +472,48 @@ print(
     f"You have chosen the directory {path_to_scenes} as the path to the .txt files")
 
 scenes_list_path = os.path.join(os.getcwd(), 'scenes_list.pkl')
-# scenes = None
-# if not os.path.exists(scenes_list_path):
-#     scenes = obtain_scenes(path_to_scenes)
-#     # print("in if", type(scenes))
-#     with open(scenes_list_path, "wb") as f:
-#         pickle.dump(scenes, f)
-# else:
-#     print("Loading saved list...")
-#     with open(scenes_list_path, "rb") as f:
-#         scenes = pickle.load(f)
-#         # print("in else", type(scenes))
+scenes = None
+if not os.path.exists(scenes_list_path):
+    scenes = obtain_scenes(path_to_scenes)
+    # print("in if", type(scenes))
+    with open(scenes_list_path, "wb") as f:
+        pickle.dump(scenes, f)
+else:
+    print("Loading saved list...")
+    with open(scenes_list_path, "rb") as f:
+        scenes = pickle.load(f)
+        # print("in else", type(scenes))
 
-# print(type(scenes[0]))
+print(type(scenes[0]))
 
 # creating the video from the pov of the driver
 
-# frames, sw, sh = visualize_replay(path_to_scenes, scenes)
-# print(frames, sw, sh)
-# create_video(frames, sw, sh, path_to_scenes)
+frames, sw, sh = visualize_replay(path_to_scenes, scenes)
+print(frames, sw, sh)
+create_video(frames, sw, sh, path_to_scenes)
 
 
 # creating the video from sensor fov
 
-traj_path = os.path.abspath(os.environ["TRAJ_PATH"])
-# traj = utils.obtain_trajectory_details(traj_path)
+# traj_path = os.path.abspath(os.environ["TRAJ_PATH"])
+# # traj = utils.obtain_trajectory_details(traj_path)
 
-cfg_path = os.path.abspath(os.environ["SENSOR_PATH"])
-# cfg = utils.open_sensor_config_file(cfg_path)
+# cfg_path = os.path.abspath(os.environ["SENSOR_PATH"])
+# # cfg = utils.open_sensor_config_file(cfg_path)
 
-las_path = os.path.abspath(os.environ["LAS_FILE_PATH"])
+# las_path = os.path.abspath(os.environ["LAS_FILE_PATH"])
 # road = utils.open_las(las_path)
 
 
-vista_output_path = os.path.abspath(os.environ["VISTA_OUTPUT_PATH"])
+# vista_output_path = os.path.abspath(os.environ["VISTA_OUTPUT_PATH"])
 
-car_path = os.path.join(os.getcwd(), "frame_images/")
-sensor_images_path = os.path.join(os.getcwd(), "fov/")
-graph_path = os.path.join(os.getcwd(), "plt_images/")
+# car_path = os.path.join(os.getcwd(), "frame_images/")
+# sensor_images_path = os.path.join(os.getcwd(), "fov/")
+# graph_path = os.path.join(os.getcwd(), "plt_images/")
 
 
-screen_wh = obtain_screen_size()
-frame_offset = check_for_padded(path_to_scenes)
+# screen_wh = obtain_screen_size()
+# frame_offset = check_for_padded(path_to_scenes)
 
 # road_o3d, src_name = utils.las2o3d_pcd(road)
 # render_sensor_fov(cfg=cfg,
@@ -589,9 +599,9 @@ def combine_images(car_path: str, sensor_path: str, graph_path: str):
     # return the height and width to pass on to the create_video function
     return h1+h2, w1
 
-h, w = combine_images(car_path, sensor_images_path, graph_path)
-images_dir = os.path.join(os.getcwd(), "combined_images")
-create_video(images_dir, w, h, path_to_scenes, filename="combined.mp4")
+# h, w = combine_images(car_path, sensor_images_path, graph_path)
+# images_dir = os.path.join(os.getcwd(), "combined_images")
+# create_video(images_dir, w, h, path_to_scenes, filename="combined.mp4")
 
 
 # data rate stuff
