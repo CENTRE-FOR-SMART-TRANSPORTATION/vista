@@ -50,10 +50,8 @@ class PointCloudOpener:
 
         # Create Open3D point cloud object with tensor values.
         # For parallelization, outputs must be able to be serialized
-        pcd = o3d.t.geometry.PointCloud(o3d.core.Device("CPU:0"))
-        pcd.point.positions = o3d.core.Tensor(
-            xyz, o3d.core.float32, o3d.core.Device("CPU:0")
-        )
+        pcd = o3d.geometry.PointCloud()
+        pcd.points = o3d.utility.Vector3dVector(xyz)
 
         # Create an intensity color map using a colormap (e.g., grayscale)
         # Normalize intensity values
@@ -62,8 +60,7 @@ class PointCloudOpener:
             intensity_color)  # Use a grayscale colormap
 
         # Set the colors of the point cloud using the intensity-based color map
-        pcd.point.colors = o3d.core.Tensor(
-            color_map[:, :3], o3d.core.float32, o3d.core.Device("CPU:0"))
+        pcd.colors = o3d.utility.Vector3dVector(color_map[:, :3])
 
         return pcd
 
@@ -143,7 +140,7 @@ def visualize_replay(
             tqdm.tqdm(scenes_list, desc="Replaying and capturing scenes")
         ):
             
-            geometry.points = o3d.utility.Vector3dVector(np.asarray(scene.point.positions))  # IF THE SCENE IS IN TENSOR
+            geometry.points = scene.points # IF THE SCENE IS IN TENSOR
             if frame == 0:
                 vis.add_geometry(geometry, reset_bounding_box=True)
             else:
