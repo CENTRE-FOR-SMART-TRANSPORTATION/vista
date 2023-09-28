@@ -16,7 +16,7 @@ from pathlib import Path
 import tqdm
 import utils
 
-import matplotlib.pyplot as plt
+import matplotlib
 from classes import SensorConfig, Trajectory
 
 
@@ -53,14 +53,11 @@ class PointCloudOpener:
         pcd = o3d.geometry.PointCloud()
         pcd.points = o3d.utility.Vector3dVector(xyz)
 
-        # Create an intensity color map using a colormap (e.g., grayscale)
-        # Normalize intensity values
-        intensity_color = (intensity[:, np.newaxis] / np.max(intensity))
-        color_map = plt.get_cmap('gray')(
-            intensity_color)  # Use a grayscale colormap
-
-        # Set the colors of the point cloud using the intensity-based color map
-        pcd.colors = o3d.utility.Vector3dVector(color_map[:, :3])
+        normalizer = matplotlib.colors.Normalize(
+            np.min(intensity), np.max(intensity))
+        las_rgb = matplotlib.cm.gray(normalizer(intensity))[:, :-1]
+        # cmap(las_intensity) returns RGBA, cut alpha channel
+        pcd.colors = o3d.utility.Vector3dVector(las_rgb)
 
         return pcd
 
