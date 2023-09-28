@@ -91,7 +91,7 @@ def obtain_scenes(path_to_scenes):
 
     from joblib import Parallel, delayed
 
-    pcds = Parallel(n_jobs=cores)(  # Switched to loky backend to maybe suppress errors?
+    pcds = Parallel(n_jobs=cores, backend="loky")(  # Switched to loky backend to maybe suppress errors?
         delayed(opener.open_point_cloud)(path_to_scenes, frame, res)
         for frame, res in tqdm.tqdm(
             args,
