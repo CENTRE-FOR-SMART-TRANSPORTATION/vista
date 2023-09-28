@@ -60,7 +60,7 @@ class PointCloudOpener:
             intensity_color)  # Use a grayscale colormap
 
         # Set the colors of the point cloud using the intensity-based color map
-        pcd.colors = o3d.utility.Vector3dVector(color_map[:, :3])
+        # pcd.colors = o3d.utility.Vector3dVector(color_map[:, :3])
 
         return pcd
 
