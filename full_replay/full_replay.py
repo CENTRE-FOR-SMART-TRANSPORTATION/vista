@@ -145,8 +145,6 @@ def visualize_replay(
             
             xyz = scene.point.positions.numpy()  # IF THE SCENE IS IN TENSOR
             geometry.points = o3d.utility.Vector3dVector(xyz)
-            print("hello")
-            continue
 
             if frame == 0:
                 vis.add_geometry(geometry, reset_bounding_box=True)
