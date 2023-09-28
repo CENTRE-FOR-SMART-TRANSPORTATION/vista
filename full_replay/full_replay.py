@@ -16,7 +16,7 @@ from pathlib import Path
 import tqdm
 import utils
 
-import matplotlib
+import matplotlib.pyplot as plt
 from classes import SensorConfig, Trajectory
 
 
@@ -50,14 +50,20 @@ class PointCloudOpener:
 
         # Create Open3D point cloud object with tensor values.
         # For parallelization, outputs must be able to be serialized
-        pcd = o3d.geometry.PointCloud()
-        pcd.points = o3d.utility.Vector3dVector(xyz)
+        pcd = o3d.t.geometry.PointCloud(o3d.core.Device("CPU:0"))
+        pcd.point.positions = o3d.core.Tensor(
+            xyz, o3d.core.float32, o3d.core.Device("CPU:0")
+        )
 
-        normalizer = matplotlib.colors.Normalize(
-            np.min(intensity), np.max(intensity))
-        las_rgb = matplotlib.cm.gray(normalizer(intensity))[:, :-1]
-        # cmap(las_intensity) returns RGBA, cut alpha channel
-        pcd.colors = o3d.utility.Vector3dVector(las_rgb)
+        # Create an intensity color map using a colormap (e.g., grayscale)
+        # Normalize intensity values
+        intensity_color = (intensity[:, np.newaxis] / np.max(intensity))
+        color_map = plt.get_cmap('gray')(
+            intensity_color)  # Use a grayscale colormap
+
+        # Set the colors of the point cloud using the intensity-based color map
+        pcd.point.colors = o3d.core.Tensor(
+            color_map[:, :3], o3d.core.float32, o3d.core.Device("CPU:0"))
 
         return pcd
 
@@ -88,7 +94,7 @@ def obtain_scenes(path_to_scenes):
 
     from joblib import Parallel, delayed
 
-    pcds = Parallel(n_jobs=cores, backend="loky")(  # Switched to loky backend to maybe suppress errors?
+    pcds = Parallel(n_jobs=cores)(  # Switched to loky backend to maybe suppress errors?
         delayed(opener.open_point_cloud)(path_to_scenes, frame, res)
         for frame, res in tqdm.tqdm(
             args,
@@ -137,7 +143,9 @@ def visualize_replay(
             tqdm.tqdm(scenes_list, desc="Replaying and capturing scenes")
         ):
             
-            geometry.points = scene.points # IF THE SCENE IS IN TENSOR
+            xyz = scene.point.positions  # IF THE SCENE IS IN TENSOR
+            print(xyz)
+            return
             if frame == 0:
                 vis.add_geometry(geometry, reset_bounding_box=True)
             else:
