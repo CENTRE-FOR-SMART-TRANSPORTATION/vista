@@ -47,7 +47,6 @@ class PointCloudOpener:
         xyz = df.iloc[:, :3].to_numpy() / 1000  # Extract XYZ coordinates
         intensity = df.iloc[:, 3].to_numpy()      # Extract intensity values
 
-
         # Create Open3D point cloud object with tensor values.
         # For parallelization, outputs must be able to be serialized
         pcd = o3d.t.geometry.PointCloud(o3d.core.Device("CPU:0"))
@@ -56,12 +55,14 @@ class PointCloudOpener:
         )
 
         # Create an intensity color map using a colormap (e.g., grayscale)
-        intensity_color = (intensity[:, np.newaxis] / np.max(intensity))  # Normalize intensity values
-        color_map = plt.get_cmap('gray')(intensity_color)  # Use a grayscale colormap
+        # Normalize intensity values
+        intensity_color = (intensity[:, np.newaxis] / np.max(intensity))
+        color_map = plt.get_cmap('gray')(
+            intensity_color)  # Use a grayscale colormap
 
         # Set the colors of the point cloud using the intensity-based color map
-        pcd.point.colors = o3d.core.Tensor(color_map[:, :3], o3d.core.float32, o3d.core.Device("CPU:0"))
-
+        pcd.point.colors = o3d.core.Tensor(
+            color_map[:, :3], o3d.core.float32, o3d.core.Device("CPU:0"))
 
         return pcd
 
@@ -237,7 +238,7 @@ def visualize_replay(
     return
 
 
-def create_video(images_dir: str, w: int, h: int, path_to_scenes: str, vehicle_speed: np.float32 = 100, point_density: np.float32 = 1.0, filename : str = "") -> None:
+def create_video(images_dir: str, w: int, h: int, path_to_scenes: str, vehicle_speed: np.float32 = 100, point_density: np.float32 = 1.0, filename: str = "") -> None:
     """Creates a video from the recorded frames.
 
     Args:
@@ -279,7 +280,8 @@ def create_video(images_dir: str, w: int, h: int, path_to_scenes: str, vehicle_s
 
     # Configure video writer
     fourcc = cv2.VideoWriter_fourcc(*"mp4v")
-    fps = np.ceil((vehicle_speed/3.6)/(1*point_density))
+    fps_speed = 2 # to increase or decrease the speed of the video
+    fps = fps_speed*np.ceil((vehicle_speed/3.6)/(1*point_density))
     writer = cv2.VideoWriter(output_path, fourcc, fps, (w, h))
 
     # Parameters for annotating text
@@ -549,9 +551,9 @@ def combine_images(car_path: str, sensor_path: str, graph_path: str):
                      for abs_path in glob.glob(sensor_path_ext)]
     sensor_images = sorted(
         sensor_images, key=lambda f: int(os.path.splitext(f)[0]))
-    
+
     graph_images = [os.path.basename(abs_path)
-                     for abs_path in glob.glob(graph_path_ext)]
+                    for abs_path in glob.glob(graph_path_ext)]
     graph_images = sorted(
         graph_images, key=lambda f: int(os.path.splitext(f)[0]))
 
@@ -568,33 +570,37 @@ def combine_images(car_path: str, sensor_path: str, graph_path: str):
         (h2, w2) = img2.shape[:2]
         (h3, w3) = img3.shape[:2]
 
-        # print(h3, w3)
-
-        scale_percent = 90 # percent of original size
-        w3 = int(img3.shape[1] * scale_percent / 100)
-        h3 = int(img3.shape[0] * scale_percent / 100)
-        dim = (w3, h3)
-        
-        # resize image
-        resized = cv2.resize(img3, dim, interpolation = cv2.INTER_AREA)
-
         img1 = img1[h1//5:h1-(h1//3 + h1//10), :]
         img2 = img2[h2//7:, :]
-
+        
         (h1, w1) = img1.shape[:2]
         (h2, w2) = img2.shape[:2]
 
+
+        scale_percent = 90  # percent of original size
+        w3 = int(img3.shape[1] * scale_percent / 100)
+        h3 = int(img3.shape[0] * scale_percent / 100)
+        dim = (w3, h3)
+
+        # resize image
+        resized = cv2.resize(img3, dim, interpolation=cv2.INTER_AREA)
+
+        w1_new = w2 - w3
+        img1_scale_percent = int(w1_new * (100 / img1.shape[1]))
+        h1_new = int(img1.shape[0] * img1_scale_percent / 100)
+        dim = (w1_new, h1_new)
+        img1_resized = cv2.resize(img1, dim, interpolation=cv2.INTER_AREA)
+
         out = np.zeros((h1 + h2, w1, 3), dtype="uint8")
-        
-        graph_w_start = w1 - (w3) - 100
-        out[0:h1, 0:w1] = img1
+
+        out[0:h1, 0:w1_new] = img1_resized
         out[h1:h1+h2, 0:w1] = img2
-        out[h1:h1+h3, graph_w_start:graph_w_start+w3] = resized
+        out[0:h1, w1_new:w1_new+w3] = resized
 
         return h1+h2, w1
 
-        cv2.imwrite(os.path.join(os.getcwd(), "combined_images", f"{i}.png"), out)
-    
+        cv2.imwrite(os.path.join(
+            os.getcwd(), "combined_images", f"{i}.png"), out)
 
     # return the height and width to pass on to the create_video function
     return h1+h2, w1
