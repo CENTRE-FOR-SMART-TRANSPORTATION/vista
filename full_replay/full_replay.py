@@ -561,6 +561,7 @@ def combine_images(car_path: str, sensor_path: str, graph_path: str):
         graph_images, key=lambda f: int(os.path.splitext(f)[0]))
 
     for i in range(len(car_images)):
+        print("hello")
         car_image = os.path.join(car_path, car_images[i])
         sensor_image = os.path.join(sensor_path, sensor_images[i])
         graph_image = os.path.join(graph_path, graph_images[i])
