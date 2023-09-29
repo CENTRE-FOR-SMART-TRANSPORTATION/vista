@@ -146,6 +146,7 @@ def visualize_replay(
             print('intensity', intensity)
             print('intensity.shape', intensity.shape)
             print('points.shape', xyz.shape)
+            print('points', xyz)
             # geometry.colors = o3d.utility.Vector3dVector(las_rgb)
 
             if frame == 0:
