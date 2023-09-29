@@ -143,7 +143,8 @@ def visualize_replay(
             normalizer = matplotlib.colors.Normalize(
                 np.min(intensity), np.max(intensity))
             las_rgb = matplotlib.cm.gray(normalizer(intensity))[:, :-1]
-            geometry.colors = o3d.utility.Vector3dVector(las_rgb)
+            print(las_rgb)
+            # geometry.colors = o3d.utility.Vector3dVector(las_rgb)
 
             if frame == 0:
                 vis.add_geometry(geometry, reset_bounding_box=True)
