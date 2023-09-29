@@ -46,7 +46,7 @@ class PointCloudOpener:
         # Skip our header, and read only XYZ coordinates
         df = pd.read_csv(path_to_scene, skiprows=0, usecols=[0, 1, 2, 3])
         xyz = df.iloc[:, :3].to_numpy() / 1000  # Extract XYZ coordinates
-        intensity = df.iloc[:, 3].to_numpy()      # Extract intensity values
+        intensity = df.iloc[:, 3].to_numpy() / 1000     # Extract intensity values
 
         # Create Open3D point cloud object with tensor values.
         # For parallelization, outputs must be able to be serialized
