@@ -16,7 +16,7 @@ from pathlib import Path
 import tqdm
 import utils
 
-import matplotlib.pyplot as plt
+import matplotlib
 from classes import SensorConfig, Trajectory
 
 
