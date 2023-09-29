@@ -283,7 +283,7 @@ def create_video(images_dir: str, w: int, h: int, path_to_scenes: str, vehicle_s
 
     # Configure video writer
     fourcc = cv2.VideoWriter_fourcc(*"mp4v")
-    fps_speed = 2  # to increase or decrease the speed of the video
+    fps_speed = 4  # to increase or decrease the speed of the video
     fps = fps_speed*np.ceil((vehicle_speed/3.6)/(1*point_density))
     writer = cv2.VideoWriter(output_path, fourcc, fps, (w, h))
 
@@ -604,6 +604,8 @@ def combine_images(car_path: str, sensor_path: str, graph_path: str):
         out[0:h1_new, 0:w1_new] = img1_resized
         out[h1:h1+h2, 0:w1] = img2
         out[0:h3, w1_new:w1_new+w3] = resized
+
+        return h1+h2, w2
 
         cv2.imwrite(os.path.join(
             os.getcwd(), "combined_images", f"{i}.png"), out)
