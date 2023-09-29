@@ -605,8 +605,6 @@ def combine_images(car_path: str, sensor_path: str, graph_path: str):
         out[h1:h1+h2, 0:w1] = img2
         out[0:h3, w1_new:w1_new+w3] = resized
 
-        return h1+h2, w1
-
         cv2.imwrite(os.path.join(
             os.getcwd(), "combined_images", f"{i}.png"), out)
 
