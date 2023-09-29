@@ -55,15 +55,9 @@ class PointCloudOpener:
             xyz, o3d.core.float32, o3d.core.Device("CPU:0")
         )
 
-        # Create an intensity color map using a colormap (e.g., grayscale)
-        # Normalize intensity values
-        intensity_color = (intensity[:, np.newaxis] / np.max(intensity))
-        color_map = plt.get_cmap('gray')(
-            intensity_color)  # Use a grayscale colormap
-
         # Set the colors of the point cloud using the intensity-based color map
         pcd.point.colors = o3d.core.Tensor(
-            color_map[:, :3], o3d.core.float32, o3d.core.Device("CPU:0"))
+            intensity, o3d.core.float32, o3d.core.Device("CPU:0"))
 
         return pcd
 
@@ -142,10 +136,14 @@ def visualize_replay(
         for frame, scene in enumerate(
             tqdm.tqdm(scenes_list, desc="Replaying and capturing scenes")
         ):
-            
+
             xyz = scene.point.positions.numpy()  # IF THE SCENE IS IN TENSOR
             geometry.points = o3d.utility.Vector3dVector(xyz)
-            geometry.colors = o3d.utility.Vector3dVector(scene.point.colors.numpy())
+            intensity = scene.point.colors.numpy()
+            normalizer = matplotlib.colors.Normalize(
+                np.min(intensity), np.max(intensity))
+            las_rgb = matplotlib.cm.gray(normalizer(intensity))[:, :-1]
+            geometry.colors = o3d.utility.Vector3dVector(las_rgb)
 
             if frame == 0:
                 vis.add_geometry(geometry, reset_bounding_box=True)
@@ -285,7 +283,7 @@ def create_video(images_dir: str, w: int, h: int, path_to_scenes: str, vehicle_s
 
     # Configure video writer
     fourcc = cv2.VideoWriter_fourcc(*"mp4v")
-    fps_speed = 2 # to increase or decrease the speed of the video
+    fps_speed = 2  # to increase or decrease the speed of the video
     fps = fps_speed*np.ceil((vehicle_speed/3.6)/(1*point_density))
     writer = cv2.VideoWriter(output_path, fourcc, fps, (w, h))
 
@@ -577,10 +575,9 @@ def combine_images(car_path: str, sensor_path: str, graph_path: str):
 
         img1 = img1[h1//5:h1-(h1//3 + h1//10), :]
         img2 = img2[h2//7:, :]
-        
+
         (h1, w1) = img1.shape[:2]
         (h2, w2) = img2.shape[:2]
-
 
         scale_percent = 90  # percent of original size
         w3 = int(img3.shape[1] * scale_percent / 100)
