@@ -471,25 +471,25 @@ def check_for_padded(path_to_scenes: str) -> int:
 # main code that runs everything
 
 
-path_to_scenes = os.path.abspath(os.environ["PATH_TO_SCENES"])
+# path_to_scenes = os.path.abspath(os.environ["PATH_TO_SCENES"])
 
-print(
-    f"You have chosen the directory {path_to_scenes} as the path to the .txt files")
+# print(
+#     f"You have chosen the directory {path_to_scenes} as the path to the .txt files")
 
-scenes_list_path = os.path.join(os.getcwd(), 'scenes_list.pkl')
-scenes = None
-if not os.path.exists(scenes_list_path):
-    scenes = obtain_scenes(path_to_scenes)
-    # print("in if", type(scenes))
-    with open(scenes_list_path, "wb") as f:
-        pickle.dump(scenes, f)
-else:
-    print("Loading saved list...")
-    with open(scenes_list_path, "rb") as f:
-        scenes = pickle.load(f)
-        # print("in else", type(scenes))
+# scenes_list_path = os.path.join(os.getcwd(), 'scenes_list.pkl')
+# scenes = None
+# if not os.path.exists(scenes_list_path):
+#     scenes = obtain_scenes(path_to_scenes)
+#     # print("in if", type(scenes))
+#     with open(scenes_list_path, "wb") as f:
+#         pickle.dump(scenes, f)
+# else:
+#     print("Loading saved list...")
+#     with open(scenes_list_path, "rb") as f:
+#         scenes = pickle.load(f)
+#         # print("in else", type(scenes))
 
-print(type(scenes[0]))
+# print(type(scenes[0]))
 
 # creating the video from the pov of the driver
 
@@ -512,13 +512,13 @@ print(type(scenes[0]))
 
 # vista_output_path = os.path.abspath(os.environ["VISTA_OUTPUT_PATH"])
 
-# car_path = os.path.join(os.getcwd(), "frame_images/")
-# sensor_images_path = os.path.join(os.getcwd(), "fov/")
-# graph_path = os.path.join(os.getcwd(), "plt_images/")
+car_path = os.path.join(os.getcwd(), "frame_images/")
+sensor_images_path = os.path.join(os.getcwd(), "fov/")
+graph_path = os.path.join(os.getcwd(), "plt_images/")
 
 
-# screen_wh = obtain_screen_size()
-# frame_offset = check_for_padded(path_to_scenes)
+screen_wh = obtain_screen_size()
+frame_offset = check_for_padded(path_to_scenes)
 
 # road_o3d, src_name = utils.las2o3d_pcd(road)
 # render_sensor_fov(cfg=cfg,
