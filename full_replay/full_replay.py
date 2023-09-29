@@ -471,7 +471,7 @@ def check_for_padded(path_to_scenes: str) -> int:
 # main code that runs everything
 
 
-# path_to_scenes = os.path.abspath(os.environ["PATH_TO_SCENES"])
+path_to_scenes = os.path.abspath(os.environ["PATH_TO_SCENES"])
 
 # print(
 #     f"You have chosen the directory {path_to_scenes} as the path to the .txt files")
