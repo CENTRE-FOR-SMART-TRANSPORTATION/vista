@@ -503,7 +503,7 @@ def data_rate_vista_automated(
                     pickle.dump(results, f)
                     results_vol = results
             else:
-                print("Loading saved list...")
+                print("Loading saved list for the volumetric method...")
                 with open(results_list_path, "rb") as f:
                     results = pickle.load(f)
                     for result in results:
@@ -548,7 +548,7 @@ def data_rate_vista_automated(
                 pickle.dump(results, f)
                 results_cart = results
         else:
-            print("Loading saved list...")
+            print("Loading saved list for the cartesian method...")
             with open(results_list_path, "rb") as f:
                 results = pickle.load(f)
                 for result in results:
@@ -671,93 +671,6 @@ def data_rate_vista_automated(
             pass
         an_data_rate2_ave.append(rolling_average(an_data_rate2[itr], 0))
 
-    # green is for simple, red is for volumetric
-    # complementary_colours = [['-r','-c'],['-g','-m'],['-b','-y']]
-    def showDataRateGraph(xBarData, yBarData, yBarAverageData, windowTitle, graphTitle, xlabel, ylabel, isSimple):
-        if isSimple:
-            colourScheme = [['g', 'm'], ['b', 'y']]
-        else:
-            colourScheme = [['r', 'c'], ['b', 'y']]
-
-        fig4, ax4 = plt.subplots()
-        fig4.canvas.manager.set_window_title(f'{windowTitle}')
-        fig4.suptitle(f"{graphTitle}", fontsize=12)
-        ax4.set_ylabel(f"{ylabel}", color='black')
-        ax4.tick_params(axis='y', colors='black')
-        for i in range(numScenes):
-            if i == 0:
-                # ORIGINAL PLOT
-                ax4.plot(xBarData[i][:, 0], yBarAverageData[i],
-                         f'{colourScheme[np.mod(i,2)][1]}')
-            else:
-                print('else called')
-                ax4_new = ax4.twinx()
-                ax4_new.plot(xBarData[i][:, 0], yBarAverageData[i],
-                             f'{colourScheme[np.mod(i,2)][1]}')
-
-                ax4_new.tick_params(
-                    axis='y', colors=f'{colourScheme[np.mod(i,2)][0]}')
-
-                offset = (i - 1) * 0.7
-                ax4_new.spines['right'].set_position(('outward', offset * 100))
-
-        ax4.set_xlabel(f"{xlabel}, huh")
-        fig4.legend()
-        fig4.tight_layout()
-        cursor(hover=True)
-
-        return fig4, ax4
-
-    def displayDataRateGraph(xBarData, yBarData, yBarAverageData, windowTitle, graphTitle, xlabel, ylabel, isShowOriginal, isShowAverage, isShowRegression):
-        fig, ax = plt.subplots()
-        fig.canvas.manager.set_window_title(f'{windowTitle}')
-        fig.suptitle(f"{graphTitle}", fontsize=12)
-        ax.set_ylabel(f"{ylabel} {get_folder(vistaoutput_path[0])}", color='r')
-        ax.tick_params(axis='y', colors='r')
-        for i in range(numScenes):
-            if i == 0:
-                # ORIGINAL PLOT
-                ax.plot(xBarData[i][:, 0], yBarData[i][:, 0],
-                        f'r', label=f'Original: {get_folder(vistaoutput_path[i])}')
-                # ROLLING AVERAGE
-                ax.plot(xBarData[i][:, 0], yBarAverageData[i],
-                        f'g', label=f'Rolling Average')
-                # BEST FIT LINE
-                poly, residual, _, _, _ = np.polyfit(
-                    xBarData[i][:, 0], yBarData[i][:, 0], deg=regression_power, full=True)
-                ax.plot(xBarData[i][:, 0], np.polyval(poly, xBarData[i][:, 0]),
-                        f'b',
-                        label=f'Fitted: {get_folder(vistaoutput_path[i])}')
-            else:
-                ax_new = ax.twinx()
-                # ORIGINAL PLOT
-                ax_new.plot(xBarData[i][:, 0], yBarData[i][:, 0],
-                            f'r', label=f'Original: {get_folder(vistaoutput_path[i])}')
-                # ROLLING AVERAGE
-                ax_new.plot(xBarData[i][:, 0], yBarAverageData[i],
-                            f'g', label=f'Rolling Average')
-                # BEST FIT LINE
-                poly, residual, _, _, _ = np.polyfit(
-                    xBarData[i][:, 0], yBarData[i][:, 0], deg=regression_power, full=True)
-                ax_new.plot(xBarData[i][:, 0], np.polyval(poly, xBarData[i][:, 0]),
-                            f'b',
-                            label=f'Fitted: {get_folder(vistaoutput_path[i])}')
-                # Setting new Y-axis
-                ax_new.set_ylabel(
-                    f"Atomic norm Data rate {get_folder(vistaoutput_path[i])}", color='black')
-                ax_new.tick_params(
-                    axis='y', colors=complementary_colours[np.mod(i, 3)][0])
-
-                offset = (i - 1) * 1
-                ax_new.spines['right'].set_position(('outward', offset * 100))
-
-        ax.set_xlabel(f"{xlabel}")
-        # plt.ylabel("Atomic norm Data rate")
-        fig.legend()
-        fig.tight_layout()
-
-        return fig, ax
-
     def saveGraphImages(xBarData, yBarData, yBarAverageData, windowTitle, graphTitle, xlabel, ylabel, isSimple):
         if isSimple:
             colourScheme = [['g', 'm'], ['b', 'y']]
@@ -773,8 +686,10 @@ def data_rate_vista_automated(
         yrange = ymax-ymin
         ymin, ymax = ymin - yrange//10, ymax + yrange//10
 
-        line2 = ax.plot(xBarData[0][0, 0], yBarData[0][0], color=f'{colourScheme[np.mod(i,2)][1]}')[0]
-        ax.set(xlim=[xmin, xmax], ylim=[ymin, ymax], xlabel=xlabel, ylabel=ylabel, title=graphTitle)
+        line2 = ax.plot(xBarData[0][0, 0], yBarData[0][0],
+                        color=f'{colourScheme[np.mod(i,2)][1]}')[0]
+        ax.set(xlim=[xmin, xmax], ylim=[ymin, ymax],
+               xlabel=xlabel, ylabel=ylabel, title=graphTitle)
         ax.legend()
 
         plt_images_dir = os.path.join(os.getcwd(), "plt_images")
@@ -796,51 +711,12 @@ def data_rate_vista_automated(
             fig=fig, func=update, frames=len(xBarData[0]), interval=30, repeat=False)
         plt.show()
 
-    # Datarate graphs
-    if enable_graphical:
-        if enable_regression:
-            # Get data rate plots for simple method
-            print("showing data rate graph")
-            print(outmatrix_count, an_data_rate2, an_data_rate2_ave)
-            saveGraphImages(outmatrix_count, an_data_rate2,
-                                            an_data_rate2_ave, 'Simple method datarate', 'Data rate for occupancy count', 'distance (m)',
-                                            'Atomic norm Data rate', True)
-            showDataRateGraph(outmatrix_count, an_data_rate2,
-                                            an_data_rate2_ave, 'Simple method datarate', 'Data rate for occupancy count', 'distance (m)',
-                                            'Atomic norm Data rate', True)
-
-            # Get data rate plots for volume method
-            # if USE_VOLUMETRIC:
-            if False:
-                fig43, ax43 = showDataRateGraph(outmatrix_count, an_data_rate,
-                                                an_data_rate_ave, 'Volume method datarate', 'Data rate for volumetric method', 'distance (m)',
-                                                'Atomic norm Data rate', True)
-        else:
-            # TO UPDATE
-            '''
-            fig4 = plt.figure("Volume method datarate")
-            fig4.suptitle("Data rate of volumetric voxelization method", fontsize=12)
-            for i in range(numScenes):
-                plt.plot(outmatrix_volume[i][:, 0], an_data_rate[i][:, 0], f'{complementary_colours[np.mod(i,3)][0]}')
-            plt.xlabel("distance (m)")
-            plt.ylabel("Atomic norm Data rate")
-
-            #plt.show(block=False)
-            #plt.show()
-
-            fig5 = plt.figure("Simple method datarate")
-            fig5.suptitle("Data rate of simple voxelization method", fontsize=12)
-            for i in range(numScenes):
-                plt.plot(outmatrix_count[i][:, 0], an_data_rate2[i][:, 0], f'{complementary_colours[np.mod(i,3)][0]}')
-            plt.xlabel("distance (m)")
-            plt.ylabel("Atomic norm Data rate")        
-
-
-            #plt.show(block=False)   
-            #plt.show()    
-            '''
+    # Get data rate plots for simple method
+    saveGraphImages(outmatrix_count, an_data_rate2,
+                    an_data_rate2_ave, 'Simple method datarate', 'Data rate for occupancy count', 'distance (m)',
+                    'Atomic norm Data rate', True)
     plt.show()
-    print("done saving")
+    print("Done saving images for data rate graph...")
 
 
 def main():

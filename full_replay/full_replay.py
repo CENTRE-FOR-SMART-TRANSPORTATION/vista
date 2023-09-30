@@ -9,8 +9,6 @@ import glob
 import time
 import pickle
 
-import tempfile
-
 from tkinter import Tk
 from pathlib import Path
 import tqdm
@@ -18,7 +16,12 @@ import utils
 
 import matplotlib
 from classes import SensorConfig, Trajectory
+from data_rate_vista import *
 
+# If you want to pickle the python results so as to not compute them next time you run
+# Useful for when testing stuff with the program
+PICKLE_RES = os.environ["PICKLE_RES"]
+VIDEO_SPEED = os.environ["VIDEO_SPEED"]
 
 class PointCloudOpener:
     # Opens one specified point cloud as a Open3D tensor point cloud for parallelism
@@ -46,7 +49,8 @@ class PointCloudOpener:
         # Skip our header, and read only XYZ coordinates
         df = pd.read_csv(path_to_scene, skiprows=0, usecols=[0, 1, 2, 3])
         xyz = df.iloc[:, :3].to_numpy() / 1000  # Extract XYZ coordinates
-        intensity = df.iloc[:, 3].to_numpy() / 1000     # Extract intensity values
+        # Extract intensity values
+        intensity = df.iloc[:, 3].to_numpy() / 1000
 
         # Create Open3D point cloud object with tensor values.
         # For parallelization, outputs must be able to be serialized
@@ -283,8 +287,7 @@ def create_video(images_dir: str, w: int, h: int, path_to_scenes: str, vehicle_s
 
     # Configure video writer
     fourcc = cv2.VideoWriter_fourcc(*"mp4v")
-    fps_speed = 4  # to increase or decrease the speed of the video
-    fps = fps_speed*np.ceil((vehicle_speed/3.6)/(1*point_density))
+    fps = VIDEO_SPEED*np.ceil((vehicle_speed/3.6)/(1*point_density))
     writer = cv2.VideoWriter(output_path, fourcc, fps, (w, h))
 
     # Parameters for annotating text
@@ -468,71 +471,6 @@ def check_for_padded(path_to_scenes: str) -> int:
 
     return offset
 
-# main code that runs everything
-
-
-path_to_scenes = os.path.abspath(os.environ["PATH_TO_SCENES"])
-
-# print(
-#     f"You have chosen the directory {path_to_scenes} as the path to the .txt files")
-
-# scenes_list_path = os.path.join(os.getcwd(), 'scenes_list.pkl')
-# scenes = None
-# if not os.path.exists(scenes_list_path):
-#     scenes = obtain_scenes(path_to_scenes)
-#     # print("in if", type(scenes))
-#     with open(scenes_list_path, "wb") as f:
-#         pickle.dump(scenes, f)
-# else:
-#     print("Loading saved list...")
-#     with open(scenes_list_path, "rb") as f:
-#         scenes = pickle.load(f)
-#         # print("in else", type(scenes))
-
-# print(type(scenes[0]))
-
-# creating the video from the pov of the driver
-
-# frames, sw, sh = visualize_replay(path_to_scenes, scenes)
-# print(frames, sw, sh)
-# create_video(frames, sw, sh, path_to_scenes)
-
-
-# creating the video from sensor fov
-
-# traj_path = os.path.abspath(os.environ["TRAJ_PATH"])
-# # traj = utils.obtain_trajectory_details(traj_path)
-
-# cfg_path = os.path.abspath(os.environ["SENSOR_PATH"])
-# # cfg = utils.open_sensor_config_file(cfg_path)
-
-# las_path = os.path.abspath(os.environ["LAS_FILE_PATH"])
-# road = utils.open_las(las_path)
-
-
-# vista_output_path = os.path.abspath(os.environ["VISTA_OUTPUT_PATH"])
-
-car_path = os.path.join(os.getcwd(), "frame_images/")
-sensor_images_path = os.path.join(os.getcwd(), "fov/")
-graph_path = os.path.join(os.getcwd(), "plt_images/")
-
-
-screen_wh = obtain_screen_size()
-frame_offset = check_for_padded(path_to_scenes)
-
-# road_o3d, src_name = utils.las2o3d_pcd(road)
-# render_sensor_fov(cfg=cfg,
-#                   traj=traj,
-#                   road=road_o3d,
-#                   src_name=src_name,
-#                   sensor_images_path=sensor_images_path,
-#                   screen_width=screen_wh[0],
-#                   screen_height=screen_wh[1],
-#                   offset=frame_offset
-#                   )
-
-
-# combine images
 
 def combine_images(car_path: str, sensor_path: str, graph_path: str):
     out_path = os.path.join(os.getcwd(), "combined_images")
@@ -605,17 +543,95 @@ def combine_images(car_path: str, sensor_path: str, graph_path: str):
         out[h1:h1+h2, 0:w1] = img2
         out[0:h3, w1_new:w1_new+w3] = resized
 
-        return h1+h2, w2
-
         cv2.imwrite(os.path.join(
             os.getcwd(), "combined_images", f"{i}.png"), out)
 
     # return the height and width to pass on to the create_video function
     return h1+h2, w1
+# main code that runs everything
 
+
+print("Getting paths to files from the env...")
+path_to_scenes = os.path.abspath(os.environ["PATH_TO_SCENES"])
+traj_path = os.path.abspath(os.environ["TRAJ_PATH"])
+cfg_path = os.path.abspath(os.environ["SENSOR_PATH"])
+las_path = os.path.abspath(os.environ["LAS_FILE_PATH"])
+vista_output_path = os.path.abspath(os.environ["VISTA_OUTPUT_PATH"])
+print(f"{path_to_scenes} is the path to the scenes, with the cooridnates and intensities in .txt files.")
+print(f"{traj_path} is the folder that contains the csvs for the trajectories.")
+print(f"{cfg_path} is the path to the sensor config")
+print(f"{las_path} is the path to the .las file")
+print(f"{vista_output_path} is the path to the vista output folder.")
+print()
+
+# paths where the images are saved
+car_path = os.path.join(os.getcwd(), "frame_images/")
+sensor_images_path = os.path.join(os.getcwd(), "fov/")
+graph_path = os.path.join(os.getcwd(), "plt_images/")
+
+# read the scenes (coordinates and intensities)
+# reads the .txt file, converting each file to a point cloud with coordinates and intensity values
+# this will be used later in visualize replay
+scenes_list_path = os.path.join(os.getcwd(), 'scenes_list.pkl')
+scenes = None
+if not os.path.exists(scenes_list_path):
+    print("Converting the .txt scenes to point clouds...")
+    scenes = obtain_scenes(path_to_scenes)
+    if PICKLE_RES:
+        with open(scenes_list_path, "wb") as f:
+            pickle.dump(scenes, f)
+else:
+    print("Loading saved list of scene point clouds from pickle file...")
+    with open(scenes_list_path, "rb") as f:
+        scenes = pickle.load(f)
+
+print("Done loading .txt files into point clouds...")
+
+# creating the video from the pov of the driver
+# this will prompt you to click p to play, click p otherwise it won't save your video
+if not os.path.exists(car_path):
+    print("Creating video from car POV, please click 'p' when prompted...")
+    frames, sw, sh = visualize_replay(path_to_scenes, scenes)
+# create_video(frames, sw, sh, path_to_scenes) # uncomment this if you want to save the video from just the driver pov
+
+# creating the video from sensor fov
+
+# getting the required objects for crating the video
+traj = utils.obtain_trajectory_details(traj_path)
+cfg = utils.open_sensor_config_file(cfg_path)
+road = utils.open_las(las_path)
+screen_wh = obtain_screen_size()
+frame_offset = check_for_padded(path_to_scenes)
+road_o3d, src_name = utils.las2o3d_pcd(road)
+
+if not os.path.exists(sensor_images_path):
+    # this will play the video of the sensor, and capture the frames and save them in a folder
+    render_sensor_fov(cfg=cfg,
+                    traj=traj,
+                    road=road_o3d,
+                    src_name=src_name,
+                    sensor_images_path=sensor_images_path,
+                    screen_width=screen_wh[0],
+                    screen_height=screen_wh[1],
+                    offset=frame_offset
+                    )
+
+
+# creating the frames for the data rate graph
+
+if not os.path.exists(graph_path):
+    # this will play a video of the graph being drawn, and save the frames in a folder
+    data_rate_vista_automated(
+        sensorcon_path=cfg_path,
+        vistaoutput_path=path_to_scenes,
+        prepad_output=True,
+        enable_graphical=True,
+        enable_regression=True,
+        regression_power=10
+    )
+
+
+# combine images and create the video
 h, w = combine_images(car_path, sensor_images_path, graph_path)
 images_dir = os.path.join(os.getcwd(), "combined_images")
 create_video(images_dir, w, h, path_to_scenes, filename="combined.mp4")
-
-
-# data rate stuff
