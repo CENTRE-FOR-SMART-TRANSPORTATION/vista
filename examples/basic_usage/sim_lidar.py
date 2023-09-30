@@ -23,8 +23,8 @@ def main(args):
         "yaw_fov": (args.yaw_min, args.yaw_max),
         "pitch_fov": (args.pitch_min, args.pitch_max),
         "frame": args.frame,
-        "yaw_res": args.resolution,
-        "pitch_res": args.resolution,
+        "yaw_res": args.resolution_hz,
+        "pitch_res": args.resolution_vl,
         "downsample": args.downsample,
         "culling_r": args.culling_r,
         "roadsection_filename": args.filename
@@ -64,10 +64,16 @@ if __name__ == "__main__":
         help="Path to the traces to use for simulation",
     )
     parser.add_argument(
-        "--resolution",
+        "--resolution_hz",
         type=float,
-        default=0.1,
-        help="Output resolution",
+        default=0.11,
+        help="Output resolution_hz",
+    )
+    parser.add_argument(
+        "--resolution_vl",
+        type=float,
+        default=0.11,
+        help="Output resolution_vl",
     )
     parser.add_argument(
         "--yaw-min",

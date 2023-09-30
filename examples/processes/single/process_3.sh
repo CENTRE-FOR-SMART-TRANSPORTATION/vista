@@ -2,7 +2,8 @@
 
 file=$LASFILE
 
-resolution=$RESOLUTION
+resolution_hz=$RESOLUTION_hz
+resolution_vl=$RESOLUTION_vl
 pitch_min=$PITCH_MIN
 pitch_max=$PITCH_MAX
 yaw_min=$YAW_MIN
@@ -20,7 +21,7 @@ do
     if $run_occlusion
     then
         python ./examples/conversion/convert_single.py --input ./examples/vista_traces/${file} --frame ${i} --range ${range} --process 3 --occlusion --yaw-min ${yaw_min} --yaw-max ${yaw_max} --pitch-min ${pitch_min} --pitch-max ${pitch_max} 
-        python ./examples/basic_usage/sim_lidar.py --trace-path ./examples/vista_traces/lidar_3 --filename ${file} --frame ${i} --resolution ${resolution} --yaw-min ${yaw_min} --yaw-max ${yaw_max} --pitch-min ${pitch_min} --pitch-max ${pitch_max} --culling-r ${culling_r}
+        python ./examples/basic_usage/sim_lidar.py --trace-path ./examples/vista_traces/lidar_3 --filename ${file} --frame ${i} --resolution_hz ${resolution_hz} --resolution_vl ${resolution_vl} --yaw-min ${yaw_min} --yaw-max ${yaw_max} --pitch-min ${pitch_min} --pitch-max ${pitch_max} --culling-r ${culling_r}
         rm ./examples/vista_traces/lidar_3/lidar_3d*
     else
         python ./examples/conversion/convert_single.py --input ./examples/vista_traces/${file} --frame ${i} --range ${range} --filename ${file} --yaw-min ${yaw_min} --yaw-max ${yaw_max} --pitch-min ${pitch_min} --pitch-max ${pitch_max} --process 3
