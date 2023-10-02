@@ -675,7 +675,7 @@ def data_rate_vista_automated(
 
     def saveToExcel(xBarData, yBarData, yBarAverageData, windowTitle, graphTitle, xlabel, ylabel, isSimple):
         filename = f'{"test"}.xlsx'
-        df = DataFrame({xlabel: xBarData[0][:, 0], ylabel: yBarData[0][0]})
+        df = DataFrame({xlabel: xBarData[0][:, 0], ylabel: yBarData[0]})
         df.to_excel(filename, 'sheet1', index=False)
 
     # Get data rate plots for simple method
