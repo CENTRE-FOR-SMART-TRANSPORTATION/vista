@@ -685,7 +685,7 @@ def data_rate_vista_automated(
                 an_data_rate2_ave, 'Simple method datarate', 'Data rate for occupancy count', 'distance (m)',
                 'Atomic norm Data rate', True)
     filename = f'{os.path.basename(os.path.normpath(path_to_scenes[0]))}_volume'
-    saveToExcel(outmatrix_count, an_data_rate,
+    saveToExcel(filename, outmatrix_count, an_data_rate,
                 an_data_rate_ave, 'Volume method datarate', 'Data rate for volumetric method', 'distance (m)',
                 'Atomic norm Data rate', True)
     plt.show()
