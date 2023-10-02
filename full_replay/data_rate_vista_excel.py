@@ -672,7 +672,7 @@ def data_rate_vista_automated(
         an_data_rate2_ave.append(rolling_average(an_data_rate2[itr], 0))
 
     def saveToExcel(xBarData, yBarData, yBarAverageData, windowTitle, graphTitle, xlabel, ylabel, isSimple):
-        filename = f'{os.path.basename(os.path.normpath(path2scenes))[:-1]}.xlsx'
+        filename = f'{os.path.basename(os.path.normpath(vistaoutput_path))[:-1]}.xlsx'
         df = DataFrame({xlabel: xBarData, ylabel: yBarData})
         df.to_excel(filename, 'sheet1', index=False)
 
