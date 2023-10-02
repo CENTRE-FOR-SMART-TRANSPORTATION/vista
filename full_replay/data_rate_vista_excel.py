@@ -689,7 +689,7 @@ def data_rate_vista_automated(
 
 def main():
     args = file_tools.parse_cmdline_args()
-    sensorcon_path = file_tools.obtain_sensor_path(args)
+    sensorcon_path = os.path.abspath(os.environ["SENSOR_PATH"])
     path2scenes = [os.path.abspath(os.environ["VISTA_OUTPUT_PATH"])]
 
     data_rate_vista_automated(
