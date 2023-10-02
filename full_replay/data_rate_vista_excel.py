@@ -677,6 +677,7 @@ def data_rate_vista_automated(
         filename = f'{"test"}.xlsx'
         print(xBarData[0][:, 0])
         print(yBarData[0])
+        print(yBarData[0][0])
         # df = DataFrame({xlabel: xBarData[0][:, 0], ylabel: yBarData[0]})
         # df.to_excel(filename, 'sheet1', index=False)
 
