@@ -974,11 +974,11 @@ def data_rate_vista_automated(
         df.to_excel(filename, 'sheet1', index=False)
 
     # Get data rate plots for simple method
-    filename = f'{os.path.basename(os.path.normpath(path_to_scenes[0]))}_occupancy'
+    filename = f'{os.path.basename(os.path.normpath(vistaoutput_path[0]))}_occupancy'
     saveToExcel(filename, outmatrix_count, an_data_rate2,
                 an_data_rate2_ave, 'Simple method datarate', 'Data rate for occupancy count', 'distance (m)',
                 'Atomic norm Data rate', True)
-    filename = f'{os.path.basename(os.path.normpath(path_to_scenes[0]))}_volume'
+    filename = f'{os.path.basename(os.path.normpath(vistaoutput_path[0]))}_volume'
     saveToExcel(filename, outmatrix_count, an_data_rate,
                 an_data_rate_ave, 'Volume method datarate', 'Data rate for volumetric method', 'distance (m)',
                 'Atomic norm Data rate', True)
