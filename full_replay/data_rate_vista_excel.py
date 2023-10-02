@@ -676,8 +676,8 @@ def data_rate_vista_automated(
     def saveToExcel(xBarData, yBarData, yBarAverageData, windowTitle, graphTitle, xlabel, ylabel, isSimple):
         filename = f'{"test"}.xlsx'
         print(xBarData[0][:, 0])
-        print(yBarData[0])
-        print(yBarData[0][0])
+        yBarDataList = [l[0] for l in yBarData[0]]
+        print(yBarDataList)
         # df = DataFrame({xlabel: xBarData[0][:, 0], ylabel: yBarData[0]})
         # df.to_excel(filename, 'sheet1', index=False)
 
