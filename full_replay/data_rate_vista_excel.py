@@ -12,6 +12,8 @@ from mplcursors import cursor
 import matplotlib.animation as animation
 import pickle
 import file_tools
+from pandas import DataFrame
+import openpyxl
 
 USE_VOLUMETRIC = True
 USE_CARTESIAN = True
@@ -673,7 +675,7 @@ def data_rate_vista_automated(
 
     def saveToExcel(xBarData, yBarData, yBarAverageData, windowTitle, graphTitle, xlabel, ylabel, isSimple):
         filename = f'{"test"}.xlsx'
-        df = DataFrame({xlabel: xBarData, ylabel: yBarData})
+        df = DataFrame({xlabel: xBarData[0][:, 0], ylabel: yBarData[0][0]})
         df.to_excel(filename, 'sheet1', index=False)
 
     # Get data rate plots for simple method
