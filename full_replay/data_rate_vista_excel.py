@@ -673,16 +673,18 @@ def data_rate_vista_automated(
             pass
         an_data_rate2_ave.append(rolling_average(an_data_rate2[itr], 0))
 
-    def saveToExcel(xBarData, yBarData, yBarAverageData, windowTitle, graphTitle, xlabel, ylabel, isSimple):
-        filename = f'{"test"}.xlsx'
+    def saveToExcel(filename, xBarData, yBarData, yBarAverageData, windowTitle, graphTitle, xlabel, ylabel, isSimple):
+        filename = f'{filename}.xlsx'
         yBarDataList = [l[0] for l in yBarData[0]]
         df = DataFrame({xlabel: xBarData[0][:, 0], ylabel: yBarDataList})
         df.to_excel(filename, 'sheet1', index=False)
 
     # Get data rate plots for simple method
-    saveToExcel(outmatrix_count, an_data_rate2,
+    filename = f'{os.path.basename(os.path.normpath(path_to_scenes))}_occupancy'
+    saveToExcel(filename, outmatrix_count, an_data_rate2,
                 an_data_rate2_ave, 'Simple method datarate', 'Data rate for occupancy count', 'distance (m)',
                 'Atomic norm Data rate', True)
+    filename = f'{os.path.basename(os.path.normpath(path_to_scenes))}_volume'
     saveToExcel(outmatrix_count, an_data_rate,
                 an_data_rate_ave, 'Volume method datarate', 'Data rate for volumetric method', 'distance (m)',
                 'Atomic norm Data rate', True)
