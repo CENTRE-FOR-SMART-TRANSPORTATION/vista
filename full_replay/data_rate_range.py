@@ -984,14 +984,14 @@ def main():
     sensorcon_path = file_tools.obtain_sensor_path(args)
     path2scenes = file_tools.obtain_multiple_scene_path(args)
     
-    # data_rate_vista_automated(
-    #     sensorcon_path=sensorcon_path,
-    #     vistaoutput_path=path2scenes, 
-    #     prepad_output=True, 
-    #     enable_graphical=True,
-    #     enable_regression=True,
-    #     regression_power=10
-    #     )
+    data_rate_vista_automated(
+        sensorcon_path=sensorcon_path,
+        vistaoutput_path=path2scenes, 
+        prepad_output=True, 
+        enable_graphical=True,
+        enable_regression=True,
+        regression_power=10
+        )
 
 
     return
