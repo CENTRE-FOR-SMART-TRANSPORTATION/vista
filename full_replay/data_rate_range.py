@@ -361,29 +361,6 @@ def data_rate_vista_automated(
     enable_resolution: bool = False,
     resolution: int = 1
     ) -> None:
-    
-    # for each frame, need the max(x)  - min(x)
-    # only doing for one scene for now
-    folder = vistaoutput_path[0]
-    files = []
-    for file in os.listdir(folder):
-        path = str(file)
-        num = int(path.split('_')[1])
-        files.append((num, os.path.join(folder, file)))
-    files.sort()
-
-    ranges = []
-    numCores = mp.cpu_count()-1
-    with mp.Pool(numCores) as p:
-        with tqdm(total=len(files), desc="Processing Ranges") as pbar:
-            for result in p.imap(get_range, files):
-                ranges.append(result)
-                pbar.update()
-
-    print(ranges)
-    
-
-    return
     f = open(sensorcon_path)
     data = json.load(f)
     
@@ -912,7 +889,7 @@ def data_rate_vista_automated(
             return fig, ax
 
     ## Datarate graphs
-    if enable_graphical:
+    if False:
         if enable_regression:
             # Need to add main title and axis titles  
             ''' # BANDAID FIX  
@@ -996,7 +973,25 @@ def data_rate_vista_automated(
             #plt.show(block=False)   
             #plt.show()    
             '''    
-    
+    # for each frame, need the max(x)  - min(x)
+    # only doing for one scene for now
+    folder = vistaoutput_path[0]
+    files = []
+    for file in os.listdir(folder):
+        path = str(file)
+        num = int(path.split('_')[1])
+        files.append((num, os.path.join(folder, file)))
+    files.sort()
+
+    ranges = []
+    numCores = mp.cpu_count()-1
+    with mp.Pool(numCores) as p:
+        with tqdm(total=len(files), desc="Processing Ranges") as pbar:
+            for result in p.imap(get_range, files):
+                ranges.append(result)
+                pbar.update()
+
+    print(ranges)
     plt.show()
 
 def main():
