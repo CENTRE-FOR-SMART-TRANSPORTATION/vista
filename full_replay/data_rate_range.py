@@ -813,8 +813,9 @@ def data_rate_vista_automated(
                 # Plot because we only need rolling average.
                 ax4.plot(xBarData[i][:, 0], yBarAverageData[i],\
                     f'{colourScheme[np.mod(i,2)][1]}')    
-                
-                range_ax.plot(xBarData[i][:, 0], ranges)               
+                avg = sum(ranges)/len(ranges)
+                yrange = [round(min(ranges)-avg/10), round(max(ranges)+avg/10)]
+                range_ax.plot(xBarData[i][:, 0], ranges, ylim=yrange)               
             else:
                 ax4_new = ax4.twinx()
                 #ORIGINAL PLOT
