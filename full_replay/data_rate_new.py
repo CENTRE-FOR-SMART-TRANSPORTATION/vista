@@ -384,7 +384,7 @@ def data_rate_vista_automated(
     bitspermeasurements = 12 # Unit of bit.
     
     # just the r precision, which should be chosen by the user.
-    voxel_rsize = 0.03    # in meters. Edit if you need to.
+    voxel_rsize = 0.02    # in meters. Edit if you need to.
     
     point_density = 1
             
