@@ -378,6 +378,7 @@ def data_rate_vista_automated(
         with tqdm(total=len(files), desc="Processing Ranges") as pbar:
             for result in p.imap(get_range, files):
                 ranges.append(result)
+                pbar.update()
 
     print(ranges)
     
