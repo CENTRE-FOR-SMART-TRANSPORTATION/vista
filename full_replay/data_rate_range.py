@@ -373,9 +373,11 @@ def data_rate_vista_automated(
     files.sort()
 
     ranges = []
-    with tqdm(total=len(files), desc="Processing Ranges") as pbar:
-        for result in p.imap(get_range, files):
-            ranges.append(result)
+    numCores = mp.cpu_count()-1
+    with mp.Pool(numCores) as p:
+        with tqdm(total=len(files), desc="Processing Ranges") as pbar:
+            for result in p.imap(get_range, files):
+                ranges.append(result)
 
     print(ranges)
     
