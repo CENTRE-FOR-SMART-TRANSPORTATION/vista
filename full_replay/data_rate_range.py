@@ -357,9 +357,10 @@ def data_rate_vista_automated(
     ) -> None:
     
     # for each frame, need the max(x)  - min(x)
-    for itr in range(numScenes):
-        for file in os.listdir(numScenes[itr]):
-            print(file)
+    # only doing for one scene for now
+    folder = vistaoutput_path[0]
+    for file in os.listdir(folder):
+        print(file)
     
     return
     f = open(sensorcon_path)
