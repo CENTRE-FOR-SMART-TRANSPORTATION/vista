@@ -384,7 +384,7 @@ def data_rate_vista_automated(
     bitspermeasurements = 12 # Unit of bit.
     
     # just the r precision, which should be chosen by the user.
-    voxel_rsize = 0.03    # in meters. Edit if you need to.
+    voxel_rsize = 0.02    # in meters. Edit if you need to.
     
     point_density = 1
             
@@ -971,7 +971,7 @@ def data_rate_vista_automated(
 
     def saveToExcel(filename, xBarData, yBarData, yBarAverageData, windowTitle, graphTitle, xlabel, ylabel, isSimple):
         filename = f'{filename}.xlsx'
-        yBarDataList = [l[0] for l in yBarData[0]]
+        yBarDataList = [l for l in yBarAverageData[0]]
         df = DataFrame({xlabel: xBarData[0][:, 0], ylabel: yBarDataList})
         df.to_excel(filename, 'sheet1', index=False)
 
