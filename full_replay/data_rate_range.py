@@ -363,7 +363,7 @@ def data_rate_vista_automated(
     for file in os.listdir(folder):
         path = str(file)
         num = int(path.split('_')[1])
-        files.append((num, os.join(folder, file)))
+        files.append((num, os.path.join(folder, file)))
     files.sort()
 
     ranges = []
