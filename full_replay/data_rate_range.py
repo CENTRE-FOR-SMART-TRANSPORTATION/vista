@@ -343,7 +343,13 @@ def occupancy_count(input: tuple) -> np.float32:
         out_ratio = voxelized.shape[0] / total_voxels # Pass total voxels from outside the loop
     
     return out_ratio
-  
+
+def get_range(file: tuple) -> np.float32:
+    _, filename = file
+    arr = np.loadtxt(filename, delimiter=',', skiprows=1, usecols=0)
+    arr /= 1000
+    return abs(max(arr)-min(arr))
+
 ### Driver functions below ###
 def data_rate_vista_automated(
     sensorcon_path: str, 
@@ -372,6 +378,10 @@ def data_rate_vista_automated(
         arr = np.loadtxt(filename, delimiter=',', skiprows=1, usecols=0)
         arr /= 1000
         ranges.append(abs(max(arr)-min(arr)))
+
+    with tqdm(total=len(files), desc="Processing Ranges") as pbar:
+        for result in p.imap(get_range, files):
+            ranges.append(result)
 
     print(ranges)
     
