@@ -715,7 +715,7 @@ def data_rate_vista_automated(
 
     #green is for simple, red is for volumetric
     #complementary_colours = [['-r','-c'],['-g','-m'],['-b','-y']]
-    def showDataRateGraph(xBarData,yBarData,yBarAverageData,windowTitle,graphTitle,xlabel,ylabel,isSimple):
+    def showDataRateGraph(ranges, xBarData,yBarData,yBarAverageData,windowTitle,graphTitle,xlabel,ylabel,isSimple):
         if isSimple:
             colourScheme = [['g','m'],['b','y']]
         else:
@@ -799,6 +799,9 @@ def data_rate_vista_automated(
         fig4.suptitle(f"{graphTitle}", fontsize=12)
         ax4.set_ylabel(f"{ylabel}",color='black')
         ax4.tick_params(axis='y', colors='black')
+        range_ax = ax4.twinx()
+        range_ax.set_ylabel("Range")
+        range_ax.tick_params(axis='y', colors='black')
         for i in range(numScenes):
             if i == 0:
                 #ORIGINAL PLOT
@@ -809,7 +812,9 @@ def data_rate_vista_automated(
                 
                 # Plot because we only need rolling average.
                 ax4.plot(xBarData[i][:, 0], yBarAverageData[i],\
-                    f'{colourScheme[np.mod(i,2)][1]}')                   
+                    f'{colourScheme[np.mod(i,2)][1]}')    
+                
+                range_ax.plot(xBarData[i][:, 0], ranges)               
             else:
                 ax4_new = ax4.twinx()
                 #ORIGINAL PLOT
@@ -888,8 +893,26 @@ def data_rate_vista_automated(
             
             return fig, ax
 
+    # for each frame, need the max(x)  - min(x)
+    # only doing for one scene for now
+    folder = vistaoutput_path[0]
+    files = []
+    for file in os.listdir(folder):
+        path = str(file)
+        num = int(path.split('_')[1])
+        files.append((num, os.path.join(folder, file)))
+    files.sort()
+
+    ranges = []
+    numCores = mp.cpu_count()-1
+    with mp.Pool(numCores) as p:
+        with tqdm(total=len(files), desc="Processing Ranges") as pbar:
+            for result in p.imap(get_range, files):
+                ranges.append(result)
+                pbar.update()
+    
     ## Datarate graphs
-    if False:
+    if enable_graphical:
         if enable_regression:
             # Need to add main title and axis titles  
             ''' # BANDAID FIX  
@@ -904,13 +927,13 @@ def data_rate_vista_automated(
             #        'Atomic norm Data rate',True)
             
             # Get data rate plots for simple method
-            fig53, ax53 = showDataRateGraph(outmatrix_count,an_data_rate2,\
+            fig53, ax53 = showDataRateGraph(ranges, outmatrix_count,an_data_rate2,\
                 an_data_rate2_ave,'Simple method datarate','Data rate for occupancy count','distance (m)',\
                    'Atomic norm Data rate',True)   
 
             # Get data rate plots for volume method
             if USE_VOLUMETRIC:
-                fig43, ax43 = showDataRateGraph(outmatrix_count,an_data_rate,\
+                fig43, ax43 = showDataRateGraph(ranges, outmatrix_count,an_data_rate,\
                     an_data_rate_ave,'Volume method datarate','Data rate for volumetric method','distance (m)',\
                     'Atomic norm Data rate',True)      
             else:
@@ -973,25 +996,7 @@ def data_rate_vista_automated(
             #plt.show(block=False)   
             #plt.show()    
             '''    
-    # for each frame, need the max(x)  - min(x)
-    # only doing for one scene for now
-    folder = vistaoutput_path[0]
-    files = []
-    for file in os.listdir(folder):
-        path = str(file)
-        num = int(path.split('_')[1])
-        files.append((num, os.path.join(folder, file)))
-    files.sort()
 
-    ranges = []
-    numCores = mp.cpu_count()-1
-    with mp.Pool(numCores) as p:
-        with tqdm(total=len(files), desc="Processing Ranges") as pbar:
-            for result in p.imap(get_range, files):
-                ranges.append(result)
-                pbar.update()
-
-    print(ranges)
     plt.show()
 
 def main():
