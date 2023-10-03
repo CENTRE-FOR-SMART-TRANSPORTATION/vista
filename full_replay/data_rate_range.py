@@ -373,12 +373,6 @@ def data_rate_vista_automated(
     files.sort()
 
     ranges = []
-    for file in files:
-        _, filename = file
-        arr = np.loadtxt(filename, delimiter=',', skiprows=1, usecols=0)
-        arr /= 1000
-        ranges.append(abs(max(arr)-min(arr)))
-
     with tqdm(total=len(files), desc="Processing Ranges") as pbar:
         for result in p.imap(get_range, files):
             ranges.append(result)
