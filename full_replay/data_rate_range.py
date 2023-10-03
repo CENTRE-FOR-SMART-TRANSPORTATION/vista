@@ -365,9 +365,17 @@ def data_rate_vista_automated(
         num = int(path.split('_')[1])
         files.append((num, os.path.abspath(file)))
     files.sort()
+
+    ranges = []
     for file in files:
-        print(file)
+        _, filename = file
+        arr = np.loadtxt(filename, delemiter=',', skiprows=1, usecols=0)
+        arr /= 1000
+        print(_)
+        print(arr)
+        break
     
+
     return
     f = open(sensorcon_path)
     data = json.load(f)
