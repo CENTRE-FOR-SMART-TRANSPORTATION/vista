@@ -462,9 +462,9 @@ def data_rate_vista_automated(
         else:
             # Simply obtain the total number of spherical voxels.
             ## Finding the total amount of voxels in this range with config
-            azimuth_capacity = np.floor((data["a_high"]-data["a_low"])/data["a_size"])
-            elevation_capacity = np.floor((data["e_high"]-data["e_low"])/data["e_size"])
-            radius_capacity = np.floor((data["r_high"]-data["r_low"])/data["r_size"])
+            azimuth_capacity = np.floor((data["a_high"]-data["a_low"])/data["horizAngRes"])
+            elevation_capacity = np.floor((data["e_high"]-data["e_low"])/data["verticAngRes"])
+            radius_capacity = np.floor((data["r_high"]-data["r_low"])/voxel_rsize)
             total_voxels = azimuth_capacity * elevation_capacity * radius_capacity
         
         
