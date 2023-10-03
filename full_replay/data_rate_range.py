@@ -369,7 +369,7 @@ def data_rate_vista_automated(
     ranges = []
     for file in files:
         _, filename = file
-        arr = np.loadtxt(filename, delemiter=',', skiprows=1, usecols=0)
+        arr = np.loadtxt(filename, delimiter=',', skiprows=1, usecols=0)
         arr /= 1000
         print(_)
         print(arr)
