@@ -359,8 +359,13 @@ def data_rate_vista_automated(
     # for each frame, need the max(x)  - min(x)
     # only doing for one scene for now
     folder = vistaoutput_path[0]
-    print(folder)
+    files = []
     for file in os.listdir(folder):
+        path = str(file)
+        num = path.split('_')[1]
+        files.append((num, os.path.abspath(file)))
+    sort(files)
+    for file in files:
         print(file)
     
     return
