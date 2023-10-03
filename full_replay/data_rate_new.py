@@ -14,8 +14,8 @@ import openpyxl
 
 import file_tools
 
-USE_VOLUMETRIC = False
-USE_CARTESIAN = True
+USE_VOLUMETRIC = True
+USE_CARTESIAN = False
 x_res = 0.11
 y_res = 0.11
 z_res = 0.11
@@ -975,6 +975,12 @@ def data_rate_vista_automated(
         df = DataFrame({xlabel: xBarData[0][:, 0], ylabel: yBarDataList})
         df.to_excel(filename, 'sheet1', index=False)
 
+    def saveToExcelBar(filename, xBarData, yBarData, yBarAverageData, windowTitle, graphTitle, xlabel, ylabel, isSimple):
+        filename = f'{filename}.xlsx'
+        yBarDataList = [l[0] for l in yBarData[0]]
+        df = DataFrame({xlabel: xBarData[0][:, 0], ylabel: yBarDataList})
+        df.to_excel(filename, 'sheet1', index=False)
+
     if USE_CARTESIAN:
         # Get data rate plots for simple method
         filename = f'{os.path.basename(os.path.normpath(vistaoutput_path[0]))}_occupancy'
@@ -982,6 +988,14 @@ def data_rate_vista_automated(
                     an_data_rate2_ave, 'Simple method datarate', 'Data rate for occupancy count', 'distance (m)',
                     'Atomic norm Data rate', True)
     else:
+        filename = f'{os.path.basename(os.path.normpath(vistaoutput_path[0]))}_occupancy_vol1'
+        saveToExcel(filename, outmatrix_count, an_data_rate2,
+                    an_data_rate2_ave, 'Simple method datarate', 'Data rate for occupancy count', 'distance (m)',
+                    'Atomic norm Data rate', True)
+        filename = f'{os.path.basename(os.path.normpath(vistaoutput_path[0]))}_occupancy_vol2'
+        saveToExcelBar(filename, outmatrix_count, an_data_rate2,
+                    an_data_rate2_ave, 'Simple method datarate', 'Data rate for occupancy count', 'distance (m)',
+                    'Atomic norm Data rate', True)
         filename = f'{os.path.basename(os.path.normpath(vistaoutput_path[0]))}_volume'
         saveToExcel(filename, outmatrix_count, an_data_rate,
                     an_data_rate_ave, 'Volume method datarate', 'Data rate for volumetric method', 'distance (m)',
