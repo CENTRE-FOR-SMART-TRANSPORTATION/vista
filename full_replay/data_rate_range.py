@@ -815,7 +815,8 @@ def data_rate_vista_automated(
                     f'{colourScheme[np.mod(i,2)][1]}')    
                 avg = sum(ranges)/len(ranges)
                 yrange = [round(min(ranges)-avg/10), round(max(ranges)+avg/10)]
-                range_ax.plot(xBarData[i][:, 0], ranges, ylim=yrange)               
+                range_ax.set_ylim(yrange[0], yrange[1])
+                range_ax.plot(xBarData[i][:, 0], ranges)               
             else:
                 ax4_new = ax4.twinx()
                 #ORIGINAL PLOT
