@@ -247,7 +247,7 @@ def main():
     # this will prompt you to click p to play, click p otherwise it won't save your video
 
     print("Converting the .txt scenes to point clouds...")
-    scenes = utils.obtain_scenes(path_to_scenes)
+    scenes = obtain_scenes(path_to_scenes)
 
     print("Creating video from car POV, please click 'p' when prompted...")
     frames, sw, sh = visualize_replay(path_to_scenes, scenes)
