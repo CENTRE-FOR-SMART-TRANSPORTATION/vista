@@ -212,6 +212,10 @@ def main():
     global VIDEO_SPEED
     VIDEO_SPEED = int(sys.argv[1])
     name = sys.argv[2]
+
+    car_path = os.path.join(os.getcwd(), "frame_images/")
+    sensor_images_path = os.path.join(os.getcwd(), "fov/")
+    graph_path = os.path.join(os.getcwd(), "plt_images/")
     # combine images and create the video
     h, w = combine_images(car_path, sensor_images_path, graph_path)
     images_dir = os.path.join(os.getcwd(), "combined_images")
