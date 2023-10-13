@@ -11,7 +11,7 @@ import pickle
 
 from tkinter import Tk
 from pathlib import Path
-import tqdm
+from tqdm import tqdm
 import utils
 
 import matplotlib
@@ -21,7 +21,7 @@ from data_rate_vista import *
 # If you want to pickle the python results so as to not compute them next time you run
 # Useful for when testing stuff with the program
 PICKLE_RES = os.environ["PICKLE_RES"]
-VIDEO_SPEED = os.environ["VIDEO_SPEED"]
+VIDEO_SPEED = int(os.environ["VIDEO_SPEED"])
 
 class PointCloudOpener:
     # Opens one specified point cloud as a Open3D tensor point cloud for parallelism
@@ -94,7 +94,7 @@ def obtain_scenes(path_to_scenes):
 
     pcds = Parallel(n_jobs=cores)(  # Switched to loky backend to maybe suppress errors?
         delayed(opener.open_point_cloud)(path_to_scenes, frame, res)
-        for frame, res in tqdm.tqdm(
+        for frame, res in tqdm(
             args,
             total=len(filenames),
             desc=f"Reading scenes to memory in parallel, using {cores} processes",
@@ -138,7 +138,7 @@ def visualize_replay(
             os.makedirs(images_dir)
 
         for frame, scene in enumerate(
-            tqdm.tqdm(scenes_list, desc="Replaying and capturing scenes")
+            tqdm(scenes_list, desc="Replaying and capturing scenes")
         ):
 
             xyz = scene.point.positions.numpy()  # IF THE SCENE IS IN TENSOR
@@ -306,7 +306,7 @@ def create_video(images_dir: str, w: int, h: int, path_to_scenes: str, vehicle_s
 
     # Now we will create our video
     print("")
-    for frame_i, filename in enumerate(tqdm.tqdm(filenames, total=len(filenames), desc=f"Writing to video")):
+    for frame_i, filename in enumerate(tqdm(filenames, total=len(filenames), desc=f"Writing to video")):
 
         img = cv2.imread(filename=os.path.join(images_dir, filename))
 
