@@ -18,6 +18,7 @@ import matplotlib
 from classes import SensorConfig, Trajectory
 
 import file_tools
+import sensorpoints
 
 # If you want to pickle the python results so as to not compute them next time you run
 # Useful for when testing stuff with the program
