@@ -352,6 +352,10 @@ def parse_cmdline_args() -> argparse.Namespace:
 
     parser.add_argument("--zoom", type=float, default=0.3125, help="Zoom level of sensor fov")
 
+    parser.add_argument("--speed", type=float, default=4, help="Speed of video")
+
+    parser.add_argument("--video_name", type=float, default="combined", help="Name of video file")
+
     parser.add_argument("--x", type=float, default=-1, help="x coord of front vector")
 
     parser.add_argument("--y", type=float, default=0, help="y coord of front vector")
