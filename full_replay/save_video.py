@@ -18,6 +18,7 @@ import matplotlib
 from classes import SensorConfig, Trajectory
 
 import file_tools
+import argparse
 
 VIDEO_SPEED = 1
 
@@ -196,7 +197,21 @@ def combine_images(car_path: str, sensor_path: str, graph_path: str):
 
 
 def main():
-    args = file_tools.parse_cmdline_args()
+    # Parse our command line arguments
+    def parse_cmdline_args() -> argparse.Namespace:
+        # use argparse to parse arguments from the command line
+        parser = argparse.ArgumentParser()
+        parser.add_argument(
+            "--scenes", type=str, default=None, help="Path to the Vista output folder")
+
+        parser.add_argument("--speed", type=float, default=4, help="Speed of video")
+
+        parser.add_argument("--video_name", type=float, default="combined", help="Name of video file")
+
+
+        return parser.parse_args()
+
+    args = parse_cmdline_args()
     
     global VIDEO_SPEED
     VIDEO_SPEED = args.speed

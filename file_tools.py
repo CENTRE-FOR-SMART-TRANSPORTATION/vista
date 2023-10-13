@@ -348,6 +348,7 @@ def parse_cmdline_args() -> argparse.Namespace:
     parser.add_argument(
         "--numScenes", type=int, default=1, help="Number of Vista output folders"
     )
+    
     parser.add_argument("--input", type=str, default=None, help="Path to the .las file")
 
     parser.add_argument("--zoom", type=float, default=0.3125, help="Zoom level of sensor fov")
