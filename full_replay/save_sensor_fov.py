@@ -157,7 +157,40 @@ def check_for_padded(path_to_scenes: str) -> int:
     return offset
 
 def main():
-    args = file_tools.parse_cmdline_args()
+    # Parse our command line arguments
+    def parse_cmdline_args() -> argparse.Namespace:
+        # use argparse to parse arguments from the command line
+        parser = argparse.ArgumentParser()
+
+        parser.add_argument(
+            "--config", type=str, default=None, help="Path to sensor config file"
+        )
+        parser.add_argument(
+            "--trajectory", type=str, default=None, help="Path to trajectory folder"
+        )
+        parser.add_argument(
+            "--observer_height", type=float, default=1.8, help="Height of the observer in m"
+        )
+        parser.add_argument(
+            "--scenes", type=str, default=None, help="Path to the Vista output folder"
+        )
+        parser.add_argument(
+            "--numScenes", type=int, default=1, help="Number of Vista output folders"
+        )
+        
+        parser.add_argument("--input", type=str, default=None, help="Path to the .las file")
+
+        parser.add_argument("--zoom", type=float, default=0.3125, help="Zoom level of sensor fov")
+
+        parser.add_argument("--x", type=float, default=-1, help="x coord of front vector")
+
+        parser.add_argument("--y", type=float, default=0, help="y coord of front vector")
+
+        parser.add_argument("--z", type=float, default=1, help="z coord of front vector")
+
+        return parser.parse_args()
+
+    args = parse_cmdline_args()
 
     path_to_scenes = file_tools.obtain_scene_path(args)
     traj = file_tools.obtain_trajectory_details(args)
@@ -178,7 +211,7 @@ def main():
     FRONT_Y = args.y if args.y is not None else FRONT_Y
     FRONT_Z = args.z if args.z is not None else FRONT_Z
     ZOOM = args.zoom if args.zoom is not None else ZOOM
-    
+
     render_sensor_fov(cfg=cfg,
                     traj=traj,
                     road=road_o3d,
