@@ -186,10 +186,10 @@ def combine_images(car_path: str, sensor_path: str, graph_path: str):
 
         h_idx, w_idx = h1, 0
 
-        for i in range(out.shape[0]):
-            for j in range(out.shape[1]):
-                if out[i][j] == 0:
-                    out[i][j] = out[h_idx][w_idx]
+        # for i in range(out.shape[0]):
+        #     for j in range(out.shape[1]):
+        #         if out[i][j] == 0:
+        #             out[i][j] = out[h_idx][w_idx]
 
         cv2.imwrite(os.path.join(
             os.getcwd(), "combined_images", f"{i}.png"), out)
