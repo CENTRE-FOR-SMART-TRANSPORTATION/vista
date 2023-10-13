@@ -100,13 +100,13 @@ def create_video(images_dir: str, w: int, h: int, path_to_scenes: str, vehicle_s
         progress_xy = (20, progress_text_size[1]+20)
         frame_annotated = annotate_frame(img, progress_text, progress_xy)
 
-        source_text = f"Source: {os.path.basename(os.path.normpath(path_to_scenes))}"
-        # Get width and height of the source text
-        source_text_size = cv2.getTextSize(
-            source_text, fontFace=font, fontScale=font_scale, thickness=font_thickness)[0]
-        source_xy = (w-source_text_size[0]-20, source_text_size[1]+20)
-        frame_annotated = annotate_frame(
-            frame_annotated, source_text, source_xy)
+        # source_text = f"Source: {os.path.basename(os.path.normpath(path_to_scenes))}"
+        # # Get width and height of the source text
+        # source_text_size = cv2.getTextSize(
+        #     source_text, fontFace=font, fontScale=font_scale, thickness=font_thickness)[0]
+        # source_xy = (w-source_text_size[0]-20, source_text_size[1]+20)
+        # frame_annotated = annotate_frame(
+        #     frame_annotated, source_text, source_xy)
 
         writer.write(cv2.cvtColor(frame_annotated, cv2.COLOR_BGR2RGB))
 
