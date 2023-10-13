@@ -207,6 +207,7 @@ def combine_images(car_path: str, sensor_path: str, graph_path: str):
 def main():
     if len(sys.argv) < 3:
         print(f'Please call it as below:\n\tpython3 save_video.py <video_speed> <video_name>\nVideo speed is an integer and video_name is the name of the file that the video will be saved as (example: combined, will be saved as combined.mp4)')
+        return
     
     global VIDEO_SPEED
     VIDEO_SPEED = int(sys.argv[1])
