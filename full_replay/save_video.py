@@ -206,7 +206,7 @@ def main():
 
         parser.add_argument("--speed", type=float, default=4, help="Speed of video")
 
-        parser.add_argument("--video_name", type=float, default="combined", help="Name of video file")
+        parser.add_argument("--video_name", type=str, default="combined", help="Name of video file")
 
 
         return parser.parse_args()
