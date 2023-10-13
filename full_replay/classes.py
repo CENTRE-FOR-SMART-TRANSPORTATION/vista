@@ -1,5 +1,5 @@
 import numpy as np
-import open3d as o3d
+
 class LasPointCloud:
     """
     Container class for the .las file. Cuts down on unused fields from the
@@ -179,45 +179,3 @@ class SensorConfig:
 
     def getRHigh(self):
         return self.r_high
-
-class PointCloudOpener:
-    # Opens one specified point cloud as a Open3D tensor point cloud for parallelism
-    def open_point_cloud(
-        self, path_to_scenes: str, frame: int, res: np.float32
-    ) -> o3d.t.geometry.PointCloud:
-        """Reads a specified point cloud from a path into memory.
-        This is called in the parallelized loop in obtain_scenes().
-
-        Args:
-            path2scenes (str): The path to the folder containing the scenes.
-            frame (int): The frame of the particular scene.
-            res (np.float32): The resolution of the sensor at which the scene was recorded.
-            This should be given in the filename, where scene names are guaranteed to be
-            "output_<FRAME>_<RES>.txt".
-
-        Returns:
-            pcd (o3d.t.geometry.PointCloud): Our point cloud, in tensor format.
-        """
-
-        scene_name = f"output_{frame}_{res:.2f}.txt"
-        path_to_scene = os.path.join(path_to_scenes, scene_name)
-        # print(f"Opening {scene_name} as pcd...")
-
-        # Skip our header, and read only XYZ coordinates
-        df = pd.read_csv(path_to_scene, skiprows=0, usecols=[0, 1, 2, 3])
-        xyz = df.iloc[:, :3].to_numpy() / 1000  # Extract XYZ coordinates
-        # Extract intensity values
-        intensity = df.iloc[:, 3].to_numpy() / 1000
-
-        # Create Open3D point cloud object with tensor values.
-        # For parallelization, outputs must be able to be serialized
-        pcd = o3d.t.geometry.PointCloud(o3d.core.Device("CPU:0"))
-        pcd.point.positions = o3d.core.Tensor(
-            xyz, o3d.core.float32, o3d.core.Device("CPU:0")
-        )
-
-        # Set the colors of the point cloud using the intensity-based color map
-        pcd.point.colors = o3d.core.Tensor(
-            intensity, o3d.core.float32, o3d.core.Device("CPU:0"))
-
-        return pcd

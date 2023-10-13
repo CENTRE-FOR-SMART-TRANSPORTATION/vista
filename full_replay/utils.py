@@ -1,26 +1,9 @@
 import open3d as o3d
 import numpy as np
-from classes import LasPointCloud, Trajectory, SensorConfig, PointCloudOpener
+from classes import LasPointCloud, Trajectory, SensorConfig
 import os
 import laspy
 import json
-
-import numpy as np
-import open3d as o3d
-import pandas as pd
-import cv2
-import tkinter as tk
-import sys
-import glob
-import time
-import pickle
-
-from tkinter import Tk
-from pathlib import Path
-from tqdm import tqdm
-import utils
-
-import matplotlib
 
 # Open our .las point cloud into memory
 
@@ -447,40 +430,3 @@ def align_sensor_points(fov_points: list, trajectory: Trajectory, observer_point
     # print(f"FOV point alignment took {(tStop-tStart):.2f}s.")
 
     return transformed_points, observer_point
-
-def obtain_scenes(path_to_scenes):
-    print("Obtaining scenes from the path to the .txt files...")
-    path_to_scenes_ext = os.path.join(path_to_scenes, "*.txt")
-
-    filenames = [
-        os.path.basename(abs_path) for abs_path in glob.glob(path_to_scenes_ext)
-    ]
-    # print(filenames)
-
-    # The resolution
-    res = np.float32(float(os.path.splitext((filenames[0].split("_")[-1]))[0]))
-
-    # For offsetting frame indexing in case if we are working with padded output
-    # Output should usually be padded anyways
-    # Offset is the first frame, this line gets the minimum frame number
-    offset = int(min(filenames, key=lambda x: int(
-        (x.split("_"))[1])).split("_")[1])
-
-    # Create our opener object (for inputs/outputs to be serializable)
-    opener = PointCloudOpener()
-    # Define the arguments that will be ran upon in parallel.
-    args = [(frame + offset, res) for frame in range(len(filenames))]
-    cores = 10
-
-    from joblib import Parallel, delayed
-
-    pcds = Parallel(n_jobs=cores)(  # Switched to loky backend to maybe suppress errors?
-        delayed(opener.open_point_cloud)(path_to_scenes, frame, res)
-        for frame, res in tqdm(
-            args,
-            total=len(filenames),
-            desc=f"Reading scenes to memory in parallel, using {cores} processes",
-        )
-    )
-
-    return pcds
