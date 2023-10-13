@@ -178,7 +178,7 @@ def combine_images(car_path: str, sensor_path: str, graph_path: str):
 
         out = np.zeros((50 + h1 + h2 + 50, 50 + w1 + 50, 3), dtype="uint8")
 
-        out[50:h1_new+50, 50:w1_new_50] = img1_resized
+        out[50:h1_new+50, 50:w1_new+50] = img1_resized
         out[h1:h1+h2, 50:w2+50] = img2
         out[50:h3+50, w1_new:w1_new+w3] = resized
 
