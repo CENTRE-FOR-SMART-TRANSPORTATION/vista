@@ -487,17 +487,15 @@ def main():
 
     road_o3d, src_name = utils.las2o3d_pcd(road)
 
-    if not os.path.exists(sensor_images_path):
-        # this will play the video of the sensor, and capture the frames and save them in a folder
-        render_sensor_fov(cfg=cfg,
-                        traj=traj,
-                        road=road_o3d,
-                        src_name=src_name,
-                        sensor_images_path=sensor_images_path,
-                        screen_width=screen_wh[0],
-                        screen_height=screen_wh[1],
-                        offset=frame_offset
-                        )
+    render_sensor_fov(cfg=cfg,
+                    traj=traj,
+                    road=road_o3d,
+                    src_name=src_name,
+                    sensor_images_path=sensor_images_path,
+                    screen_width=screen_wh[0],
+                    screen_height=screen_wh[1],
+                    offset=frame_offset
+                    )
 
 if __name__ == "__main__":
     main()
