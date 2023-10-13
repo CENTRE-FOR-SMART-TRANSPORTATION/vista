@@ -483,34 +483,18 @@ def data_rate_vista_automated(
 
         # Calculate deltas using the volume method if selected.
         if USE_VOLUMETRIC:
-            results_list_path = os.path.join(os.getcwd(), 'results_vol.pkl')
-            results_vol = None
-            if not os.path.exists(results_list_path):
-                with mp.Pool(numCores) as p:
-                    inputData = [(voxel_rsize, voxel_asize, voxel_esize, data, i, vistaoutput_path[itr],
-                                  point_density, max_volume, global_offset) for i in range(smallest, upperbound, resolution)]
-                    results = []
-                    with tqdm(total=len(inputData), desc="Processing Volume") as pbar:
-                        for result in p.imap(multiprocessed_vol_funct, inputData):
-                            # result[0] is i in line 119. This subtraction is done so that result[1] can be inserted into
-                            # outmatrix_volume at the proper index, which starts from 0, rather than at the variable "smallest"
-                            outmatrix_volume[itr][(
-                                result[0] - smallest)//resolution] = result[1]
-                            results.append(result)
-                            pbar.update()
-
-                with open(results_list_path, "wb") as f:
-                    pickle.dump(results, f)
-                    results_vol = results
-            else:
-                print("Loading saved list for the volumetric method...")
-                with open(results_list_path, "rb") as f:
-                    results = pickle.load(f)
-                    for result in results:
+            with mp.Pool(numCores) as p:
+                inputData = [(voxel_rsize, voxel_asize, voxel_esize, data, i, vistaoutput_path[itr],
+                                point_density, max_volume, global_offset) for i in range(smallest, upperbound, resolution)]
+                results = []
+                with tqdm(total=len(inputData), desc="Processing Volume") as pbar:
+                    for result in p.imap(multiprocessed_vol_funct, inputData):
+                        # result[0] is i in line 119. This subtraction is done so that result[1] can be inserted into
+                        # outmatrix_volume at the proper index, which starts from 0, rather than at the variable "smallest"
                         outmatrix_volume[itr][(
                             result[0] - smallest)//resolution] = result[1]
-
-                    # print("in else", type(scenes))
+                        results.append(result)
+                        pbar.update()
 
         # Calculate deltas using the simple method.
         # Calculate the total possible number of Cartesian voxels within our FOV given in spherical coordinates.
@@ -529,31 +513,18 @@ def data_rate_vista_automated(
                 (data["r_high"]-data["r_low"])/data["r_size"])
             total_voxels = azimuth_capacity * elevation_capacity * radius_capacity
 
-        results_list_path = os.path.join(os.getcwd(), 'results_cart.pkl')
-        results_cart = None
-        if not os.path.exists(results_list_path):
-            with mp.Pool(numCores) as p:
-                inputData = [(voxel_rsize, voxel_asize, voxel_esize, data, i, vistaoutput_path[itr],
-                              point_density, total_voxels, global_offset) for i in range(smallest, upperbound, resolution)]
-                results = []
-                with tqdm(total=len(inputData), desc="Processing Count") as pbar:
-                    for result in p.imap(multiprocessed_count_funct, inputData):
-                        # result[0] is i in line 133. This subtraction is done so that result[1] can be inserted into
-                        # outmatrix_count at the proper index, which starts from 0, rather than at the variable "smallest"
-                        outmatrix_count[itr][(
-                            result[0] - smallest)//resolution] = result[1]
-                        results.append(result)
-                        pbar.update()
-            with open(results_list_path, "wb") as f:
-                pickle.dump(results, f)
-                results_cart = results
-        else:
-            print("Loading saved list for the cartesian method...")
-            with open(results_list_path, "rb") as f:
-                results = pickle.load(f)
-                for result in results:
+        with mp.Pool(numCores) as p:
+            inputData = [(voxel_rsize, voxel_asize, voxel_esize, data, i, vistaoutput_path[itr],
+                            point_density, total_voxels, global_offset) for i in range(smallest, upperbound, resolution)]
+            results = []
+            with tqdm(total=len(inputData), desc="Processing Count") as pbar:
+                for result in p.imap(multiprocessed_count_funct, inputData):
+                    # result[0] is i in line 133. This subtraction is done so that result[1] can be inserted into
+                    # outmatrix_count at the proper index, which starts from 0, rather than at the variable "smallest"
                     outmatrix_count[itr][(
                         result[0] - smallest)//resolution] = result[1]
+                    results.append(result)
+                    pbar.update()
 
     print('\nDone!')
 
