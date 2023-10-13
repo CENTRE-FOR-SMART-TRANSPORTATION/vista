@@ -17,6 +17,8 @@ import utils
 import matplotlib
 from classes import SensorConfig, Trajectory
 
+import file_tools
+
 VIDEO_SPEED = 1
 
 
@@ -141,7 +143,6 @@ def combine_images(car_path: str, sensor_path: str, graph_path: str):
 
     print(len(car_images), len(sensor_images), len(graph_images))
     for i in range(len(car_images)):
-        print("hello")
         car_image = os.path.join(car_path, car_images[i])
         sensor_image = os.path.join(sensor_path, sensor_images[i])
         graph_image = os.path.join(graph_path, graph_images[i])
@@ -176,10 +177,6 @@ def combine_images(car_path: str, sensor_path: str, graph_path: str):
 
         out = np.zeros((h1 + h2, w1, 3), dtype="uint8")
 
-        print(img1.shape)
-        print(img1_resized.shape)
-        print(img2.shape)
-        print(resized.shape)
         out[0:h1_new, 0:w1_new] = img1_resized
         out[h1:h1+h2, 0:w2] = img2
         out[0:h3, w1_new:w1_new+w3] = resized
@@ -207,6 +204,7 @@ def main():
     VIDEO_SPEED = int(sys.argv[1])
     name = sys.argv[2]
 
+    path_to_scenes = file_tools.obtain_scene_path(args)
     car_path = os.path.join(os.getcwd(), "frame_images/")
     sensor_images_path = os.path.join(os.getcwd(), "fov/")
     graph_path = os.path.join(os.getcwd(), "plt_images/")

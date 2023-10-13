@@ -172,6 +172,13 @@ def main():
 
     road_o3d, src_name = utils.las2o3d_pcd(road)
 
+    global FRONT_X, FRONT_Y, FRONT_Z, ZOOM
+
+    FRONT_X = args.x if args.x is not None else FRONT_X
+    FRONT_Y = args.y if args.y is not None else FRONT_Y
+    FRONT_Z = args.z if args.z is not None else FRONT_Z
+    ZOOM = args.zoom if args.zoom is not None else ZOOM
+    
     render_sensor_fov(cfg=cfg,
                     traj=traj,
                     road=road_o3d,

@@ -350,6 +350,14 @@ def parse_cmdline_args() -> argparse.Namespace:
     )
     parser.add_argument("--input", type=str, default=None, help="Path to the .las file")
 
+    parser.add_argument("--zoom", type=float, default=0.3125, help="Zoom level of sensor fov")
+
+    parser.add_argument("--x", type=float, default=-1, help="x coord of front vector")
+
+    parser.add_argument("--y", type=float, default=0, help="y coord of front vector")
+
+    parser.add_argument("--z", type=float, default=1, help="z coord of front vector")
+
     return parser.parse_args()
 
 
