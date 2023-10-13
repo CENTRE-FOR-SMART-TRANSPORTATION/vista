@@ -11,7 +11,6 @@ import pandas as pd
 import cv2
 import tkinter as tk
 import sys
-import os
 import glob
 import time
 import pickle
