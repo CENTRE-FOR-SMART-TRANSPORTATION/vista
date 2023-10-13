@@ -16,7 +16,6 @@ import utils
 
 import matplotlib
 from classes import SensorConfig, Trajectory
-from data_rate_vista import *
 
 # If you want to pickle the python results so as to not compute them next time you run
 # Useful for when testing stuff with the program
