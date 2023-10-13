@@ -204,6 +204,7 @@ def main():
     VIDEO_SPEED = int(sys.argv[1])
     name = sys.argv[2]
 
+    args = file_tools.parse_cmdline_args()
     path_to_scenes = file_tools.obtain_scene_path(args)
     car_path = os.path.join(os.getcwd(), "frame_images/")
     sensor_images_path = os.path.join(os.getcwd(), "fov/")
