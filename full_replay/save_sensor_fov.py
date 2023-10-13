@@ -474,6 +474,7 @@ def check_for_padded(path_to_scenes: str) -> int:
 def main():
     args = file_tools.parse_cmdline_args()
 
+    path_to_scenes = file_tools.obtain_scene_path(args)
     traj = file_tools.obtain_trajectory_details(args)
     cfg  = sensorpoints.open_sensor_config_file(args)
     road = file_tools.open_las(args)
