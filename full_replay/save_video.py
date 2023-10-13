@@ -184,7 +184,7 @@ def combine_images(car_path: str, sensor_path: str, graph_path: str):
         out[h1:h1+h2, 0:w2] = img2
         out[0:h3, w1_new:w1_new+w3] = resized
 
-        h_idx, w_idx = h2_new, 0
+        h_idx, w_idx = h1, 0
 
         for i in range(out.shape[0]):
             for j in range(out.shape[1]):
