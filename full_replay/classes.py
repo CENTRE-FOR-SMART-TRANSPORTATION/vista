@@ -1,5 +1,5 @@
 import numpy as np
-
+import open3d as o3d
 class LasPointCloud:
     """
     Container class for the .las file. Cuts down on unused fields from the
