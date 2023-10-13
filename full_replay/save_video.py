@@ -193,7 +193,7 @@ def combine_images(car_path: str, sensor_path: str, graph_path: str):
             os.getcwd(), "combined_images", f"{i}.png"), out)
 
     # return the height and width to pass on to the create_video function
-    return h1+h2, w1
+    return 100 + h1 + h2, 100 + w1
 
 
 def main():
