@@ -715,7 +715,7 @@ def data_rate_vista_automated(
     saveGraphImages(outmatrix_count, an_data_rate2,
                     an_data_rate2_ave, 'Simple method datarate', 'Data rate for occupancy count', 'distance (m)',
                     'Atomic norm Data rate', True)
-    plt.show()
+
     print("Done saving images for data rate graph...")
 
 
