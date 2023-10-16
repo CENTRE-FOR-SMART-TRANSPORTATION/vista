@@ -236,7 +236,7 @@ def main():
     interval_length = len(images[0])//5
     intervals = []
     for i in range(5):
-        intervals.append((i*interval_length, max(len(images[0]), (i+1)*interval_length)))
+        intervals.append((i*interval_length, min(len(images[0]), (i+1)*interval_length)))
     
     print(intervals)
     # processes = []
