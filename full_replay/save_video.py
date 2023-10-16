@@ -149,7 +149,7 @@ def combine_images(images: tuple, paths: tuple, lIdx: int, rIdx: int, dims: list
     car_images, sensor_images, graph_images = images
     car_path, sensor_path, graph_path = paths
 
-    for i in range(len(car_images)):
+    for i in range(tqdm(car_images, total=len(car_images), desc="Combining images")):
         car_image = os.path.join(car_path, car_images[i])
         sensor_image = os.path.join(sensor_path, sensor_images[i])
         graph_image = os.path.join(graph_path, graph_images[i])
