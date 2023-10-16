@@ -151,7 +151,7 @@ def combine_images(images: tuple, paths: tuple, lIdx: int, rIdx: int, dims: list
     car_images, sensor_images, graph_images = images
     car_path, sensor_path, graph_path = paths
 
-    for i in range(len(tqdm(car_images, total=len(car_images), desc="Combining images"))):
+    for i in tqdm(range(len(car_images)), desc="Combining images"):
         car_image = os.path.join(car_path, car_images[i])
         sensor_image = os.path.join(sensor_path, sensor_images[i])
         graph_image = os.path.join(graph_path, graph_images[i])
@@ -239,20 +239,19 @@ def main():
         intervals.append((i*interval_length, (i+1)*interval_length))
     intervals.append((4*interval_length, len(images[0])))
     
-    print(intervals)
-    # processes = []
-    # lock = Lock()
-    # dims = [-1, -1]
-    # for interval in intervals:
-    #     p = Process(target=combine_images, args=(images, paths, interval[0], interval[1], dims, lock))
-    #     processes.append(p)
+    processes = []
+    lock = Lock()
+    dims = [-1, -1]
+    for interval in intervals:
+        p = Process(target=combine_images, args=(images, paths, interval[0], interval[1], dims, lock))
+        processes.append(p)
 
-    # print(f"Combining {len(images[0])} images...")
-    # for p in processes:
-    #     p.start()
+    print(f"Combining {len(images[0])} images...")
+    for p in processes:
+        p.start()
     
-    # for p in processes:
-    #     p.join()
+    for p in processes:
+        p.join()
 
     # h, w = dims
     # images_dir = os.path.join(os.getcwd(), "combined_images")
