@@ -229,13 +229,13 @@ def main():
     paths = (car_path, sensor_images_path, graph_path)
     images = get_image_files(paths)
 
-    # we'll have 5 processes
+    # we'll have 10 processes
 
-    interval_length = len(images[0])//5
+    interval_length = len(images[0])//10
     intervals = []
-    for i in range(4):
+    for i in range(9):
         intervals.append((i*interval_length, (i+1)*interval_length))
-    intervals.append((4*interval_length, len(images[0])))
+    intervals.append((9*interval_length, len(images[0])))
     
     processes = []
     lock = Lock()
