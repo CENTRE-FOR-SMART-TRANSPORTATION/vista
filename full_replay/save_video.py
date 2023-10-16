@@ -141,7 +141,7 @@ def get_image_files(paths):
     
     return car_images, sensor_images, graph_images
 
-def combine_images(images: tuple, paths: tuple, lIdx: int, rIdx: int, dims: list, lock: Lock):
+def combine_images(images: tuple, paths: tuple, lIdx: int, rIdx: int, q: Queue, lock: Lock):
     out_path = os.path.join(os.getcwd(), "combined_images")
     if not os.path.exists(out_path):
         os.makedirs(out_path)
