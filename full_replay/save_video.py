@@ -146,6 +146,9 @@ def combine_images(images: tuple, paths: tuple, lIdx: int, rIdx: int, dims: list
     if not os.path.exists(out_path):
         os.makedirs(out_path)
 
+    for i in range(len(images)):
+        images[i] = images[i][lIdx: rIdx]
+    
     car_images, sensor_images, graph_images = images
     car_path, sensor_path, graph_path = paths
 
@@ -250,6 +253,7 @@ def main():
     for p in processes:
         p.join()
 
+    h, w = dims
     images_dir = os.path.join(os.getcwd(), "combined_images")
     create_video(images_dir, w, h, path_to_scenes, filename=f"{name}.mp4")
 
