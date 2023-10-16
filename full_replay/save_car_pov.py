@@ -22,7 +22,7 @@ import file_tools
 class PointCloudOpener:
     # Opens one specified point cloud as a Open3D tensor point cloud for parallelism
     def open_point_cloud(
-        self, path_to_scenes: str, frame: int, res: np.float32
+        self, path_to_scenes: str, frame: int, res: np.float32, mode: str
     ) -> o3d.t.geometry.PointCloud:
         """Reads a specified point cloud from a path into memory.
         This is called in the parallelized loop in obtain_scenes().
@@ -51,10 +51,23 @@ class PointCloudOpener:
         pcd = o3d.t.geometry.PointCloud(o3d.core.Device("CPU:0"))
         pcd.point.positions = o3d.core.Tensor(xyz, o3d.core.float32, o3d.core.Device("CPU:0"))
 
+        if mode == "intensity":
+            # Extract intensity values
+            intensity = df.iloc[:, 3].to_numpy() / 1000
+            # Set the colors of the point cloud using the intensity-based color map
+            pcd.point.colors = o3d.core.Tensor(
+                intensity, o3d.core.float32, o3d.core.Device("CPU:0"))
+        elif mode == "x":
+            # Extract intensity values
+            x = df.iloc[:, 0].to_numpy() / 1000
+            # Set the colors of the point cloud using the intensity-based color map
+            pcd.point.colors = o3d.core.Tensor(
+                x, o3d.core.float32, o3d.core.Device("CPU:0"))
+
         return pcd
 
 
-def obtain_scenes(path_to_scenes):
+def obtain_scenes(path_to_scenes, mode):
     print("Obtaining scenes from the path to the .txt files...")
     path_to_scenes_ext = os.path.join(path_to_scenes, "*.txt")
 
@@ -81,7 +94,7 @@ def obtain_scenes(path_to_scenes):
     from joblib import Parallel, delayed
 
     pcds = Parallel(n_jobs=cores)(  # Switched to loky backend to maybe suppress errors?
-        delayed(opener.open_point_cloud)(path_to_scenes, frame, res)
+        delayed(opener.open_point_cloud)(path_to_scenes, frame, res, mode)
         for frame, res in tqdm(
             args,
             total=len(filenames),
@@ -97,6 +110,7 @@ def visualize_replay(
     scenes_list: np.ndarray,
     vehicle_speed: np.float32 = 100,
     point_density: np.float32 = 1.0,
+    mode: str = "default"
 ) -> str or int:
     # Obtain screen parameters for our video
     root = Tk()
@@ -127,17 +141,17 @@ def visualize_replay(
         for frame, scene in enumerate(
             tqdm(scenes_list, desc="Replaying and capturing scenes")
         ):
-
-            ## For intensity colors
-            # xyz = scene.point.positions.numpy()  # IF THE SCENE IS IN TENSOR
-            # geometry.points = o3d.utility.Vector3dVector(xyz)
-            # intensity = scene.point.colors.numpy()
-            # normalizer = matplotlib.colors.Normalize(
-            #     np.min(intensity), np.max(intensity))
-            # las_rgb = matplotlib.cm.gray(normalizer(intensity))[:, :-1]
-            # geometry.colors = o3d.utility.Vector3dVector(las_rgb)
-
-            geometry.points = scene.to_legacy().points  # IF THE SCENE IS IN TENSOR
+            if mode == "default":
+                geometry.points = scene.to_legacy().points  # IF THE SCENE IS IN TENSOR
+            else:
+                # For intensity colors
+                xyz = scene.point.positions.numpy()  # IF THE SCENE IS IN TENSOR
+                geometry.points = o3d.utility.Vector3dVector(xyz)
+                scalar_val = scene.point.colors.numpy()
+                normalizer = matplotlib.colors.Normalize(
+                    np.min(scalar_val), np.max(scalar_val))
+                las_rgb = matplotlib.cm.gray(normalizer(scalar_val))[:, :-1]
+                geometry.colors = o3d.utility.Vector3dVector(las_rgb)
 
             if frame == 0:
                 vis.add_geometry(geometry, reset_bounding_box=True)
@@ -235,17 +249,43 @@ def visualize_replay(
     return
 
 def main():
-    args = file_tools.parse_cmdline_args()
+    # Parse our command line arguments
+    def parse_cmdline_args() -> argparse.Namespace:
+        # use argparse to parse arguments from the command line
+        parser = argparse.ArgumentParser()
+
+        parser.add_argument(
+            "--config", type=str, default=None, help="Path to sensor config file"
+        )
+        parser.add_argument(
+            "--trajectory", type=str, default=None, help="Path to trajectory folder"
+        )
+        parser.add_argument(
+            "--observer_height", type=float, default=1.8, help="Height of the observer in m"
+        )
+        parser.add_argument(
+            "--scenes", type=str, default=None, help="Path to the Vista output folder"
+        )
+        parser.add_argument(
+            "--numScenes", type=int, default=1, help="Number of Vista output folders"
+        )
+        
+        parser.add_argument("--input", type=str, default=None, help="Path to the .las file")
+
+        parser.add_argument("--mode", type=str, default="default", help="Zoom level of sensor fov", choices=["default", "intensity", "x"])
+        return parser.parse_args()
+    
+    args = parse_cmdline_args()
     path_to_scenes = file_tools.obtain_scene_path(args)
     car_path = os.path.join(os.getcwd(), "frame_images/")
     # creating the video from the pov of the driver
     # this will prompt you to click p to play, click p otherwise it won't save your video
 
     print("Converting the .txt scenes to point clouds...")
-    scenes = obtain_scenes(path_to_scenes)
+    scenes = obtain_scenes(path_to_scenes, mode=args.mode)
 
     print("Creating video from car POV, please click 'p' when prompted...")
-    frames, sw, sh = visualize_replay(path_to_scenes, scenes)
+    frames, sw, sh = visualize_replay(path_to_scenes, scenes, mode=args.mode)
 
 if __name__ == "__main__":
     main()
