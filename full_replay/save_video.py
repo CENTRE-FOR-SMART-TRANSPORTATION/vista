@@ -116,8 +116,9 @@ def create_video(images_dir: str, w: int, h: int, path_to_scenes: str, vehicle_s
     print(f"Video replay has been written to {output_path}")
     return
 
-def get_image_files():
+def get_image_files(paths):
     # Read our frames from our temporary directory
+    car_path, sensor_path, graph_path = paths
     car_path_ext = os.path.join(car_path, '*.png')
     sensor_path_ext = os.path.join(sensor_path, '*.png')
     graph_path_ext = os.path.join(graph_path, "*.png")
@@ -225,8 +226,8 @@ def main():
     sensor_images_path = os.path.join(os.getcwd(), "fov/")
     graph_path = os.path.join(os.getcwd(), "plt_images/")
     # combine images and create the video
-    images = get_image_files()
     paths = (car_path, sensor_images_path, graph_path)
+    images = get_image_files(paths)
 
     # we'll have 5 processes
 
