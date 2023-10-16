@@ -239,7 +239,8 @@ def main():
     
     processes = []
     lock = Lock()
-    dims = [-1, -1]
+    dims = list()
+    dims += [-1, -1]
     for interval in intervals:
         p = Process(target=combine_images, args=(images, paths, interval[0], interval[1], dims, lock))
         processes.append(p)
