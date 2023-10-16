@@ -39,25 +39,17 @@ class PointCloudOpener:
         """
 
         scene_name = f"output_{frame}_{res:.2f}.txt"
-        path_to_scene = os.path.join(path_to_scenes, scene_name)
-        # print(f"Opening {scene_name} as pcd...")
-
+        path_to_scene = os.path.join(path2scenes, scene_name)
+        # print(scene_name)
+        
         # Skip our header, and read only XYZ coordinates
-        df = pd.read_csv(path_to_scene, skiprows=0, usecols=[0, 1, 2, 3])
-        xyz = df.iloc[:, :3].to_numpy() / 1000  # Extract XYZ coordinates
-        # Extract intensity values
-        intensity = df.iloc[:, 3].to_numpy() / 1000
-
+        df = pd.read_csv(path_to_scene, skiprows=0, usecols=[0, 1, 2])
+        xyz = df.to_numpy() / 1000
+        
         # Create Open3D point cloud object with tensor values.
-        # For parallelization, outputs must be able to be serialized
+        # For parallelization, outputs must be able to be serialized 
         pcd = o3d.t.geometry.PointCloud(o3d.core.Device("CPU:0"))
-        pcd.point.positions = o3d.core.Tensor(
-            xyz, o3d.core.float32, o3d.core.Device("CPU:0")
-        )
-
-        # Set the colors of the point cloud using the intensity-based color map
-        pcd.point.colors = o3d.core.Tensor(
-            intensity, o3d.core.float32, o3d.core.Device("CPU:0"))
+        pcd.point.positions = o3d.core.Tensor(xyz, o3d.core.float32, o3d.core.Device("CPU:0"))
 
         return pcd
 
@@ -136,13 +128,16 @@ def visualize_replay(
             tqdm(scenes_list, desc="Replaying and capturing scenes")
         ):
 
-            xyz = scene.point.positions.numpy()  # IF THE SCENE IS IN TENSOR
-            geometry.points = o3d.utility.Vector3dVector(xyz)
-            intensity = scene.point.colors.numpy()
-            normalizer = matplotlib.colors.Normalize(
-                np.min(intensity), np.max(intensity))
-            las_rgb = matplotlib.cm.gray(normalizer(intensity))[:, :-1]
-            geometry.colors = o3d.utility.Vector3dVector(las_rgb)
+            ## For intensity colors
+            # xyz = scene.point.positions.numpy()  # IF THE SCENE IS IN TENSOR
+            # geometry.points = o3d.utility.Vector3dVector(xyz)
+            # intensity = scene.point.colors.numpy()
+            # normalizer = matplotlib.colors.Normalize(
+            #     np.min(intensity), np.max(intensity))
+            # las_rgb = matplotlib.cm.gray(normalizer(intensity))[:, :-1]
+            # geometry.colors = o3d.utility.Vector3dVector(las_rgb)
+
+            geometry.points = scene.to_legacy().points  # IF THE SCENE IS IN TENSOR
 
             if frame == 0:
                 vis.add_geometry(geometry, reset_bounding_box=True)
