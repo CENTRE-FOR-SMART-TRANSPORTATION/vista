@@ -19,6 +19,7 @@ from classes import SensorConfig, Trajectory
 
 import file_tools
 import argparse
+from multiprocessing import Process, Lock
 
 VIDEO_SPEED = 1
 
@@ -115,12 +116,7 @@ def create_video(images_dir: str, w: int, h: int, path_to_scenes: str, vehicle_s
     print(f"Video replay has been written to {output_path}")
     return
 
-
-def combine_images(car_path: str, sensor_path: str, graph_path: str):
-    out_path = os.path.join(os.getcwd(), "combined_images")
-    if not os.path.exists(out_path):
-        os.makedirs(out_path)
-
+def get_image_files():
     # Read our frames from our temporary directory
     car_path_ext = os.path.join(car_path, '*.png')
     sensor_path_ext = os.path.join(sensor_path, '*.png')
@@ -141,8 +137,16 @@ def combine_images(car_path: str, sensor_path: str, graph_path: str):
                     for abs_path in glob.glob(graph_path_ext)]
     graph_images = sorted(
         graph_images, key=lambda f: int(os.path.splitext(f)[0]))
+    
+    return car_images, sensor_images, graph_images
 
-    print(len(car_images), len(sensor_images), len(graph_images))
+def combine_images(images: tuple, lIdx: int, rIdx: int, dims: list, lock: Lock):
+    out_path = os.path.join(os.getcwd(), "combined_images")
+    if not os.path.exists(out_path):
+        os.makedirs(out_path)
+
+    car_images, sensor_images, graph_images = images
+
     for i in range(len(car_images)):
         car_image = os.path.join(car_path, car_images[i])
         sensor_image = os.path.join(sensor_path, sensor_images[i])
@@ -187,7 +191,11 @@ def combine_images(car_path: str, sensor_path: str, graph_path: str):
             os.getcwd(), "combined_images", f"{i}.png"), out)
 
     # return the height and width to pass on to the create_video function
-    return 100 + h1 + h2, 100 + w1
+
+    lock.acquire()
+    dims[0] = 100 + h1 + h2
+    dims[1] = 100 + w1
+    lock.release()
 
 
 def main():
@@ -216,7 +224,29 @@ def main():
     sensor_images_path = os.path.join(os.getcwd(), "fov/")
     graph_path = os.path.join(os.getcwd(), "plt_images/")
     # combine images and create the video
-    h, w = combine_images(car_path, sensor_images_path, graph_path)
+    images = get_image_files()
+
+    # we'll have 5 processes
+
+    interval_length = len(images[0])//5
+    intervals = []
+    for i in range(5):
+        intervals.append((i*interval_length, max(len(images[0]), (i+1)*interval_length)))
+    
+    processes = []
+    lock = Lock()
+    dims = [-1, -1]
+    for interval in intervals:
+        p = Process(target=combine_images, args=(images, interval[0], interval[1], dims, lock))
+        processes.append(p)
+
+    print(f"Combining {len(images[0])} images...")
+    for p in processes:
+        p.start()
+    
+    for p in processes:
+        p.join()
+
     images_dir = os.path.join(os.getcwd(), "combined_images")
     create_video(images_dir, w, h, path_to_scenes, filename=f"{name}.mp4")
 
