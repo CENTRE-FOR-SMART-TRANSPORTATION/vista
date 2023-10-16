@@ -145,22 +145,18 @@ def combine_images(images: tuple, paths: tuple, lIdx: int, rIdx: int, dims: list
     out_path = os.path.join(os.getcwd(), "combined_images")
     if not os.path.exists(out_path):
         os.makedirs(out_path)
-        
-    images = [l[lIdx: rIdx] for l in images]
     
     car_images, sensor_images, graph_images = images
     car_path, sensor_path, graph_path = paths
 
-    for i in tqdm(range(len(car_images)), desc="Combining images"):
+    for i in tqdm(range(lIdx, rIdx), desc="Combining images"):
         car_image = os.path.join(car_path, car_images[i])
         sensor_image = os.path.join(sensor_path, sensor_images[i])
         graph_image = os.path.join(graph_path, graph_images[i])
 
-        lock.acquire()
         img1 = cv2.imread(sensor_image)
         img2 = cv2.imread(car_image)
         img3 = cv2.imread(graph_image)
-        lock.release()
 
         (h1, w1) = img1.shape[:2]
         (h2, w2) = img2.shape[:2]
@@ -193,10 +189,8 @@ def combine_images(images: tuple, paths: tuple, lIdx: int, rIdx: int, dims: list
         out[h1:h1+h2, 50:w2+50] = img2
         out[50:h3+50, w1_new:w1_new+w3] = resized
 
-        lock.acquire()
         cv2.imwrite(os.path.join(
             os.getcwd(), "combined_images", f"{i}.png"), out)
-        lock.release()
 
     # return the height and width to pass on to the create_video function
 
