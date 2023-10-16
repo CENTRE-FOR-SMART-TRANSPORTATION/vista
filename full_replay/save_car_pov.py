@@ -39,7 +39,7 @@ class PointCloudOpener:
         """
 
         scene_name = f"output_{frame}_{res:.2f}.txt"
-        path_to_scene = os.path.join(path2scenes, scene_name)
+        path_to_scene = os.path.join(path_to_scenes, scene_name)
         # print(scene_name)
         
         # Skip our header, and read only XYZ coordinates
