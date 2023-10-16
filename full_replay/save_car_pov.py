@@ -189,7 +189,7 @@ def visualize_replay(
             vis.update_renderer()
 
             img = np.asarray(vis.capture_screen_float_buffer(do_render=True))
-            # img = (img[:, :] * 255).astype(np.uint8)  # Normalize RGB to 8-bit
+            img = (img[:, :] * 255).astype(np.uint8)  # Normalize RGB to 8-bit
 
             # Capture the rendered point cloud to an RGB image for video output
             # frames.append(np.asarray(vis.capture_screen_float_buffer(do_render=True)))
