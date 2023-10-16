@@ -252,7 +252,7 @@ def main():
         p.join()
 
     h, w = q.get()
-    print(dims)
+    print(h, w)
     images_dir = os.path.join(os.getcwd(), "combined_images")
     create_video(images_dir, w, h, path_to_scenes, filename=f"{name}.mp4")
 
