@@ -19,7 +19,7 @@ from classes import SensorConfig, Trajectory
 
 import file_tools
 import argparse
-from multiprocessing import Process, Lock
+from multiprocessing import Process, Lock, Queue
 
 VIDEO_SPEED = 1
 
@@ -195,8 +195,7 @@ def combine_images(images: tuple, paths: tuple, lIdx: int, rIdx: int, dims: list
     # return the height and width to pass on to the create_video function
 
     lock.acquire()
-    dims[0] = 100 + h1 + h2
-    dims[1] = 100 + w1
+    q.put((100 + h1 + h2, 100 + w1))
     lock.release()
 
 
@@ -239,10 +238,9 @@ def main():
     
     processes = []
     lock = Lock()
-    dims = list()
-    dims += [-1, -1]
+    q = Queue()
     for interval in intervals:
-        p = Process(target=combine_images, args=(images, paths, interval[0], interval[1], dims, lock))
+        p = Process(target=combine_images, args=(images, paths, interval[0], interval[1], q, lock))
         processes.append(p)
 
     print(f"Each running process is printing a progress bar, so it won't look consistent,\n just a general idea of how long it will take.")
@@ -253,7 +251,7 @@ def main():
     for p in processes:
         p.join()
 
-    h, w = dims
+    h, w = q.get()
     print(dims)
     images_dir = os.path.join(os.getcwd(), "combined_images")
     create_video(images_dir, w, h, path_to_scenes, filename=f"{name}.mp4")
