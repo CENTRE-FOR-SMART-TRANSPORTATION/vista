@@ -145,9 +145,8 @@ def combine_images(images: tuple, paths: tuple, lIdx: int, rIdx: int, dims: list
     out_path = os.path.join(os.getcwd(), "combined_images")
     if not os.path.exists(out_path):
         os.makedirs(out_path)
-
-    for i in range(len(images)):
-        images[i] = images[i][lIdx: rIdx]
+        
+    images = [l[lIdx: rIdx] for l in images]
     
     car_images, sensor_images, graph_images = images
     car_path, sensor_path, graph_path = paths
