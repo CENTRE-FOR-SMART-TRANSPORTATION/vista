@@ -246,7 +246,7 @@ def main():
         p = Process(target=combine_images, args=(images, paths, interval[0], interval[1], dims, lock))
         processes.append(p)
 
-    print(f"Each running process is printing a progres bar, so it won't look consistent,\n just a general idea of how long it will take.")
+    print(f"Each running process is printing a progress bar, so it won't look consistent,\n just a general idea of how long it will take.")
     print(f"Combining {len(images[0])} images...")
     for p in processes:
         p.start()
