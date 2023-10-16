@@ -238,23 +238,24 @@ def main():
     for i in range(5):
         intervals.append((i*interval_length, max(len(images[0]), (i+1)*interval_length)))
     
-    processes = []
-    lock = Lock()
-    dims = [-1, -1]
-    for interval in intervals:
-        p = Process(target=combine_images, args=(images, paths, interval[0], interval[1], dims, lock))
-        processes.append(p)
+    print(intervals)
+    # processes = []
+    # lock = Lock()
+    # dims = [-1, -1]
+    # for interval in intervals:
+    #     p = Process(target=combine_images, args=(images, paths, interval[0], interval[1], dims, lock))
+    #     processes.append(p)
 
-    print(f"Combining {len(images[0])} images...")
-    for p in processes:
-        p.start()
+    # print(f"Combining {len(images[0])} images...")
+    # for p in processes:
+    #     p.start()
     
-    for p in processes:
-        p.join()
+    # for p in processes:
+    #     p.join()
 
-    h, w = dims
-    images_dir = os.path.join(os.getcwd(), "combined_images")
-    create_video(images_dir, w, h, path_to_scenes, filename=f"{name}.mp4")
+    # h, w = dims
+    # images_dir = os.path.join(os.getcwd(), "combined_images")
+    # create_video(images_dir, w, h, path_to_scenes, filename=f"{name}.mp4")
 
 
 if __name__ == "__main__":
