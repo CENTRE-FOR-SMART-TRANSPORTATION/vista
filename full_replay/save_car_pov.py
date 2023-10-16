@@ -18,6 +18,7 @@ import matplotlib
 from classes import SensorConfig, Trajectory
 
 import file_tools
+import argparse
 
 class PointCloudOpener:
     # Opens one specified point cloud as a Open3D tensor point cloud for parallelism
