@@ -246,6 +246,7 @@ def main():
         p = Process(target=combine_images, args=(images, paths, interval[0], interval[1], dims, lock))
         processes.append(p)
 
+    print(f"Each running process is printing a progres bar, so it won't look consistent,\n just a general idea of how long it will take.")
     print(f"Combining {len(images[0])} images...")
     for p in processes:
         p.start()
@@ -253,9 +254,9 @@ def main():
     for p in processes:
         p.join()
 
-    # h, w = dims
-    # images_dir = os.path.join(os.getcwd(), "combined_images")
-    # create_video(images_dir, w, h, path_to_scenes, filename=f"{name}.mp4")
+    h, w = dims
+    images_dir = os.path.join(os.getcwd(), "combined_images")
+    create_video(images_dir, w, h, path_to_scenes, filename=f"{name}.mp4")
 
 
 if __name__ == "__main__":
