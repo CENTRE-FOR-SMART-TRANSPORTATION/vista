@@ -140,12 +140,13 @@ def get_image_files():
     
     return car_images, sensor_images, graph_images
 
-def combine_images(images: tuple, lIdx: int, rIdx: int, dims: list, lock: Lock):
+def combine_images(images: tuple, paths: tuple, lIdx: int, rIdx: int, dims: list, lock: Lock):
     out_path = os.path.join(os.getcwd(), "combined_images")
     if not os.path.exists(out_path):
         os.makedirs(out_path)
 
     car_images, sensor_images, graph_images = images
+    car_path, sensor_path, graph_path = paths
 
     for i in range(len(car_images)):
         car_image = os.path.join(car_path, car_images[i])
@@ -225,6 +226,7 @@ def main():
     graph_path = os.path.join(os.getcwd(), "plt_images/")
     # combine images and create the video
     images = get_image_files()
+    paths = (car_path, sensor_images_path, graph_path)
 
     # we'll have 5 processes
 
@@ -237,7 +239,7 @@ def main():
     lock = Lock()
     dims = [-1, -1]
     for interval in intervals:
-        p = Process(target=combine_images, args=(images, interval[0], interval[1], dims, lock))
+        p = Process(target=combine_images, args=(images, paths, interval[0], interval[1], dims, lock))
         processes.append(p)
 
     print(f"Combining {len(images[0])} images...")
