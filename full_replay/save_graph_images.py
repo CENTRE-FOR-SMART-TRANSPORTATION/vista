@@ -652,11 +652,11 @@ def data_rate_vista_automated(
 
         fig, ax = plt.subplots()
         xmin, xmax = min(xBarData[0][:, 0]), max(xBarData[0][:, 0])
-        xrange = (xmax-xmin)*SCALE
+        xrange = (xmax-xmin)
         xmin, xmax = xmin - xrange//10, xmax + xrange//10
 
         ymin, ymax = min(yBarData[0]), max(yBarData[0])
-        yrange = ymax-ymin
+        yrange = (ymax-ymin)*SCALE
         ymin, ymax = ymin - yrange//10, ymax + yrange//10
 
         line2 = ax.plot(xBarData[0][0, 0], yBarData[0][0],
