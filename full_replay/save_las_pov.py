@@ -40,10 +40,11 @@ def render_sensor_fov(
         if mode == "front":
             ctr.set_front([-1, 0, 0])  
             ctr.set_up([0, 0, 1])
+            ctr.set_lookat(traj.getObserverPoints()[frame, :])
         elif mode == "isometric":
             ctr.set_front([-1, -1, 1])  
             ctr.set_up([0, 0, 1])
-        ctr.set_lookat(traj.getRoadPoints()[frame, :])
+            ctr.set_lookat(traj.getRoadPoints()[frame, :])
         ctr.set_zoom(ZOOM)
 
     # Setup our visualizer
