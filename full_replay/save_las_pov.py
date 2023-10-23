@@ -90,7 +90,7 @@ def render_sensor_fov(
     for frame in range(0+offset, num_points-offset):
         # Set the view to look at the next road point
         set_visualizer_pov(VIEW)
-
+        vis.update_geometry(road)
         vis.poll_events()
         vis.update_renderer()
 
