@@ -38,8 +38,8 @@ def render_sensor_fov(
     # Helper function to set the visualizer POV
     def set_visualizer_pov(mode: str) -> None:
         if mode == "front":
-            ctr.set_front([-1, 0, 0])  
-            ctr.set_up([0, 0, 1])
+            ctr.set_front(traj.getForwards()[frame, :])  
+            ctr.set_up(traj.getUpwards()[frame, :])
             ctr.set_lookat(traj.getObserverPoints()[frame, :])
         elif mode == "isometric":
             ctr.set_front([-1, -1, 1])  
