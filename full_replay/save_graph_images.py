@@ -15,7 +15,7 @@ import file_tools
 import argparse
 
 USE_VOLUMETRIC = True
-USE_CARTESIAN = True
+USE_CARTESIAN = False
 SCALE = 1
 x_res = 0.11
 y_res = 0.11
@@ -487,7 +487,7 @@ def data_rate_vista_automated(
         if USE_VOLUMETRIC:
             with mp.Pool(numCores) as p:
                 inputData = [(voxel_rsize, voxel_asize, voxel_esize, data, i, vistaoutput_path[itr],
-                                point_density, max_volume, global_offset) for i in range(smallest, upperbound, resolution)]
+                              point_density, max_volume, global_offset) for i in range(smallest, upperbound, resolution)]
                 results = []
                 with tqdm(total=len(inputData), desc="Processing Volume") as pbar:
                     for result in p.imap(multiprocessed_vol_funct, inputData):
@@ -508,16 +508,16 @@ def data_rate_vista_automated(
             # Simply obtain the total number of spherical voxels.
             # Finding the total amount of voxels in this range with config
             azimuth_capacity = np.floor(
-                (data["a_high"]-data["a_low"])/data["a_size"])
+                (data["a_high"]-data["a_low"])/data["horizAngRes"])
             elevation_capacity = np.floor(
-                (data["e_high"]-data["e_low"])/data["e_size"])
+                (data["e_high"]-data["e_low"])/data["verticAngRes"])
             radius_capacity = np.floor(
-                (data["r_high"]-data["r_low"])/data["r_size"])
+                (data["r_high"]-data["r_low"])/voxel_rsize)
             total_voxels = azimuth_capacity * elevation_capacity * radius_capacity
 
         with mp.Pool(numCores) as p:
             inputData = [(voxel_rsize, voxel_asize, voxel_esize, data, i, vistaoutput_path[itr],
-                            point_density, total_voxels, global_offset) for i in range(smallest, upperbound, resolution)]
+                          point_density, total_voxels, global_offset) for i in range(smallest, upperbound, resolution)]
             results = []
             with tqdm(total=len(inputData), desc="Processing Count") as pbar:
                 for result in p.imap(multiprocessed_count_funct, inputData):
@@ -672,7 +672,7 @@ def data_rate_vista_automated(
         def update(frame):
             # for each frame, update the data stored on each artist.
             x = xBarData[0][:frame, 0]
-            y = yBarData[0][:frame]
+            y = yBarAverageData[0][:frame]
 
             # update the line plot:
             line2.set_xdata(x)
@@ -712,10 +712,12 @@ def main():
         parser.add_argument(
             "--numScenes", type=int, default=1, help="Number of Vista output folders"
         )
-        
-        parser.add_argument("--input", type=str, default=None, help="Path to the .las file")
 
-        parser.add_argument("--scale", type=float, default=0.3125, help="The value that the y axis will be stretched by")
+        parser.add_argument("--input", type=str, default=None,
+                            help="Path to the .las file")
+
+        parser.add_argument("--scale", type=float, default=0.3125,
+                            help="The value that the y axis will be stretched by")
 
         return parser.parse_args()
 
