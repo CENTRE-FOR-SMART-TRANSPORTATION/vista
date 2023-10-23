@@ -20,6 +20,9 @@ from classes import SensorConfig, Trajectory
 import file_tools
 import argparse
 
+ZOOM = 0.03
+VIEW = "isometric"
+
 class PointCloudOpener:
     # Opens one specified point cloud as a Open3D tensor point cloud for parallelism
     def open_point_cloud(
@@ -165,11 +168,15 @@ def visualize_replay(
                 sys.exit(1)
             else:
                 # Isometric front view
-                ctr.change_field_of_view(step=50)
-                ctr.set_front([-1, -1, 1])  
-                ctr.set_up([0, 0, 1])
-                ctr.set_lookat([0, 0, 1.8])
-                ctr.set_zoom(0.3)  
+                if VIEW == "front":
+                    ctr.set_front([-1, 0, 0])  
+                    ctr.set_up([0, 0, 1])
+                    ctr.set_lookat([18.5, 0, 1.8])
+                elif VIEW == "isometric":
+                    ctr.set_front([-1, -1, 1])  
+                    ctr.set_up([0, 0, 1])
+                    ctr.set_lookat([0, 0, 1.8])
+                ctr.set_zoom(ZOOM)
 
             """ Settings for POV of driver:
         ctr.set_front([-1, 0, 0])  
@@ -178,6 +185,7 @@ def visualize_replay(
         ctr.set_zoom(0.025)    
       """
             """ Settings for isometric forward POV:
+        ctr.change_field_of_view(step=50)
         ctr.set_front([-1, -1, 1])  
         ctr.set_up([0, 0, 1])
         ctr.set_lookat([0, 0, 1.8])
@@ -273,12 +281,18 @@ def main():
         
         parser.add_argument("--input", type=str, default=None, help="Path to the .las file")
 
-        parser.add_argument("--mode", type=str, default="default", help="Zoom level of sensor fov", choices=["default", "intensity", "x"])
+        parser.add_argument("--mode", type=str, default="default", help="Mode for the colors of the points", choices=["default", "intensity", "x"])
+        
+        parser.add_argument("--view", type=str, default="isometric", help="Option for the view of the points", choices=["front", "isometric"])
+
         return parser.parse_args()
     
+    global ZOOM, VIEW
     args = parse_cmdline_args()
     path_to_scenes = file_tools.obtain_scene_path(args)
     car_path = os.path.join(os.getcwd(), "frame_images/")
+    ZOOM = args.zoom if args.zoom is not None else ZOOM
+    VIEW = args.view if args.view is not None else VIEW
     # creating the video from the pov of the driver
     # this will prompt you to click p to play, click p otherwise it won't save your video
 
