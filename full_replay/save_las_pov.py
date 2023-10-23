@@ -46,7 +46,8 @@ def render_sensor_fov(
             x, y, z = traj.getUpwards()[frame, :]
             ctr.set_up([x, y, z])
 
-            ctr.set_lookat(traj.getRoadPoints()[frame, :])
+            ctr.set_lookat(traj.getLeftwards()[frame, :])
+            ctr.change_field_of_view(step=50)
             ctr.set_zoom(0.025) 
         elif mode == "isometric":
             x, y, z = traj.getForwards()[frame, :]
