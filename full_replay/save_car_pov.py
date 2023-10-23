@@ -285,6 +285,8 @@ def main():
         
         parser.add_argument("--view", type=str, default="isometric", help="Option for the view of the points", choices=["front", "isometric"])
 
+        parser.add_argument("--zoom", type=float, default=0.3125, help="Zoom level of car pov")
+
         return parser.parse_args()
     
     global ZOOM, VIEW
