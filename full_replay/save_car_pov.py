@@ -172,11 +172,12 @@ def visualize_replay(
                     ctr.set_front([-1, 0, 0])  
                     ctr.set_up([0, 0, 1])
                     ctr.set_lookat([18.5, 0, 1.8])
+                    ctr.set_zoom(0.025)   
                 elif VIEW == "isometric":
                     ctr.set_front([-1, -1, 1])  
                     ctr.set_up([0, 0, 1])
                     ctr.set_lookat([0, 0, 1.8])
-                ctr.set_zoom(ZOOM)
+                    ctr.set_zoom(ZOOM)
 
             """ Settings for POV of driver:
         ctr.set_front([-1, 0, 0])  
