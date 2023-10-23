@@ -42,9 +42,13 @@ def render_sensor_fov(
             z = 1.8
             y *= -1
             ctr.set_front([x, y, z])  
-            ctr.set_up([0, 0, 1])
-            ctr.set_lookat(traj.getObserverPoints()[frame, :])
-            ctr.set_zoom(0.2) 
+        
+            x, y, z = traj.getUpwards()[frame, :]
+            z += 1.8
+            ctr.set_up([x, y, z])
+
+            ctr.set_lookat(traj.getRoadPoints()[frame, :])
+            ctr.set_zoom(1) 
         elif mode == "isometric":
             x, y, z = traj.getForwards()[frame, :]
             z = 1.8
@@ -94,6 +98,7 @@ def render_sensor_fov(
     for frame in range(0+offset, num_points-offset):
         # Set the view to look at the next road point
         set_visualizer_pov(VIEW)
+        vis.update_geometry(road)
         vis.poll_events()
         vis.update_renderer()
 
