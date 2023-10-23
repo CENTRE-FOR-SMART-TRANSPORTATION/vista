@@ -43,7 +43,7 @@ def render_sensor_fov(
             y *= -1
             ctr.set_front([x, y, z])  
             ctr.set_up([0, 0, 1])
-            ctr.set_lookat([x, y, z])
+            ctr.set_lookat([18.5, 0, 1.8])
             ctr.set_zoom(0.025) 
         elif mode == "isometric":
             x, y, z = traj.getForwards()[frame, :]
@@ -71,6 +71,13 @@ def render_sensor_fov(
         pass
     else:
         ctr = vis.get_view_control()
+
+    # Configure our render option
+    render_opt = vis.get_render_option()
+    render_opt.point_size = 1.0
+    render_opt.show_coordinate_frame = True  # Does this even work
+    render_opt.background_color = np.array(
+        [16/255, 16/255, 16/255])  # 8-bit RGB, (16, 16, 16)
 
     # Initalize geometries
     vis.add_geometry(road)
