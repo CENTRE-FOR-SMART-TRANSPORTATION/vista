@@ -34,7 +34,7 @@ def render_sensor_fov(
     screen_height: int,
     offset: int
 ) -> None:
-    global VIEW
+    global VIEW, ZOOM
     # Helper function to set the visualizer POV
     def set_visualizer_pov(mode: str) -> None:
         if mode == "front":
