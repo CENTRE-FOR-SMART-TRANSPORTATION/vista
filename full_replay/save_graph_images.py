@@ -12,9 +12,11 @@ from mplcursors import cursor
 import matplotlib.animation as animation
 import pickle
 import file_tools
+import argparse
 
 USE_VOLUMETRIC = True
 USE_CARTESIAN = True
+SCALE = 1
 x_res = 0.11
 y_res = 0.11
 z_res = 0.11
@@ -650,7 +652,7 @@ def data_rate_vista_automated(
 
         fig, ax = plt.subplots()
         xmin, xmax = min(xBarData[0][:, 0]), max(xBarData[0][:, 0])
-        xrange = xmax-xmin
+        xrange = (xmax-xmin)*SCALE
         xmin, xmax = xmin - xrange//10, xmax + xrange//10
 
         ymin, ymax = min(yBarData[0]), max(yBarData[0])
@@ -691,9 +693,38 @@ def data_rate_vista_automated(
 
 
 def main():
-    args = file_tools.parse_cmdline_args()
+    def parse_cmdline_args() -> argparse.Namespace:
+        # use argparse to parse arguments from the command line
+        parser = argparse.ArgumentParser()
+
+        parser.add_argument(
+            "--config", type=str, default=None, help="Path to sensor config file"
+        )
+        parser.add_argument(
+            "--trajectory", type=str, default=None, help="Path to trajectory folder"
+        )
+        parser.add_argument(
+            "--observer_height", type=float, default=1.8, help="Height of the observer in m"
+        )
+        parser.add_argument(
+            "--scenes", type=str, default=None, help="Path to the Vista output folder"
+        )
+        parser.add_argument(
+            "--numScenes", type=int, default=1, help="Number of Vista output folders"
+        )
+        
+        parser.add_argument("--input", type=str, default=None, help="Path to the .las file")
+
+        parser.add_argument("--scale", type=float, default=0.3125, help="The value that the y axis will be stretched by")
+
+        return parser.parse_args()
+
+    global SCALE
+
+    args = parse_cmdline_args()
     sensorcon_path = file_tools.obtain_sensor_path(args)
     path2scenes = file_tools.obtain_multiple_scene_path(args)
+    SCALE = args.scale if args.scale is not None else SCALE
 
     data_rate_vista_automated(
         sensorcon_path=sensorcon_path,
