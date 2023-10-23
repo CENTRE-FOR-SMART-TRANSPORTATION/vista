@@ -165,7 +165,7 @@ def visualize_replay(
                 sys.exit(1)
             else:
                 # Isometric front view
-                # ctr.change_field_of_view(step=50)
+                ctr.change_field_of_view(step=50)
                 ctr.set_front([-1, 0, 0])
                 ctr.set_up([0, 0, 1])
                 ctr.set_lookat([18.5, 0, 1.8])
