@@ -72,13 +72,6 @@ def render_sensor_fov(
     else:
         ctr = vis.get_view_control()
 
-    # Configure our render option
-    render_opt = vis.get_render_option()
-    render_opt.point_size = 1.0
-    render_opt.show_coordinate_frame = True  # Does this even work
-    render_opt.background_color = np.array(
-        [16/255, 16/255, 16/255])  # 8-bit RGB, (16, 16, 16)
-
     # Initalize geometries
     vis.add_geometry(road)
 
