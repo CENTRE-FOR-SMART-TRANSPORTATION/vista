@@ -43,7 +43,7 @@ def render_sensor_fov(
             y *= -1
             ctr.set_front([x, y, z])  
             ctr.set_up([0, 0, 1])
-            ctr.set_lookat([x+1, y-1, 1.8])
+            ctr.set_lookat([x, y, z])
             ctr.set_zoom(0.025) 
         elif mode == "isometric":
             x, y, z = traj.getForwards()[frame, :]
@@ -82,9 +82,6 @@ def render_sensor_fov(
     # Initalize geometries
     vis.add_geometry(road)
 
-    geometry = o3d.geometry.PointCloud()
-    vis.add_geometry(geometry)
-
     vis.poll_events()
     vis.update_renderer()
 
@@ -97,7 +94,6 @@ def render_sensor_fov(
     for frame in range(0+offset, num_points-offset):
         # Set the view to look at the next road point
         set_visualizer_pov(VIEW)
-        vis.update_geometry(road)
         vis.poll_events()
         vis.update_renderer()
 
