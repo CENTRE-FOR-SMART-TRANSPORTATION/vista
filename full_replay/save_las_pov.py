@@ -44,11 +44,10 @@ def render_sensor_fov(
             ctr.set_front([x, y, z])  
         
             x, y, z = traj.getUpwards()[frame, :]
-            z += 1.8
             ctr.set_up([x, y, z])
 
             ctr.set_lookat(traj.getRoadPoints()[frame, :])
-            ctr.set_zoom(1) 
+            ctr.set_zoom(0.025) 
         elif mode == "isometric":
             x, y, z = traj.getForwards()[frame, :]
             z = 1.8
