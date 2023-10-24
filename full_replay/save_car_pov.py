@@ -19,6 +19,7 @@ from classes import SensorConfig, Trajectory
 
 import file_tools
 import argparse
+import shutil
 
 ZOOM = 0.03
 VIEW = "isometric"
@@ -294,6 +295,9 @@ def main():
     args = parse_cmdline_args()
     path_to_scenes = file_tools.obtain_scene_path(args)
     car_path = os.path.join(os.getcwd(), "frame_images/")
+
+    if os.path.exists(car_path):
+        shutil.rmtree(car_path)
     ZOOM = args.zoom if args.zoom is not None else ZOOM
     VIEW = args.view if args.view is not None else VIEW
     # creating the video from the pov of the driver

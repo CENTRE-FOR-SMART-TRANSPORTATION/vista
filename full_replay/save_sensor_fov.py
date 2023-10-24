@@ -20,6 +20,7 @@ from classes import SensorConfig, Trajectory
 import file_tools
 import sensorpoints
 import argparse
+import shutil
 
 # If you want to pickle the python results so as to not compute them next time you run
 # Useful for when testing stuff with the program
@@ -199,6 +200,8 @@ def main():
     road = file_tools.open_las(args)
 
     sensor_images_path = os.path.join(os.getcwd(), "fov/")
+    if os.path.exists(sensor_images_path):
+        shutil.rmtree(sensor_images_path)
 
     # getting the required objects for crating the video
     screen_wh = obtain_screen_size()

@@ -13,6 +13,7 @@ import matplotlib.animation as animation
 import pickle
 import file_tools
 import argparse
+import shutil
 
 USE_VOLUMETRIC = True
 USE_CARTESIAN = False
@@ -668,6 +669,8 @@ def data_rate_vista_automated(
         plt_images_dir = os.path.join(os.getcwd(), "plt_images")
         if not os.path.exists(plt_images_dir):
             os.makedirs(plt_images_dir)
+        else:
+            shutil.rmtree(plt_images_dir)
 
         def update(frame):
             # for each frame, update the data stored on each artist.
