@@ -56,6 +56,7 @@ class PointCloudOpener:
         pcd = o3d.t.geometry.PointCloud(o3d.core.Device("CPU:0"))
         pcd.point.positions = o3d.core.Tensor(xyz, o3d.core.float32, o3d.core.Device("CPU:0"))
 
+        print(df.shape)
         if mode == "intensity":
             # Extract intensity values
             intensity = df.iloc[:, 3].to_numpy() / 1000

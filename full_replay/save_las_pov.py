@@ -52,10 +52,14 @@ def render_sensor_fov(
         elif mode == "isometric":
             x, y, z = traj.getForwards()[frame, :]
             z = 1.8
+            y *= -1
             ctr.set_front([x, y, z])  
-            ctr.set_up([0, 0, 1])
-            ctr.set_lookat(traj.getRoadPoints()[frame, :])
-            ctr.set_zoom(ZOOM)
+        
+            x, y, z = traj.getUpwards()[frame, :]
+            ctr.set_up([x, y, z])
+
+            ctr.set_lookat(traj.getObserverPoints()[frame, :])
+            ctr.set_zoom(ZOOM) 
 
     # Setup our visualizer
     vis = o3d.visualization.Visualizer()
