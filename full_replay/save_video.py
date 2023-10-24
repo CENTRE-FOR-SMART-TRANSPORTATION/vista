@@ -21,6 +21,8 @@ import file_tools
 import argparse
 from multiprocessing import Process, Lock, Queue
 
+import shutil
+
 VIDEO_SPEED = 1
 
 
@@ -144,6 +146,9 @@ def get_image_files(paths):
 def combine_images(images: tuple, paths: tuple, lIdx: int, rIdx: int, q: Queue, lock: Lock):
     out_path = os.path.join(os.getcwd(), "combined_images")
     if not os.path.exists(out_path):
+        os.makedirs(out_path)
+    else:
+        shutil.rmtree(out_path)
         os.makedirs(out_path)
     
     car_images, sensor_images, graph_images = images
