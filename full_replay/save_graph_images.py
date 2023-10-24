@@ -15,8 +15,8 @@ import file_tools
 import argparse
 import shutil
 
-USE_VOLUMETRIC = True
-USE_CARTESIAN = False
+USE_VOLUMETRIC = False
+USE_CARTESIAN = True
 SCALE = 1
 x_res = 0.11
 y_res = 0.11
