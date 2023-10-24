@@ -39,7 +39,7 @@ def render_sensor_fov(
     def set_visualizer_pov(mode: str) -> None:
         if mode == "front":
             x, y, z = traj.getForwards()[frame, :]
-            z = 1.8
+            z = 0
             y *= -1
             ctr.set_front([x, y, z])  
         
