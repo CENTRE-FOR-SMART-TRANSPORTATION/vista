@@ -59,6 +59,7 @@ class PointCloudOpener:
         print(df.shape)
         if mode == "intensity":
             # Extract intensity values
+            df = pd.read_csv(path_to_scene, skiprows=0, usecols=[0, 1, 2, 3])
             intensity = df.iloc[:, 3].to_numpy() / 1000
             # Set the colors of the point cloud using the intensity-based color map
             pcd.point.colors = o3d.core.Tensor(
