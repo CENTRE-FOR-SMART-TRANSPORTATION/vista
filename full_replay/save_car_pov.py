@@ -300,6 +300,7 @@ def main():
 
     if os.path.exists(car_path):
         shutil.rmtree(car_path)
+        os.makedirs(car_path)
     ZOOM = args.zoom if args.zoom is not None else ZOOM
     VIEW = args.view if args.view is not None else VIEW
     # creating the video from the pov of the driver

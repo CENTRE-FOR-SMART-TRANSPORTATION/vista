@@ -202,6 +202,7 @@ def main():
     sensor_images_path = os.path.join(os.getcwd(), "fov/")
     if os.path.exists(sensor_images_path):
         shutil.rmtree(sensor_images_path)
+        os.makedirs(sensor_images_path)
 
     # getting the required objects for crating the video
     screen_wh = obtain_screen_size()

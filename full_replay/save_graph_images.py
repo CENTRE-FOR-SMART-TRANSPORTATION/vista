@@ -671,6 +671,7 @@ def data_rate_vista_automated(
             os.makedirs(plt_images_dir)
         else:
             shutil.rmtree(plt_images_dir)
+            os.makedirs(plt_images_dir)
 
         def update(frame):
             # for each frame, update the data stored on each artist.
