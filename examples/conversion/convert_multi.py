@@ -105,7 +105,9 @@ def main(args):
 
     # Traslantion
     xyz -= np.array([pov_X, pov_Y, pov_Z])
-
+    # Sensor at 1.2 meter above
+    xyz[:, 2] -= 1200
+    
     xyz_distance = np.sqrt(
         np.square(xyz[:, 0]) + np.square(xyz[:, 1]) + np.square(xyz[:, 2])
     )
@@ -159,8 +161,6 @@ def main(args):
         xyz.double().T,
     ).T
 
-    # Sensor at 1.2 meter above
-    xyz[:, 2] -= 1200
     xyz = xyz.cpu().numpy()
 
     with h5py.File(
@@ -176,7 +176,7 @@ def main(args):
     print(f2["intensity"])
 
     pd.DataFrame(xyz).to_csv(
-        f"./examples/vista_traces/lidar_{args.process}/lidar_3d.csv"
+        f"./examples/vista_traces/lidar_{args.process}/lidar_3d.csv", index=False
     )
 
 
