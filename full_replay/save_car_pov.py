@@ -159,8 +159,8 @@ def visualize_replay(
                     geometry.points = o3d.utility.Vector3dVector(xyz)
                     scalar_val = scene.point.colors.numpy()
                     normalizer = matplotlib.colors.Normalize(
-                        -np.max(abs(scalar_val)), np.max(abs(scalar_val)))
-                    las_rgb = cmap(normalizer(scalar_val))[:, :-1]
+                        0, np.max(abs(scalar_val)))
+                    las_rgb = cmap(normalizer(abs(scalar_val)))[:, :-1]
                     geometry.colors = o3d.utility.Vector3dVector(las_rgb)
                 else:
                     # For intensity colors
