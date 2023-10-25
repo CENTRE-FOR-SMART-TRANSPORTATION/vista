@@ -146,11 +146,6 @@ def get_image_files(paths):
 
 def combine_images(images: tuple, paths: tuple, lIdx: int, rIdx: int, q: Queue, lock: Lock):
     out_path = os.path.join(os.getcwd(), "combined_images")
-    if not os.path.exists(out_path):
-        os.makedirs(out_path)
-    else:
-        shutil.rmtree(out_path)
-        os.makedirs(out_path)
     
     car_images, sensor_images, graph_images = images
     car_path, sensor_path, graph_path = paths
@@ -224,6 +219,12 @@ def main():
     load_dotenv()
     args.scenes = os.environ["SCENES"] if args.scenes is None else args.scenes
     
+    combined_path = os.path.join(os.getcwd(), "combined_images")
+    if not os.path.exists(combined_path):
+        os.makedirs(combined_path)
+    else:
+        shutil.rmtree(combined_path)
+        os.makedirs(combined_path)
     global VIDEO_SPEED
     VIDEO_SPEED = args.speed
     name = args.video_name
