@@ -57,7 +57,7 @@ def render_sensor_fov(
 
             ctr.set_front([-1*x1, -1*y1, z1])
             ctr.set_up([x2, y2, z2])
-            ctr.set_lookat([x3, y3, z3+1.8])
+            ctr.set_lookat([x3, y3, z3])
             ctr.set_zoom(ZOOM) 
 
     # Setup our visualizer
