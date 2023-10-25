@@ -77,7 +77,7 @@ def obtain_sensor_path() -> str:
 
 
 # Obtain the trajectory
-def obtain_trajectory_details() -> str:
+def obtain_trajectory_path() -> str:
     """Obtains a pregenerated trajectory and reads each of them into
     a container class.
 
@@ -140,8 +140,9 @@ def obtain_las_path() -> str:
 
     return os.path.abspath(las_filename)
 
-scenes = file_tools.obtain_scene_path()
-config = file_tools.obtain_sensor_path()
+scenes = obtain_scene_path()
+config = obtain_sensor_path()
+trajectory = obtain_trajectory_path()
 las_file = obtain_las_path()
 
 env_str = f'''
