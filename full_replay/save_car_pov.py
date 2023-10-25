@@ -132,6 +132,7 @@ def visualize_replay(
         # creates an empty point cloud on which we will display stuff using the visualizer
         geometry = o3d.geometry.PointCloud()
         vis.add_geometry(geometry)
+        cmap = matplotlib.colors.LinearSegmentedColormap.from_list("mycmap", ["blue", "green", "yellow", "red"])
 
         # Obtain view control of the visualizer to change POV on setup
         # NOTE Currently, as of 5/19/2023, the get_view_control() method for the open3d.Visualizer class
@@ -158,8 +159,7 @@ def visualize_replay(
                     geometry.points = o3d.utility.Vector3dVector(xyz)
                     scalar_val = scene.point.colors.numpy()
                     normalizer = matplotlib.colors.Normalize(
-                        np.min(scalar_val), np.max(scalar_val))
-                    cmap = matplotlib.colors.LinearSegmentedColormap.from_list("mycmap", ["blue", "green", "yellow", "red"])
+                        -np.max(abs(scalar_val)), np.max(abs(scalar_val)))
                     las_rgb = cmap(normalizer(scalar_val))[:, :-1]
                     geometry.colors = o3d.utility.Vector3dVector(las_rgb)
                 else:
