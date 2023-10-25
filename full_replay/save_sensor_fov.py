@@ -201,7 +201,7 @@ def main():
     args.config = os.environ["CONFIG"] if args.config is None else args.config
     args.input = os.environ["INPUT"] if args.input is None else args.input
 
-    path_to_scenes = file_tools.obtain_scene_path()
+    path_to_scenes = file_tools.obtain_scene_path(args)
     traj = file_tools.obtain_trajectory_details(args)
     cfg  = sensorpoints.open_sensor_config_file(args)
     road = file_tools.open_las(args)
