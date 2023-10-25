@@ -152,14 +152,25 @@ def visualize_replay(
             if mode == "default":
                 geometry.points = scene.to_legacy().points  # IF THE SCENE IS IN TENSOR
             else:
-                # For intensity colors
-                xyz = scene.point.positions.numpy()  # IF THE SCENE IS IN TENSOR
-                geometry.points = o3d.utility.Vector3dVector(xyz)
-                scalar_val = scene.point.colors.numpy()
-                normalizer = matplotlib.colors.Normalize(
-                    np.min(scalar_val), np.max(scalar_val))
-                las_rgb = matplotlib.cm.gray(normalizer(scalar_val))[:, :-1]
-                geometry.colors = o3d.utility.Vector3dVector(las_rgb)
+                if mode == "x":
+                    # For intensity colors
+                    xyz = scene.point.positions.numpy()  # IF THE SCENE IS IN TENSOR
+                    geometry.points = o3d.utility.Vector3dVector(xyz)
+                    scalar_val = scene.point.colors.numpy()
+                    normalizer = matplotlib.colors.Normalize(
+                        np.min(scalar_val), np.max(scalar_val))
+                    cmap = matplotlib.colors.LinearSegmentedColormap("mycmap", ["blue", "green", "yellow", "red"])
+                    las_rgb = cmap(normalizer(scalar_val))[:, :-1]
+                    geometry.colors = o3d.utility.Vector3dVector(las_rgb)
+                else:
+                    # For intensity colors
+                    xyz = scene.point.positions.numpy()  # IF THE SCENE IS IN TENSOR
+                    geometry.points = o3d.utility.Vector3dVector(xyz)
+                    scalar_val = scene.point.colors.numpy()
+                    normalizer = matplotlib.colors.Normalize(
+                        np.min(scalar_val), np.max(scalar_val))
+                    las_rgb = matplotlib.cm.gray(normalizer(scalar_val))[:, :-1]
+                    geometry.colors = o3d.utility.Vector3dVector(las_rgb)
 
             if frame == 0:
                 vis.add_geometry(geometry, reset_bounding_box=True)
