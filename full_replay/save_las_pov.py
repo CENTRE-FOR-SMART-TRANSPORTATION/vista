@@ -40,9 +40,9 @@ def render_sensor_fov(
     # Helper function to set the visualizer POV
     def set_visualizer_pov(mode: str) -> None:
         if mode == "front":
-            x1, y1, z1 = traj.getForwards()[::-1][frame, :]
-            x2, y2, z2 = traj.getUpwards()[::-1][frame, :]
-            x3, y3, z3 = traj.getObserverPoints()[::-1][frame, :]
+            x1, y1, z1 = traj.getForwards()[frame, :]
+            x2, y2, z2 = traj.getUpwards()[frame, :]
+            x3, y3, z3 = traj.getObserverPoints()[frame, :]
             print('forwards', x1, y1, z1)
             print('upwards', x2, y2, z2)
             print('observer', x3, y3, z3)
