@@ -22,6 +22,7 @@ import argparse
 from multiprocessing import Process, Lock, Queue
 
 import shutil
+from dotenv import load_dotenv
 
 VIDEO_SPEED = 1
 
@@ -220,6 +221,8 @@ def main():
         return parser.parse_args()
 
     args = parse_cmdline_args()
+    load_dotenv()
+    args.scenes = os.environ["SCENES"] if args.scenes is None else args.scenes
     
     global VIDEO_SPEED
     VIDEO_SPEED = args.speed
