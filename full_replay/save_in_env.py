@@ -13,12 +13,7 @@ from tkinter import Tk
 from pathlib import Path
 from tqdm import tqdm
 
-FILE = Path(__file__).resolve()
-ROOT = FILE.parents[0]  # Root directory
-ROOT2 = Path(__file__).parent.resolve()
-if str(ROOT) not in sys.path:
-    sys.path.append(str(ROOT))
-ROOT = Path(os.path.relpath(ROOT, Path.cwd()))
+DESKTOP = os.path.join(os.path.join(os.path.expanduser('~')), 'Desktop') 
 
 # Obtain the path to our scenes
 def obtain_scene_path() -> str:
@@ -35,7 +30,7 @@ def obtain_scene_path() -> str:
     # Manually open trajectory folder
     Tk().withdraw()
     scenes_folderpath = tk.filedialog.askdirectory(
-        initialdir=ROOT2, title="Please select the Vista output folder"
+        initialdir=DESKTOP, title="Please select the Vista output folder"
     )
     print(
         f"\nYou have chosen to open the folder to the scenes:\n{scenes_folderpath}"
@@ -68,7 +63,7 @@ def obtain_sensor_path() -> str:
     Tk().withdraw()
     sensorcon_filepath = tk.filedialog.askopenfilename(
         filetypes=[(".json files", "*.json"), ("All files", "*")],
-        initialdir=os.path.join(ROOT2, "sensors/"),
+        initialdir=os.path.join(DESKTOP),
         title="Please select the sensor configuration file",
     )
     print(f"\nYou have chosen to open the sensor file:\n{sensorcon_filepath}")
@@ -91,7 +86,7 @@ def obtain_trajectory_path() -> str:
     # Manually open trajectory folder
     Tk().withdraw()
     trajectory_folderpath = tk.filedialog.askdirectory(
-        initialdir=ROOT2, title="Please select the trajectory folder"
+        initialdir=DESKTOP, title="Please select the trajectory folder"
     )
     print(
         f"You have chosen to open the trajectory folder:\n{trajectory_folderpath}"
@@ -132,7 +127,7 @@ def obtain_las_path() -> str:
     Tk().withdraw()
     las_filename = tk.filedialog.askopenfilename(
         filetypes=[(".las files", "*.las"), ("All files", "*")],
-        initialdir=ROOT2,
+        initialdir=DESKTOP,
         title="Please select the main point cloud",
     )
 
