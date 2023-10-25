@@ -20,6 +20,7 @@ from classes import SensorConfig, Trajectory
 import file_tools
 import sensorpoints
 import argparse
+from dotenv import load_dotenv
 
 ZOOM = 0.3
 VIEW = "isometric"
@@ -169,6 +170,8 @@ def main():
         return parser.parse_args()
 
     args = parse_cmdline_args()
+    load_dotenv()
+
     args.scenes = os.environ["SCENES"] if args.scenes is None else args.scenes
     args.trajectory = os.environ["TRAJECTORY"] if args.trajectory is None else args.trajectory
     args.config = os.environ["CONFIG"] if args.config is None else args.config

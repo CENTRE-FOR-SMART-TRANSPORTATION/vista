@@ -21,6 +21,8 @@ import file_tools
 import argparse
 import shutil
 
+from dotenv import load_dotenv
+
 ZOOM = 0.03
 VIEW = "isometric"
 
@@ -295,6 +297,8 @@ def main():
     
     global ZOOM, VIEW
     args = parse_cmdline_args()
+    load_dotenv()
+    
     args.scenes = os.environ["SCENES"] if args.scenes is None else args.scenes
 
     path_to_scenes = file_tools.obtain_scene_path()

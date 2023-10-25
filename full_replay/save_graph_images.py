@@ -14,6 +14,7 @@ import pickle
 import file_tools
 import argparse
 import shutil
+from dotenv import load_dotenv
 
 USE_VOLUMETRIC = True
 USE_CARTESIAN = False
@@ -728,6 +729,8 @@ def main():
     global SCALE
 
     args = parse_cmdline_args()
+    load_dotenv()
+    
     args.config = os.environ["CONFIG"] if args.config is None else args.config
     args.scenes = os.environ["SCENES"] if args.scenes is None else args.scenes
 
