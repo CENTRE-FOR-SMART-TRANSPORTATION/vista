@@ -58,7 +58,7 @@ def render_sensor_fov(
             ctr.set_front([-1, 0, 1])  
             ctr.set_up([0, 0, 1])
             ctr.set_lookat(traj.getRoadPoints()[frame, :]) # Center the view around the sensor FOV
-            ctr.set_zoom(0.3125)
+            ctr.set_zoom(0.05)
 
     # Setup our visualizer
     vis = o3d.visualization.Visualizer()
