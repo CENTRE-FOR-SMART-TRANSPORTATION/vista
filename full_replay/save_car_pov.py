@@ -159,7 +159,7 @@ def visualize_replay(
                     scalar_val = scene.point.colors.numpy()
                     normalizer = matplotlib.colors.Normalize(
                         np.min(scalar_val), np.max(scalar_val))
-                    cmap = matplotlib.colors.LinearSegmentedColormap("mycmap", ["blue", "green", "yellow", "red"])
+                    cmap = matplotlib.colors.LinearSegmentedColormap.from_list("mycmap", ["blue", "green", "yellow", "red"])
                     las_rgb = cmap(normalizer(scalar_val))[:, :-1]
                     geometry.colors = o3d.utility.Vector3dVector(las_rgb)
                 else:
