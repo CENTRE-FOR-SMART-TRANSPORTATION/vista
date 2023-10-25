@@ -42,7 +42,7 @@ def render_sensor_fov(
             x1, y1, z1 = traj.getForwards()[frame, :]
             x2, y2, z2 = traj.getUpwards()[frame, :]
             x3, y3, z3 = traj.getObserverPoints()[frame, :]
-            z3 = z1
+            z1 = 0
 
             ctr.set_front([x1, y1, z1])
             ctr.set_up([x2, y2, z2])
