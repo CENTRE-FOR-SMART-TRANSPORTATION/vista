@@ -182,7 +182,17 @@ def combine_images(images: tuple, paths: tuple, lIdx: int, rIdx: int, q: Queue, 
         h1_new = int(img1.shape[0] * img1_scale_percent / 100)
         dim = (w1_new, h1_new)
         img1_resized = cv2.resize(img1, dim, interpolation=cv2.INTER_AREA)
-
+        
+        border_size = 10
+        img2 = cv2.copyMakeBorder(
+            img2,
+            top=border_size,
+            bottom=border_size,
+            left=border_size,
+            right=border_size,
+            borderType=cv2.BORDER_CONSTANT,
+            value='white'
+        )
         h_idx, w_idx = h1_new//5, w1_new//2
         out = np.zeros((50 + h1 + h2 + 50, 50 + w1 + 50, 3), dtype="uint8")
         out[:, :] = img1_resized[h_idx][w_idx]
