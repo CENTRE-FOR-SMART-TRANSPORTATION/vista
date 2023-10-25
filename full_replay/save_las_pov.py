@@ -39,15 +39,15 @@ def render_sensor_fov(
     # Helper function to set the visualizer POV
     def set_visualizer_pov(mode: str) -> None:
         if mode == "front":
-            x, y, z = traj.getForwards()[frame, :]
-            z = 0
-            ctr.set_front([x, y, z])  
-        
-            x, y, z = traj.getUpwards()[frame, :]
+            x1, y1, z1 = traj.getForwards()[frame, :]
+            x2, y2, z2 = traj.getUpwards()[frame, :]
+            x3, y3, z3 = traj.getObserverPoints()[frame, :]
+            z3 = z1
             ctr.set_up([x, y, z])
 
-            ctr.set_lookat(traj.getObserverPoints()[frame, :])
-            ctr.change_field_of_view(step=50)
+            ctr.set_front([x1, y1, z1])
+            ctr.set_up([x2, y2, z2])
+            ctr.set_lookat([x3, y3, z3])
             ctr.set_zoom(0.025) 
         elif mode == "isometric":
             x, y, z = traj.getForwards()[frame, :]
