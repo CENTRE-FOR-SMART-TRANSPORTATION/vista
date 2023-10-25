@@ -169,7 +169,11 @@ def main():
         return parser.parse_args()
 
     args = parse_cmdline_args()
-
+    args.scenes = os.environ["SCENES"]
+    args.trajectory = os.environ["TRAJECTORY"]
+    args.config = os.environ["CONFIG"]
+    args.input = os.environ["INPUT"]
+    
     path_to_scenes = file_tools.obtain_scene_path(args)
     traj = file_tools.obtain_trajectory_details(args)
     cfg  = sensorpoints.open_sensor_config_file(args)

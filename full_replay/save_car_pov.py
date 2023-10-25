@@ -295,7 +295,9 @@ def main():
     
     global ZOOM, VIEW
     args = parse_cmdline_args()
-    path_to_scenes = file_tools.obtain_scene_path(args)
+    args.scenes = os.environ["SCENES"]
+
+    path_to_scenes = file_tools.obtain_scene_path()
     car_path = os.path.join(os.getcwd(), "frame_images/")
 
     if os.path.exists(car_path):
