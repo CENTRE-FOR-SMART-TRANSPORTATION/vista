@@ -53,7 +53,7 @@ def render_sensor_fov(
         elif mode == "isometric":
             x1, y1, z1 = traj.getForwards()[frame, :]
             x2, y2, z2 = traj.getUpwards()[frame, :]
-            x3, y3, z3 = traj.getObserverPoints()[frame, :]
+            x3, y3, z3 = traj.getRoadPoints()[frame, :]
 
             ctr.set_front([-1*x1, -1*y1, z1])
             ctr.set_up([x2, y2, z2])
