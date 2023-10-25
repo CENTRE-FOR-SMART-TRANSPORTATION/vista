@@ -153,7 +153,6 @@ def combine_images(images: tuple, paths: tuple, lIdx: int, rIdx: int, q: Queue, 
 
         (h1, w1) = img1.shape[:2]
         (h2, w2) = img2.shape[:2]
-        (h3, w3) = img3.shape[:2]
 
         img1 = img1[h1//5:h1-(h1//5), :]
         img2 = img2[h2//7:, :]
