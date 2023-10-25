@@ -186,7 +186,10 @@ def main():
     road = file_tools.open_las(args)
 
     sensor_images_path = os.path.join(os.getcwd(), "las_pov/")
-
+    if os.path.exists(sensor_images_path):
+        shutil.rmtree(sensor_images_path)
+        os.makedirs(sensor_images_path)
+        
     # getting the required objects for crating the video
     screen_wh = obtain_screen_size()
     frame_offset = check_for_padded(path_to_scenes)
