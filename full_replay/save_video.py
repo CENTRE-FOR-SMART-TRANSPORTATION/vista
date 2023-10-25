@@ -198,7 +198,7 @@ def combine_images(images: tuple, paths: tuple, lIdx: int, rIdx: int, q: Queue, 
         out = np.zeros((50 + h1 + h2 + 50, 50 + w1 + 50, 3), dtype="uint8")
         out[:, :] = img1_resized[h_idx][w_idx]
         out[50:h1_new+50, 50:w1_new+50] = img1_resized
-        out[h1:h1+h2, 50:w2+50] = img2
+        out[h1+10:h1+10+h2, 40:w2+60] = img2
         out[50:h3+50, w1_new:w1_new+w3] = resized
 
         cv2.imwrite(os.path.join(
