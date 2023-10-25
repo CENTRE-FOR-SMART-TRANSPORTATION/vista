@@ -36,13 +36,20 @@ def render_sensor_fov(
     offset: int
 ) -> None:
     global VIEW, ZOOM
+
+    traj.getForwards().reverse()
+    traj.getUpwards().reverse()
+    traj.getLeftwards().reverse()
+    traj.getObserverPoints().reverse()
+    traj.getRoadPoints().reverse()
     # Helper function to set the visualizer POV
     def set_visualizer_pov(mode: str) -> None:
         if mode == "front":
             x1, y1, z1 = traj.getForwards()[frame, :]
             x2, y2, z2 = traj.getUpwards()[frame, :]
             x3, y3, z3 = traj.getObserverPoints()[frame, :]
-            z1 = 0
+            z1 = 1.8
+            z3 = 1.8
 
             ctr.set_front([x1, y1, z1])
             ctr.set_up([x2, y2, z2])
