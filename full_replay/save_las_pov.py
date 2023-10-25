@@ -21,6 +21,7 @@ import file_tools
 import sensorpoints
 import argparse
 from dotenv import load_dotenv
+import shutil
 
 ZOOM = 0.3
 VIEW = "isometric"
@@ -189,7 +190,7 @@ def main():
     if os.path.exists(sensor_images_path):
         shutil.rmtree(sensor_images_path)
         os.makedirs(sensor_images_path)
-        
+
     # getting the required objects for crating the video
     screen_wh = obtain_screen_size()
     frame_offset = check_for_padded(path_to_scenes)
