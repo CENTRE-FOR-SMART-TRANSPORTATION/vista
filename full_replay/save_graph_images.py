@@ -728,8 +728,8 @@ def main():
     global SCALE
 
     args = parse_cmdline_args()
-    args.config = os.environ["CONFIG"]
-    args.scenes = os.environ["SCENES"]
+    args.config = os.environ["CONFIG"] if args.config is None else args.config
+    args.scenes = os.environ["SCENES"] if args.scenes is None else args.scenes
 
     sensorcon_path = file_tools.obtain_sensor_path(args)
     path2scenes = file_tools.obtain_multiple_scene_path(args)

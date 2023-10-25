@@ -140,10 +140,10 @@ config = obtain_sensor_path()
 trajectory = obtain_trajectory_path()
 las_file = obtain_las_path()
 
-env_str = f'''export SCENES={scenes}
-export TRAJECTORY={trajectory}
-export CONFIG={config}
-export INPUT={las_file}
+env_str = f'''export SCENES="{scenes}"
+export TRAJECTORY="{trajectory}"
+export CONFIG="{config}"
+export INPUT="{las_file}"
 '''
 
 with open(".env", "w") as f:
