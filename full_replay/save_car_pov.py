@@ -58,7 +58,6 @@ class PointCloudOpener:
         pcd = o3d.t.geometry.PointCloud(o3d.core.Device("CPU:0"))
         pcd.point.positions = o3d.core.Tensor(xyz, o3d.core.float32, o3d.core.Device("CPU:0"))
 
-        print(df.shape)
         if mode == "intensity":
             # Extract intensity values
             df = pd.read_csv(path_to_scene, skiprows=0, usecols=[0, 1, 2, 3])
