@@ -27,6 +27,7 @@ import math
 ZOOM = 0.3
 VIEW = "isometric"
 
+
 def render_sensor_fov(
     cfg: SensorConfig,
     traj: Trajectory,
@@ -50,22 +51,22 @@ def render_sensor_fov(
             ctr.set_front([-1*x1, -1*y1, z1])
             ctr.set_up([x2, y2, z2])
             ctr.set_lookat([x3, y3, z3+1.8])
-            ctr.set_zoom(0.025) 
+            ctr.set_zoom(0.025)
         elif mode == "isometric":
             x1, y1, z1 = traj.getForwards()[frame, :]
             x2, y2, z2 = traj.getUpwards()[frame, :]
             x3, y3, z3 = traj.getRoadPoints()[frame, :]
             z1 = 0
             x1, y1 = -x1, -y1
-            
-            rotation_y = math.radians(30)  # 30 degrees left
+
+            rotation_z = math.radians(30)  # 30 degrees left
             rotation_x = math.radians(-45)  # 45 degrees downwards
 
             # Rotation matrices
-            rotation_y_matrix = np.array([
-                [np.cos(rotation_y), 0, np.sin(rotation_y)],
-                [0, 1, 0],
-                [-np.sin(rotation_y), 0, np.cos(rotation_y)]
+            rotation_z_matrix = np.array([
+                [np.cos(rotation_z), -np.sin(rotation_z), 0],
+                [np.sin(rotation_z), np.cos(rotation_z), 0],
+                [0, 0, 1]
             ])
 
             rotation_x_matrix = np.array([
@@ -75,12 +76,15 @@ def render_sensor_fov(
             ])
 
             # Apply rotations
-            forwards = np.dot(rotation_x_matrix, np.dot(rotation_y_matrix, np.array([x1, y1, z1])))
-            upwards = np.dot(rotation_x_matrix, np.dot(rotation_y_matrix, np.array([x2, y2, z2])))
+            forwards = np.dot(rotation_x_matrix, np.dot(
+                rotation_z_matrix, np.array([x1, y1, z1])))
+            upwards = np.dot(rotation_x_matrix, np.dot(
+                rotation_z_matrix, np.array([x2, y2, z2])))
 
-            ctr.set_front(forwards)  
+            ctr.set_front(forwards)
             ctr.set_up(upwards)
-            ctr.set_lookat(traj.getRoadPoints()[frame, :]) # Center the view around the sensor FOV
+            # Center the view around the sensor FOV
+            ctr.set_lookat(traj.getRoadPoints()[frame, :])
 
             ctr.set_zoom(0.05)
 
@@ -143,6 +147,8 @@ def render_sensor_fov(
     return
 
 # Obtains screen size (width, height) in pixels
+
+
 def obtain_screen_size() -> tuple:
     # Obtain screen parameters for our video
     from tkinter import Tk
@@ -162,6 +168,7 @@ def check_for_padded(path_to_scenes: str) -> int:
         (x.split('_'))[1])).split('_')[1])
 
     return offset
+
 
 def main():
     # Parse our command line arguments
@@ -184,12 +191,15 @@ def main():
         parser.add_argument(
             "--numScenes", type=int, default=1, help="Number of Vista output folders"
         )
-        
-        parser.add_argument("--input", type=str, default=None, help="Path to the .las file")
 
-        parser.add_argument("--zoom", type=float, default=0.3, help="Zoom level of sensor fov")
+        parser.add_argument("--input", type=str, default=None,
+                            help="Path to the .las file")
 
-        parser.add_argument("--view", type=str, default="isometric", help="Option for the view of the points", choices=["front", "isometric"])
+        parser.add_argument("--zoom", type=float, default=0.3,
+                            help="Zoom level of sensor fov")
+
+        parser.add_argument("--view", type=str, default="isometric",
+                            help="Option for the view of the points", choices=["front", "isometric"])
 
         return parser.parse_args()
 
@@ -203,7 +213,7 @@ def main():
 
     path_to_scenes = file_tools.obtain_scene_path(args)
     traj = file_tools.obtain_trajectory_details(args)
-    cfg  = sensorpoints.open_sensor_config_file(args)
+    cfg = sensorpoints.open_sensor_config_file(args)
     road = file_tools.open_las(args)
 
     sensor_images_path = os.path.join(os.getcwd(), "las_pov/")
@@ -222,14 +232,15 @@ def main():
     VIEW = args.view if args.view is not None else VIEW
 
     render_sensor_fov(cfg=cfg,
-                    traj=traj,
-                    road=road_o3d,
-                    src_name=src_name,
-                    sensor_images_path=sensor_images_path,
-                    screen_width=screen_wh[0],
-                    screen_height=screen_wh[1],
-                    offset=frame_offset
-                    )
+                      traj=traj,
+                      road=road_o3d,
+                      src_name=src_name,
+                      sensor_images_path=sensor_images_path,
+                      screen_width=screen_wh[0],
+                      screen_height=screen_wh[1],
+                      offset=frame_offset
+                      )
+
 
 if __name__ == "__main__":
     main()
