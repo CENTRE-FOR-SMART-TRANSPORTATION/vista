@@ -60,7 +60,7 @@ def render_sensor_fov(
             x1, y1 = -x1, -y1
 
             rotation_z = math.radians(45)  # degrees left
-            rotation_x = math.radians(60)  # degrees downwards
+            rotation_x = math.radians(30)  # degrees downwards
 
             # Rotation matrices
             rotation_z_matrix = np.array([
