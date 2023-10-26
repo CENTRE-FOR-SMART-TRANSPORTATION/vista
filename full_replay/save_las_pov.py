@@ -22,6 +22,7 @@ import sensorpoints
 import argparse
 from dotenv import load_dotenv
 import shutil
+import math
 
 ZOOM = 0.3
 VIEW = "isometric"
@@ -79,7 +80,7 @@ def render_sensor_fov(
             ctr.set_front(forwards)  
             ctr.set_up(upwards)
             ctr.set_lookat(traj.getRoadPoints()[frame, :]) # Center the view around the sensor FOV
-            
+
             ctr.set_zoom(0.05)
 
     # Setup our visualizer
