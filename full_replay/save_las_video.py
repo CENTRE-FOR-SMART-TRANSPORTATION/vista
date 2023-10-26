@@ -153,18 +153,10 @@ def combine_images(images: tuple, paths: tuple, lIdx: int, rIdx: int, q: Queue, 
 
         (h1, w1) = img1.shape[:2]
         (h2, w2) = img2.shape[:2]
-
-        img1 = img1[h1//5:h1-(h1//5), :]
-        img2 = img2[h2//7:, :]
-
-        (h1, w1) = img1.shape[:2]
-        (h2, w2) = img2.shape[:2]
         
-        h_idx, w_idx = h1//5, w1//2
-        out = np.zeros((50 + h1 + h2 + 50, 50 + w1 + 50, 3), dtype="uint8")
-        out[:, :] = img1[h_idx][w_idx]
-        out[50:h1+50, 50:w1+50] = img1
-        out[h1:h1+h2, 50:w2+50] = img2
+        out = np.zeros((h1, w1 + w2, 3), dtype="uint8")
+        out[:, :w1] = img1
+        out[:, w1:w1+w2] = img2
 
         cv2.imwrite(os.path.join(
             os.getcwd(), "combined_images", f"{i}.png"), out)
