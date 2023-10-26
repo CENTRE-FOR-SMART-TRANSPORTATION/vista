@@ -57,8 +57,8 @@ def render_sensor_fov(
             x3, y3, z3 = traj.getRoadPoints()[frame, :]
             z1 = 0
 
-            rotation_y = math.radians(30)  # 30 degrees left
-            rotation_x = math.radians(45)  # 45 degrees downwards
+            rotation_y = math.radians(-30)  # 30 degrees left
+            rotation_x = math.radians(-45)  # 45 degrees downwards
 
             # Rotation matrices
             rotation_y_matrix = np.array([
