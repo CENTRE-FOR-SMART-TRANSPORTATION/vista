@@ -44,20 +44,42 @@ def render_sensor_fov(
             x1, y1, z1 = traj.getForwards()[frame, :]
             x2, y2, z2 = traj.getUpwards()[frame, :]
             x3, y3, z3 = traj.getObserverPoints()[frame, :]
+            z1 = 0
 
             ctr.set_front([-1*x1, -1*y1, z1])
             ctr.set_up([x2, y2, z2])
             ctr.set_lookat([x3, y3, z3+1.8])
             ctr.set_zoom(0.025) 
-            ctr.set_constant_z_far(100)
         elif mode == "isometric":
             x1, y1, z1 = traj.getForwards()[frame, :]
             x2, y2, z2 = traj.getUpwards()[frame, :]
             x3, y3, z3 = traj.getRoadPoints()[frame, :]
+            z1 = 0
 
-            ctr.set_front([-1, 0, 1])  
-            ctr.set_up([0, 0, 1])
+            rotation_y = math.radians(30)  # 30 degrees left
+            rotation_x = math.radians(45)  # 45 degrees downwards
+
+            # Rotation matrices
+            rotation_y_matrix = np.array([
+                [np.cos(rotation_y), 0, np.sin(rotation_y)],
+                [0, 1, 0],
+                [-np.sin(rotation_y), 0, np.cos(rotation_y)]
+            ])
+
+            rotation_x_matrix = np.array([
+                [1, 0, 0],
+                [0, np.cos(rotation_x), -np.sin(rotation_x)],
+                [0, np.sin(rotation_x), np.cos(rotation_x)]
+            ])
+
+            # Apply rotations
+            forwards = np.dot(rotation_x_matrix, np.dot(rotation_y_matrix, np.array([x1, y1, z1])))
+            upwards = np.dot(rotation_x_matrix, np.dot(rotation_y_matrix, np.array([x2, y2, z2])))
+
+            ctr.set_front(forwards)  
+            ctr.set_up(upwards)
             ctr.set_lookat(traj.getRoadPoints()[frame, :]) # Center the view around the sensor FOV
+            
             ctr.set_zoom(0.05)
 
     # Setup our visualizer
