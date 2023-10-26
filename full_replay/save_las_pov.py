@@ -59,7 +59,7 @@ def render_sensor_fov(
             z1 = 0
             x1, y1 = -x1, -y1
 
-            rotation_z = math.radians(15)  # 30 degrees left
+            rotation_z = math.radians(60)  # 30 degrees left
             rotation_x = math.radians(45)  # 45 degrees downwards
 
             # Rotation matrices
@@ -86,7 +86,7 @@ def render_sensor_fov(
             # Center the view around the sensor FOV
             ctr.set_lookat(traj.getRoadPoints()[frame, :])
 
-            ctr.set_zoom(0.05)
+            ctr.set_zoom(0.1)
 
     # Setup our visualizer
     vis = o3d.visualization.Visualizer()
