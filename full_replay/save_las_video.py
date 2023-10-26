@@ -164,7 +164,7 @@ def combine_images(images: tuple, paths: tuple, lIdx: int, rIdx: int, q: Queue, 
     # return the height and width to pass on to the create_video function
 
     lock.acquire()
-    q.put((100 + h1 + h2, 100 + w1))
+    q.put((h1, w1+w2))
     lock.release()
 
 
