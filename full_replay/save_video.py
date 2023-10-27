@@ -223,7 +223,8 @@ def main():
 
         parser.add_argument("--video_name", type=str, default="combined", help="Name of video file")
 
-
+        parser.add_argument("--mode", type=str, default="default",
+                            help="Option for the view of the points", choices=["las", "default"])
         return parser.parse_args()
 
     args = parse_cmdline_args()
@@ -241,7 +242,7 @@ def main():
     name = args.video_name
 
     path_to_scenes = file_tools.obtain_scene_path(args)
-    car_path = os.path.join(os.getcwd(), "frame_images/")
+    car_path = os.path.join(os.getcwd(), "frame_images/") if args.mode == "default" else os.path.join(os.getcwd(), "las_pov/")
     sensor_images_path = os.path.join(os.getcwd(), "fov/")
     graph_path = os.path.join(os.getcwd(), "plt_images/")
     # combine images and create the video
