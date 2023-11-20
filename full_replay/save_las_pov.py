@@ -25,8 +25,10 @@ import shutil
 import math
 
 ZOOM = 0.07
-VIEW = "isometric"
-
+VIEW = "isometric-constant"
+FRONT_X = -1
+FRONT_Y = 0
+FRONT_Z = 1
 
 def render_sensor_fov(
     cfg: SensorConfig,
@@ -80,9 +82,11 @@ def render_sensor_fov(
                 rotation_z_matrix, np.array([x1, y1, z1])))
             upwards = np.dot(rotation_x_matrix, np.dot(
                 rotation_z_matrix, np.array([x2, y2, z2])))
+        elif mode == "isometric-constant":
+            global FRONT_X, FRONT_Y, FRONT_Z, ZOOM
+            ctr.set_front([FRONT_X, FRONT_Y, FRONT_Z])
+            ctr.set_up([0, 0, 1])
 
-            ctr.set_front(forwards)
-            ctr.set_up(upwards)
             # Center the view around the sensor FOV
             ctr.set_lookat(traj.getRoadPoints()[frame, :])
 
@@ -192,6 +196,12 @@ def main():
             "--numScenes", type=int, default=1, help="Number of Vista output folders"
         )
 
+        parser.add_argument("--x", type=float, default=-1, help="x coord of front vector")
+
+        parser.add_argument("--y", type=float, default=0, help="y coord of front vector")
+
+        parser.add_argument("--z", type=float, default=1, help="z coord of front vector")
+
         parser.add_argument("--input", type=str, default=None,
                             help="Path to the .las file")
 
@@ -230,6 +240,9 @@ def main():
     global ZOOM, VIEW
     ZOOM = args.zoom if args.zoom is not None else ZOOM
     VIEW = args.view if args.view is not None else VIEW
+    FRONT_X = args.x if args.x is not None else FRONT_X
+    FRONT_Y = args.y if args.y is not None else FRONT_Y
+    FRONT_Z = args.z if args.z is not None else FRONT_Z
 
     render_sensor_fov(cfg=cfg,
                       traj=traj,
