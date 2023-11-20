@@ -236,7 +236,7 @@ def main():
 
     road_o3d, src_name = utils.las2o3d_pcd(road)
 
-    global ZOOM, VIEW
+    global ZOOM, VIEW, FRONT_X, FRONT_Y, FRONT_Z
     ZOOM = args.zoom if args.zoom is not None else ZOOM
     VIEW = args.view if args.view is not None else VIEW
     FRONT_X = args.x if args.x is not None else FRONT_X
