@@ -208,7 +208,7 @@ def main():
                             help="Zoom level of sensor fov")
 
         parser.add_argument("--view", type=str, default="isometric",
-                            help="Option for the view of the points", choices=["front", "isometric"])
+                            help="Option for the view of the points", choices=["front", "isometric", "isometric-constant"])
 
         return parser.parse_args()
 
