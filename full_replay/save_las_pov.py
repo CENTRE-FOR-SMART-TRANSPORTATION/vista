@@ -83,7 +83,6 @@ def render_sensor_fov(
             upwards = np.dot(rotation_x_matrix, np.dot(
                 rotation_z_matrix, np.array([x2, y2, z2])))
         elif mode == "isometric-constant":
-            global FRONT_X, FRONT_Y, FRONT_Z, ZOOM
             ctr.set_front([FRONT_X, FRONT_Y, FRONT_Z])
             ctr.set_up([0, 0, 1])
 
