@@ -55,6 +55,7 @@ def render_sensor_fov(
             ctr.set_lookat([x3, y3, z3+1.8])
             ctr.set_zoom(ZOOM)
         elif mode == "isometric":
+            print("isometric view")
             x1, y1, z1 = traj.getForwards()[frame, :]
             x2, y2, z2 = traj.getUpwards()[frame, :]
             x3, y3, z3 = traj.getRoadPoints()[frame, :]
@@ -83,6 +84,7 @@ def render_sensor_fov(
             upwards = np.dot(rotation_x_matrix, np.dot(
                 rotation_z_matrix, np.array([x2, y2, z2])))
         elif mode == "isometric-constant":
+            print("constant view")
             ctr.set_front([FRONT_X, FRONT_Y, FRONT_Z])
             ctr.set_up([0, 0, 1])
 
