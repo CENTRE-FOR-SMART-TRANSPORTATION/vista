@@ -82,6 +82,9 @@ def render_sensor_fov(
                 rotation_z_matrix, np.array([x1, y1, z1])))
             upwards = np.dot(rotation_x_matrix, np.dot(
                 rotation_z_matrix, np.array([x2, y2, z2])))
+                
+            # Center the view around the sensor FOV
+            ctr.set_lookat(traj.getRoadPoints()[frame, :])
             ctr.set_zoom(ZOOM)
         elif mode == "isometric-constant":
             ctr.set_front([FRONT_X, FRONT_Y, FRONT_Z])
