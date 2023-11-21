@@ -70,6 +70,10 @@ def align_car_points(car_points, trajectory, observer_point):
         trajectory.getObserverPoints()[observer_point, :]
     )
 
+    # Additional rotation of 90 degrees horizontally to the left
+    rotation_90_left = np.array([[0, 0, -1], [0, 1, 0], [1, 0, 0]])
+    transformed_points = np.matmul(transformed_points, rotation_90_left.T)
+    
     return transformed_points, observer_point
 
 
