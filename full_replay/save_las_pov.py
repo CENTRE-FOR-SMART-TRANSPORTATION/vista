@@ -115,11 +115,11 @@ def generate_car_points(car_dimensions=(3.0, 4.0, 2.0), resolution=0.1):
                                           np.arange(0, tire_height, resolution))).T.reshape(-1, 3)
 
     # Translate boxes and tires to their respective positions
-    translation_a = np.array([0, -length / 2, height / 4])
+    translation_a = np.array([-length / 2, 0, height / 4])
     translation_b = np.array([0, 0, height / 4])
-    translation_c = np.array([0, length / 2, height / 4])
-    translation_tire_a = np.array([0, -length / 2, 0])
-    translation_tire_c = np.array([0, length / 2, 0])
+    translation_c = np.array([length / 2, 0, height / 4])
+    translation_tire_a = np.array([-length / 2, 0, 0])
+    translation_tire_c = np.array([length / 2, 0, 0])
 
     box_a_points += translation_a
     box_b_points += translation_b
