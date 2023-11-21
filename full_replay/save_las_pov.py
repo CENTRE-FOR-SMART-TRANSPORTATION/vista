@@ -73,7 +73,7 @@ def align_car_points(car_points, trajectory, observer_point):
     return transformed_points, observer_point
 
 
-def generate_car_points(car_dimensions=(3.0, 4.0, 2.0), resolution=0.1):
+def generate_car_points(car_dimensions=(8.0, 4.0, 2.0), resolution=0.1):
     """
     Generates XYZ points for a simple representation of a car with three boxes (a, b, and c),
     where b has more height than c. Two small cylinders represent tires under boxes a and c.
