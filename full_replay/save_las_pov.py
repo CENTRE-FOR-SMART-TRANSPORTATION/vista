@@ -73,7 +73,7 @@ def align_car_points(car_points, trajectory, observer_point):
     return transformed_points, observer_point
 
 
-def generate_car_points(car_dimensions=(8.0, 4.0, 2.0), resolution=0.1):
+def generate_car_points(car_dimensions=(8.0, 1.0, 1.0), resolution=0.1):
     """
     Generates XYZ points for a simple representation of a car with three boxes (a, b, and c),
     where b has more height than c. Two small cylinders represent tires under boxes a and c.
@@ -244,7 +244,7 @@ def render_sensor_fov(
         # Get sensor FOV
         aligned_car_points = align_car_points(car_points, traj, frame)
         geometry.points = o3d.utility.Vector3dVector(aligned_car_points[0]) 
-        geometry.colors = o3d.utility.Vector3dVector(np.ones((aligned_car_points[0].shape[0], 3), dtype=np.float64))
+        geometry.colors = o3d.utility.Vector3dVector(np.ones((aligned_car_points[0].shape[0], 3), dtype=np.float64)*[0, 1, 0])
 
         set_visualizer_pov(VIEW)
 
