@@ -234,10 +234,9 @@ def render_sensor_fov(
 
     for frame in range(0+offset, num_points-offset):
         # Get sensor FOV
-        aligned_car_points = car_points
 
-        geometry.points = o3d.utility.Vector3dVector(aligned_car_points[0]) 
-        geometry.colors = o3d.utility.Vector3dVector(np.ones((aligned_car_points[0].shape[0], 3), dtype=np.float64))
+        geometry.points = o3d.utility.Vector3dVector(car_points) 
+        geometry.colors = o3d.utility.Vector3dVector(np.ones((car_points.shape[0], 3), dtype=np.float64))
 
         set_visualizer_pov(VIEW)
 
