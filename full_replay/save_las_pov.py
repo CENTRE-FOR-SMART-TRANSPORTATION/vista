@@ -30,6 +30,101 @@ FRONT_X = -1
 FRONT_Y = 0
 FRONT_Z = 1
 
+
+def align_sensor_points(fov_points: list, trajectory: Trajectory, observer_point: int) -> list or int:
+    """Aligns sensor points to the vehicle's orientation and position 
+    at the provided scene number. Output will be in global coordinates
+    such that it can be easily superimposed onto the road section itself.
+
+    Args:
+        fov_points (list): List containing the XYZ points that make up the sensor
+        FOV, for each sensor.
+        trajectory (Trajectory): Container class containing the trajectory parameters.
+        observer_point (int): Observer point detailing the scene at where
+        FOV points should be translated
+
+    Returns:
+        transformed_points (list): List containing the XYZ points that make up the sensor
+        FOV, for each sensor after our transformation.
+    """
+
+    # In case if the user does not input a flag for the observer point
+    total_road_points = trajectory.getObserverPoints().shape[0]
+    if observer_point == None:
+        observer_point = int(
+            input(f"Enter the observer point (from 0 to {total_road_points}): "))
+    if ((observer_point > total_road_points) or (observer_point < 0)):
+        raise ValueError("Observer point is out of range!")
+
+    # print("\nAligning FOV points!")
+    # tStart = perf_counter()
+
+    # Rotation matrices are formed as this in the first two dimensions:
+    # (note that this is a 2D matrix, the third dimension is the ith rotation matrix)
+    # [ fx_i fy_i fz_i ]
+    # [ lx_i ly_i lz_i ]
+    # [ ux_i uy_i uz_i ]
+    #
+    # For a point given by [x y z] (row vector):
+    # [x y z]*R will take our points from RELATIVE to GLOBAL coordiantes
+    # [x y z]*R' (R transposed) will take our points from GLOBAL to RELATIVE coordinates
+
+    # Obtain rotation matrices
+    # Equivalent to the implementation in MATLAB
+    rotation_matrices = np.reshape(
+        np.hstack((trajectory.getForwards(),
+                  trajectory.getLeftwards(), trajectory.getUpwards())),
+        (trajectory.getObserverPoints().shape[0], 3, 3),
+        order='F'
+    )
+
+    rotation_matrices = np.transpose(rotation_matrices, (2, 1, 0))
+
+    # Now we will translate our FOV points to the observer point and align it with the trajectory
+    # Also equivalent to the implementation in MATLAB
+    transformed_points = []
+    for sensorpoints in fov_points:
+        out = (
+            np.matmul(sensorpoints[(sensorpoints[:, 2] > -1.8), :],
+                      rotation_matrices[:, :, observer_point])
+            +
+            trajectory.getObserverPoints()[observer_point, :]
+        )
+        transformed_points.append(out)
+
+    # tStop = perf_counter()
+    # print(f"FOV point alignment took {(tStop-tStart):.2f}s.")
+
+    return transformed_points, observer_point
+
+
+def generate_car_points(car_dimensions=(2.0, 1.0, 0.5), resolution=0.1):
+    """
+    Generates XYZ points for a simple rectangular box representing a car.
+
+    Args:
+        car_dimensions (tuple): Dimensions of the car in (length, width, height).
+        resolution (float): Point density, i.e., the distance between points.
+
+    Returns:
+        car_points (numpy.ndarray): Array containing XYZ points representing the car.
+    """
+
+    # Define the dimensions of the car
+    length, width, height = car_dimensions
+
+    # Create ranges for x, y, and z dimensions
+    x_range = np.arange(-length / 2, length / 2, resolution)
+    y_range = np.arange(-width / 2, width / 2, resolution)
+    z_range = np.arange(0, height, resolution)
+
+    # Generate points for the car
+    car_points = np.array(np.meshgrid(
+        x_range, y_range, z_range)).T.reshape(-1, 3)
+
+    return car_points
+
+
 def render_sensor_fov(
     cfg: SensorConfig,
     traj: Trajectory,
@@ -82,7 +177,7 @@ def render_sensor_fov(
                 rotation_z_matrix, np.array([x1, y1, z1])))
             upwards = np.dot(rotation_x_matrix, np.dot(
                 rotation_z_matrix, np.array([x2, y2, z2])))
-                
+
             # Center the view around the sensor FOV
             ctr.set_lookat(traj.getRoadPoints()[frame, :])
             ctr.set_zoom(ZOOM)
@@ -124,18 +219,34 @@ def render_sensor_fov(
     # Initalize geometries
     vis.add_geometry(road)
 
+    geometry = o3d.geometry.PointCloud()
+    vis.add_geometry(geometry)
+
     vis.poll_events()
     vis.update_renderer()
 
     # Begin our replay of the sensor FOV
     num_points = traj.getNumPoints()
-    fov_points = utils.generate_sensor_points(cfg)
+    car_points = generate_car_points()
+
     if not os.path.exists(sensor_images_path):
         os.makedirs(sensor_images_path)
 
     for frame in range(0+offset, num_points-offset):
-        # Set the view to look at the next road point
+        # Get sensor FOV
+        aligned_car_points, _ = align_sensor_points(car_points, traj, frame)
+
+        geometry.points = o3d.utility.Vector3dVector(aligned_fov_points[0]) 
+        geometry.colors = o3d.utility.Vector3dVector(np.ones((aligned_fov_points[0].shape[0], 3), dtype=np.float64))
+
         set_visualizer_pov(VIEW)
+
+        # Then update the visualizer
+        if frame == 0+offset:
+            vis.add_geometry(geometry, reset_bounding_box=False)
+        else:
+            vis.update_geometry(geometry)
+
         vis.update_geometry(road)
         vis.poll_events()
         vis.update_renderer()
@@ -199,11 +310,14 @@ def main():
             "--numScenes", type=int, default=1, help="Number of Vista output folders"
         )
 
-        parser.add_argument("--x", type=float, default=-1, help="x coord of front vector")
+        parser.add_argument("--x", type=float, default=-1,
+                            help="x coord of front vector")
 
-        parser.add_argument("--y", type=float, default=0, help="y coord of front vector")
+        parser.add_argument("--y", type=float, default=0,
+                            help="y coord of front vector")
 
-        parser.add_argument("--z", type=float, default=1, help="z coord of front vector")
+        parser.add_argument("--z", type=float, default=1,
+                            help="z coord of front vector")
 
         parser.add_argument("--input", type=str, default=None,
                             help="Path to the .las file")
