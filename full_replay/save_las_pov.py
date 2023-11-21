@@ -73,9 +73,10 @@ def align_car_points(car_points, trajectory, observer_point):
     return transformed_points, observer_point
 
 
-def generate_car_points(car_dimensions=(2.0, 1.0, 0.5), resolution=0.1):
+def generate_car_points(car_dimensions=(4.0, 2.0, 1.0), resolution=0.1):
     """
-    Generates XYZ points for a simple rectangular box representing a car.
+    Generates XYZ points for a simple representation of a car with three boxes (a, b, and c),
+    where b has more height than c. Two small cylinders represent tires under boxes a and c.
 
     Args:
         car_dimensions (tuple): Dimensions of the car in (length, width, height).
@@ -85,17 +86,49 @@ def generate_car_points(car_dimensions=(2.0, 1.0, 0.5), resolution=0.1):
         car_points (numpy.ndarray): Array containing XYZ points representing the car.
     """
 
-    # Define the dimensions of the car
     length, width, height = car_dimensions
 
-    # Create ranges for x, y, and z dimensions
-    x_range = np.arange(-length / 2, length / 2, resolution)
-    y_range = np.arange(-width / 2, width / 2, resolution)
-    z_range = np.arange(0, height, resolution)
+    # Generate points for box a
+    box_a_points = np.array(np.meshgrid(np.arange(-length / 4, length / 4, resolution),
+                                        np.arange(-width / 2, width / 2, resolution),
+                                        np.arange(0, height / 2, resolution))).T.reshape(-1, 3)
 
-    # Generate points for the car
-    car_points = np.array(np.meshgrid(
-        x_range, y_range, z_range)).T.reshape(-1, 3)
+    # Generate points for box b (taller than box a)
+    box_b_points = np.array(np.meshgrid(np.arange(-length / 4, length / 4, resolution),
+                                        np.arange(-width / 2, width / 2, resolution),
+                                        np.arange(0, 1.5 * height / 2, resolution))).T.reshape(-1, 3)
+
+    # Generate points for box c (same height as box a)
+    box_c_points = np.array(np.meshgrid(np.arange(-length / 4, length / 4, resolution),
+                                        np.arange(-width / 2, width / 2, resolution),
+                                        np.arange(0, height / 2, resolution))).T.reshape(-1, 3)
+
+    # Generate points for tires under box a and box c (cylinders)
+    tire_radius = width / 8
+    tire_height = height / 4
+    tire_a_points = np.array(np.meshgrid(np.arange(-tire_radius, tire_radius, resolution),
+                                          np.arange(-tire_radius, tire_radius, resolution),
+                                          np.arange(0, tire_height, resolution))).T.reshape(-1, 3)
+
+    tire_c_points = np.array(np.meshgrid(np.arange(-tire_radius, tire_radius, resolution),
+                                          np.arange(-tire_radius, tire_radius, resolution),
+                                          np.arange(0, tire_height, resolution))).T.reshape(-1, 3)
+
+    # Translate boxes and tires to their respective positions
+    translation_a = np.array([0, -length / 2, height / 4])
+    translation_b = np.array([0, 0, height / 4])
+    translation_c = np.array([0, length / 2, height / 4])
+    translation_tire_a = np.array([0, -length / 2, 0])
+    translation_tire_c = np.array([0, length / 2, 0])
+
+    box_a_points += translation_a
+    box_b_points += translation_b
+    box_c_points += translation_c
+    tire_a_points += translation_tire_a
+    tire_c_points += translation_tire_c
+
+    # Combine all points into a single array
+    car_points = np.vstack([box_a_points, box_b_points, box_c_points, tire_a_points, tire_c_points])
 
     return car_points
 
