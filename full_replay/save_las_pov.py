@@ -73,7 +73,7 @@ def align_car_points(car_points, trajectory, observer_point):
     return transformed_points, observer_point
 
 
-def generate_car_points(car_dimensions=(10.0, 4.0, 1.0), resolution=0.1):
+def generate_car_points(car_dimensions=(8.0, 4.0, 2.0), resolution=0.1):
     """
     Generates XYZ points for a simple representation of a car with three boxes (a, b, and c),
     where b has more height than c. Two small cylinders represent tires under boxes a and c.
@@ -96,7 +96,7 @@ def generate_car_points(car_dimensions=(10.0, 4.0, 1.0), resolution=0.1):
     # Generate points for box b (taller than box a)
     box_b_points = np.array(np.meshgrid(np.arange(-length / 4, length / 4, resolution),
                                         np.arange(-width / 2, width / 2, resolution),
-                                        np.arange(0, 2 * height / 2, resolution))).T.reshape(-1, 3)
+                                        np.arange(0, 4 * height / 2, resolution))).T.reshape(-1, 3)
 
     # Generate points for box c (same height as box a)
     box_c_points = np.array(np.meshgrid(np.arange(-length / 4, length / 4, resolution),
