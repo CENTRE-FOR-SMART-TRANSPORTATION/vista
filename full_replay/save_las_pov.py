@@ -31,69 +31,44 @@ FRONT_Y = 0
 FRONT_Z = 1
 
 
-def align_sensor_points(fov_points: list, trajectory: Trajectory, observer_point: int) -> list or int:
-    """Aligns sensor points to the vehicle's orientation and position 
-    at the provided scene number. Output will be in global coordinates
-    such that it can be easily superimposed onto the road section itself.
+def align_car_points(car_points, trajectory, observer_point):
+    """
+    Aligns car points to the vehicle's orientation and position at the provided scene number.
+    Output will be in global coordinates.
 
     Args:
-        fov_points (list): List containing the XYZ points that make up the sensor
-        FOV, for each sensor.
+        car_points (numpy.ndarray): Array containing XYZ points representing the car.
         trajectory (Trajectory): Container class containing the trajectory parameters.
         observer_point (int): Observer point detailing the scene at where
-        FOV points should be translated
+        car points should be translated.
 
     Returns:
-        transformed_points (list): List containing the XYZ points that make up the sensor
-        FOV, for each sensor after our transformation.
+        transformed_points (numpy.ndarray): Array containing the XYZ points that make up the aligned car.
     """
 
-    # In case if the user does not input a flag for the observer point
+    # Input Validation
     total_road_points = trajectory.getObserverPoints().shape[0]
-    if observer_point == None:
-        observer_point = int(
-            input(f"Enter the observer point (from 0 to {total_road_points}): "))
-    if ((observer_point > total_road_points) or (observer_point < 0)):
+    if observer_point is None:
+        observer_point = int(input(f"Enter the observer point (from 0 to {total_road_points}): "))
+    if observer_point > total_road_points or observer_point < 0:
         raise ValueError("Observer point is out of range!")
 
-    # print("\nAligning FOV points!")
-    # tStart = perf_counter()
-
-    # Rotation matrices are formed as this in the first two dimensions:
-    # (note that this is a 2D matrix, the third dimension is the ith rotation matrix)
-    # [ fx_i fy_i fz_i ]
-    # [ lx_i ly_i lz_i ]
-    # [ ux_i uy_i uz_i ]
-    #
-    # For a point given by [x y z] (row vector):
-    # [x y z]*R will take our points from RELATIVE to GLOBAL coordiantes
-    # [x y z]*R' (R transposed) will take our points from GLOBAL to RELATIVE coordinates
-
-    # Obtain rotation matrices
-    # Equivalent to the implementation in MATLAB
+    # Rotation matrices
     rotation_matrices = np.reshape(
         np.hstack((trajectory.getForwards(),
-                  trajectory.getLeftwards(), trajectory.getUpwards())),
+                   trajectory.getLeftwards(), trajectory.getUpwards())),
         (trajectory.getObserverPoints().shape[0], 3, 3),
         order='F'
     )
-
     rotation_matrices = np.transpose(rotation_matrices, (2, 1, 0))
 
-    # Now we will translate our FOV points to the observer point and align it with the trajectory
-    # Also equivalent to the implementation in MATLAB
-    transformed_points = []
-    for sensorpoints in fov_points:
-        out = (
-            np.matmul(sensorpoints[(sensorpoints[:, 2] > -1.8), :],
-                      rotation_matrices[:, :, observer_point])
-            +
-            trajectory.getObserverPoints()[observer_point, :]
-        )
-        transformed_points.append(out)
-
-    # tStop = perf_counter()
-    # print(f"FOV point alignment took {(tStop-tStart):.2f}s.")
+    # Transformation Loop
+    transformed_points = (
+        np.matmul(car_points[(car_points[:, 2] > -1.8), :],
+                  rotation_matrices[:, :, observer_point])
+        +
+        trajectory.getObserverPoints()[observer_point, :]
+    )
 
     return transformed_points, observer_point
 
@@ -234,9 +209,9 @@ def render_sensor_fov(
 
     for frame in range(0+offset, num_points-offset):
         # Get sensor FOV
-
-        geometry.points = o3d.utility.Vector3dVector(car_points) 
-        geometry.colors = o3d.utility.Vector3dVector(np.ones((car_points.shape[0], 3), dtype=np.float64))
+        aligned_car_points = align_car_points(car_points, traj, frame)
+        geometry.points = o3d.utility.Vector3dVector(align_car_points[0]) 
+        geometry.colors = o3d.utility.Vector3dVector(np.ones((aligned_car_points[0].shape[0], 3), dtype=np.float64))
 
         set_visualizer_pov(VIEW)
 
