@@ -73,6 +73,8 @@ def align_car_points(car_points, trajectory, observer_point):
     return transformed_points, observer_point
 
 
+import numpy as np
+
 def generate_car_points(car_dimensions=(8.0, 4.0, 2.0), resolution=0.1):
     """
     Generates XYZ points for a simple representation of a car with three boxes (a, b, and c),
@@ -114,21 +116,35 @@ def generate_car_points(car_dimensions=(8.0, 4.0, 2.0), resolution=0.1):
                                           np.arange(-tire_radius, tire_radius, resolution),
                                           np.arange(0, tire_height, resolution))).T.reshape(-1, 3)
 
+    # Generate points for additional tires at the front and back (cylinders)
+    tire_front_points = np.array(np.meshgrid(np.arange(-tire_radius, tire_radius, resolution),
+                                              np.arange(-tire_radius, tire_radius, resolution),
+                                              np.arange(0, tire_height, resolution))).T.reshape(-1, 3)
+
+    tire_back_points = np.array(np.meshgrid(np.arange(-tire_radius, tire_radius, resolution),
+                                             np.arange(-tire_radius, tire_radius, resolution),
+                                             np.arange(0, tire_height, resolution))).T.reshape(-1, 3)
+
     # Translate boxes and tires to their respective positions
     translation_a = np.array([-length / 2, 0, height / 4])
     translation_b = np.array([0, 0, height / 4])
     translation_c = np.array([length / 2, 0, height / 4])
     translation_tire_a = np.array([-length / 2, 0, 0])
     translation_tire_c = np.array([length / 2, 0, 0])
+    translation_tire_front = np.array([-length / 4, width / 2, 0])
+    translation_tire_back = np.array([-length / 4, -width / 2, 0])
 
     box_a_points += translation_a
     box_b_points += translation_b
     box_c_points += translation_c
     tire_a_points += translation_tire_a
     tire_c_points += translation_tire_c
+    tire_front_points += translation_tire_front
+    tire_back_points += translation_tire_back
 
     # Combine all points into a single array
-    car_points = np.vstack([box_a_points, box_b_points, box_c_points, tire_a_points, tire_c_points])
+    car_points = np.vstack([box_a_points, box_b_points, box_c_points, tire_a_points, tire_c_points,
+                            tire_front_points, tire_back_points])
 
     return car_points
 
