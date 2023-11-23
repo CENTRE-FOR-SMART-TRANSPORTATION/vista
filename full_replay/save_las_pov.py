@@ -47,7 +47,7 @@ def align_car_points(car_points, trajectory, observer_point):
     """
 
     # Input Validation
-    total_road_points = trajectory.getObserverPoints().shape[0]
+    total_road_points = trajectory.getRoadPoints().shape[0]
     if observer_point is None:
         observer_point = int(input(f"Enter the observer point (from 0 to {total_road_points}): "))
     if observer_point > total_road_points or observer_point < 0:
@@ -67,7 +67,7 @@ def align_car_points(car_points, trajectory, observer_point):
         np.matmul(car_points[(car_points[:, 2] > -1.8), :],
                   rotation_matrices[:, :, observer_point])
         +
-        trajectory.getObserverPoints()[observer_point, :]
+        trajectory.getRoadPoints()[observer_point, :]
     )
 
     return transformed_points, observer_point
