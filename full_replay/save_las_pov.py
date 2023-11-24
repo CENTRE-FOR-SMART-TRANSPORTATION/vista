@@ -266,11 +266,11 @@ def render_sensor_fov(
 
         set_visualizer_pov(VIEW)
 
-        # # Then update the visualizer
-        # if frame == 0+offset:
-        #     vis.add_geometry(geometry, reset_bounding_box=False)
-        # else:
-        #     vis.update_geometry(geometry)
+        # Then update the visualizer
+        if frame == 0+offset:
+            vis.add_geometry(geometry, reset_bounding_box=False)
+        else:
+            vis.update_geometry(geometry)
 
         vis.update_geometry(road)
         vis.poll_events()
