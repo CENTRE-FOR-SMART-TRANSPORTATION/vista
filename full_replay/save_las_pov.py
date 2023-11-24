@@ -245,8 +245,8 @@ def render_sensor_fov(
     # Initalize geometries
     vis.add_geometry(road)
 
-    geometry = o3d.geometry.PointCloud()
-    vis.add_geometry(geometry)
+    # geometry = o3d.geometry.PointCloud()
+    # vis.add_geometry(geometry)
 
     vis.poll_events()
     vis.update_renderer()
@@ -260,17 +260,17 @@ def render_sensor_fov(
 
     for frame in range(0+offset, num_points-offset):
         # Get sensor FOV
-        aligned_car_points = align_car_points(car_points, traj, frame)
-        geometry.points = o3d.utility.Vector3dVector(aligned_car_points[0]) 
-        geometry.colors = o3d.utility.Vector3dVector(np.ones((aligned_car_points[0].shape[0], 3), dtype=np.float64))
+        # aligned_car_points = align_car_points(car_points, traj, frame)
+        # geometry.points = o3d.utility.Vector3dVector(aligned_car_points[0]) 
+        # geometry.colors = o3d.utility.Vector3dVector(np.ones((aligned_car_points[0].shape[0], 3), dtype=np.float64))
 
         set_visualizer_pov(VIEW)
 
-        # Then update the visualizer
-        if frame == 0+offset:
-            vis.add_geometry(geometry, reset_bounding_box=False)
-        else:
-            vis.update_geometry(geometry)
+        # # Then update the visualizer
+        # if frame == 0+offset:
+        #     vis.add_geometry(geometry, reset_bounding_box=False)
+        # else:
+        #     vis.update_geometry(geometry)
 
         vis.update_geometry(road)
         vis.poll_events()
