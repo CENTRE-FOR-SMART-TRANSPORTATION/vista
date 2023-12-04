@@ -405,7 +405,7 @@ def main():
     road_o3d, src_name = utils.las2o3d_pcd(road)
 
     global HEIGHT
-    HEIGHT = max(traj.getObserverPoints()[:,2]*SCALE) + 10
+    HEIGHT = max(traj.getObserverPoints()[:,2]*SCALE) + 1.8
     render_sensor_fov(cfg=cfg,
                       traj=traj,
                       road=road_o3d,
