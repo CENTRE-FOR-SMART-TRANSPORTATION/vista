@@ -376,6 +376,15 @@ def main():
     traj = file_tools.obtain_trajectory_details(args)
     cfg = sensorpoints.open_sensor_config_file(args)
     road = file_tools.open_las(args)
+
+    global ZOOM, VIEW, FRONT_X, FRONT_Y, FRONT_Z
+    ZOOM = args.zoom if args.zoom is not None else ZOOM
+    VIEW = args.view if args.view is not None else VIEW
+    FRONT_X = args.x if args.x is not None else FRONT_X
+    FRONT_Y = args.y if args.y is not None else FRONT_Y
+    FRONT_Z = args.z if args.z is not None else FRONT_Z
+    SCALE = args.scale if args.scale is not None else SCALE
+    
     if VERTICAL:
         road.setZ(road.getZ()*SCALE)
 
@@ -390,13 +399,6 @@ def main():
 
     road_o3d, src_name = utils.las2o3d_pcd(road)
 
-    global ZOOM, VIEW, FRONT_X, FRONT_Y, FRONT_Z
-    ZOOM = args.zoom if args.zoom is not None else ZOOM
-    VIEW = args.view if args.view is not None else VIEW
-    FRONT_X = args.x if args.x is not None else FRONT_X
-    FRONT_Y = args.y if args.y is not None else FRONT_Y
-    FRONT_Z = args.z if args.z is not None else FRONT_Z
-    SCALE = args.scale if args.scale is not None else SCALE
 
     render_sensor_fov(cfg=cfg,
                       traj=traj,
