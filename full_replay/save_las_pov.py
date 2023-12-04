@@ -172,6 +172,10 @@ def render_sensor_fov(
             x3, y3, z3 = traj.getObserverPoints()[frame, :]
             z1 = 0
 
+            if VERTICAL:
+                z1 *= SCALE
+                z2 *= SCALE
+                z3 *= SCALE
             ctr.set_front([-1*x1, -1*y1, z1])
             ctr.set_up([x2, y2, z2])
             ctr.set_lookat([x3, y3, z3+1.8])
@@ -384,7 +388,7 @@ def main():
     FRONT_Y = args.y if args.y is not None else FRONT_Y
     FRONT_Z = args.z if args.z is not None else FRONT_Z
     SCALE = args.scale if args.scale is not None else SCALE
-    
+
     if VERTICAL:
         road.setZ(road.getZ()*SCALE)
 
