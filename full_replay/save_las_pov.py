@@ -30,6 +30,7 @@ FRONT_X = -1
 FRONT_Y = 0
 FRONT_Z = 1
 OBJECT = True
+VERTICAL = TRUE
 
 
 def align_car_points(car_points, trajectory, observer_point):
@@ -371,6 +372,8 @@ def main():
     traj = file_tools.obtain_trajectory_details(args)
     cfg = sensorpoints.open_sensor_config_file(args)
     road = file_tools.open_las(args)
+    if VERTICAL:
+        road.setZ(road.getZ()*100)
 
     sensor_images_path = os.path.join(os.getcwd(), "las_pov/")
     if os.path.exists(sensor_images_path):
