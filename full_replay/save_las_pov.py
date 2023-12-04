@@ -176,10 +176,9 @@ def render_sensor_fov(
             if VERTICAL:
                 z1 *= SCALE
                 z2 *= SCALE
-                z3 *= SCALE
             ctr.set_front([-1*x1, -1*y1, z1])
             ctr.set_up([x2, y2, z2])
-            ctr.set_lookat([x3, y3, HEIGHT])
+            ctr.set_lookat([x3, y3, z3+1.8])
             ctr.set_zoom(ZOOM)
         elif mode == "isometric":
             x1, y1, z1 = traj.getForwards()[frame, :]
@@ -406,6 +405,9 @@ def main():
 
     global HEIGHT
     HEIGHT = max(traj.getObserverPoints()[:,2]*SCALE) + 1.8
+    cur = traj.getObserverPoints()
+    cur[:,3] *= SCALE
+    traj.setObserverPoints(cur)
     render_sensor_fov(cfg=cfg,
                       traj=traj,
                       road=road_o3d,
