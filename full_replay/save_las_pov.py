@@ -372,8 +372,8 @@ def main():
     traj = file_tools.obtain_trajectory_details(args)
     cfg = sensorpoints.open_sensor_config_file(args)
     road = file_tools.open_las(args)
-    if VERTICAL:
-        road.setZ(road.getZ()*100)
+    # if VERTICAL:
+    #     road.setZ(road.getZ()*100)
 
     sensor_images_path = os.path.join(os.getcwd(), "las_pov/")
     if os.path.exists(sensor_images_path):
