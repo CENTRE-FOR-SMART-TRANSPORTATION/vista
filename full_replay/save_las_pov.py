@@ -29,6 +29,7 @@ VIEW = "isometric-constant"
 FRONT_X = -1
 FRONT_Y = 0
 FRONT_Z = 1
+SCALE = 1
 OBJECT = False
 VERTICAL = True
 
@@ -355,6 +356,9 @@ def main():
         parser.add_argument("--zoom", type=float, default=0.3,
                             help="Zoom level of sensor fov")
 
+        parser.add_argument("--scale", type=float, default=0.3,
+                            help="scale of z points")
+
         parser.add_argument("--view", type=str, default="isometric",
                             help="Option for the view of the points", choices=["front", "isometric", "isometric-constant"])
 
@@ -373,7 +377,7 @@ def main():
     cfg = sensorpoints.open_sensor_config_file(args)
     road = file_tools.open_las(args)
     if VERTICAL:
-        road.setZ(road.getZ()*1)
+        road.setZ(road.getZ()*SCALE)
 
     sensor_images_path = os.path.join(os.getcwd(), "las_pov/")
     if os.path.exists(sensor_images_path):
@@ -392,6 +396,7 @@ def main():
     FRONT_X = args.x if args.x is not None else FRONT_X
     FRONT_Y = args.y if args.y is not None else FRONT_Y
     FRONT_Z = args.z if args.z is not None else FRONT_Z
+    SCALE = args.scale if args.scale is not None else SCALE
 
     render_sensor_fov(cfg=cfg,
                       traj=traj,
