@@ -373,7 +373,7 @@ def main():
     cfg = sensorpoints.open_sensor_config_file(args)
     road = file_tools.open_las(args)
     if VERTICAL:
-        road.setZ(road.getZ()*2)
+        road.setZ(road.getZ()*1)
 
     sensor_images_path = os.path.join(os.getcwd(), "las_pov/")
     if os.path.exists(sensor_images_path):
