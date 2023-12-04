@@ -30,7 +30,7 @@ FRONT_X = -1
 FRONT_Y = 0
 FRONT_Z = 1
 OBJECT = True
-VERTICAL = TRUE
+VERTICAL = True
 
 
 def align_car_points(car_points, trajectory, observer_point):
