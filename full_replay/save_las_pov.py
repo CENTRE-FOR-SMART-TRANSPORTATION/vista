@@ -406,7 +406,7 @@ def main():
     global HEIGHT
     HEIGHT = max(traj.getObserverPoints()[:,2]*SCALE) + 1.8
     cur = traj.getObserverPoints()
-    cur[:,3] *= SCALE
+    cur[:,2] *= SCALE
     traj.setObserverPoints(cur)
     render_sensor_fov(cfg=cfg,
                       traj=traj,
