@@ -32,6 +32,7 @@ FRONT_Z = 1
 SCALE = 1
 OBJECT = False
 VERTICAL = True
+HEIGHT = 0
 
 
 def align_car_points(car_points, trajectory, observer_point):
@@ -162,7 +163,7 @@ def render_sensor_fov(
     screen_height: int,
     offset: int
 ) -> None:
-    global VIEW, ZOOM
+    global VIEW, ZOOM, HEIGHT, VERTICAL
 
     # Helper function to set the visualizer POV
     def set_visualizer_pov(mode: str) -> None:
@@ -178,7 +179,7 @@ def render_sensor_fov(
                 z3 *= SCALE
             ctr.set_front([-1*x1, -1*y1, z1])
             ctr.set_up([x2, y2, z2])
-            ctr.set_lookat([x3, y3, z3+(1.8*SCALE)+z3/15])
+            ctr.set_lookat([x3, y3, HEIGHT])
             ctr.set_zoom(ZOOM)
         elif mode == "isometric":
             x1, y1, z1 = traj.getForwards()[frame, :]
@@ -403,7 +404,8 @@ def main():
 
     road_o3d, src_name = utils.las2o3d_pcd(road)
 
-
+    global HEIGHT
+    HEIGHT = max(traj.getObserverPoints()[:,2]*SCALE) + 10
     render_sensor_fov(cfg=cfg,
                       traj=traj,
                       road=road_o3d,
