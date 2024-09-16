@@ -1,6 +1,6 @@
 opencv-python
 ffio
-shapely
+shapely==1.7
 descartes
 matplotlib
 pyrender
